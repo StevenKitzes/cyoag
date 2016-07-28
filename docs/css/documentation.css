@@ -1,0 +1,113 @@
+/* General styles applicable to any documentation files */
+
+body {
+  background: aliceblue;
+  font-family: sans-serif;
+}
+
+.center {
+  text-align: center;
+}
+.bold {
+  font-weight: 800;
+}
+
+.no-gaps {
+  border: 0;
+  margin: 0;
+  padding: 0;
+}
+
+.title {
+  font-size: 4em;
+  font-weight: 300;
+}
+
+table {
+  border-style: solid;
+  border-width: 1px;
+  border-color: black;
+  border-radius: 5px;
+}
+td {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+}
+
+/*
+ * Give cells in odd numbered table rows
+ * alternating light and dark blue BG color,
+ * and cells in even numbered rows alternating
+ * light and dark green BG color
+ */
+tr:nth-child(odd) td:nth-child(odd) {
+	background: #ddf;
+}
+tr:nth-child(odd) td:nth-child(even) {
+	background: #ccf;
+}
+tr:nth-child(even) td:nth-child(odd) {
+	background: #dfd;
+}
+tr:nth-child(even) td:nth-child(even) {
+	background: #cfc;
+}
+
+/*
+ * Notes are light gray, and can include links
+ * that are formatted to match the surrouding
+ * text, except with the customary underlining
+ * intact.
+ */
+.note {
+  font-size: 0.8em;
+  font-style: italic;
+  color: #888;
+}
+
+/* Links share colors with Notes except when hovered */
+a:link, a:visited, a:active {
+  color: #888;
+}
+a:hover {
+  color: #555;
+}
+
+/*
+ * Auto-numbering for nested lists up to 3 deep,
+ * the first outer list starting at 0 (meant for Toc)
+ * and nested lists starting at 1.  Use <h2> tags to
+ * indicate the main text of a given <li>.
+ */
+ol {
+  counter-reset: section -1;
+  list-style-type: none;
+}
+ol ol {
+  counter-reset: section 0;
+  list-style-type: none;
+}
+li.header, li.subheader, li.subsubheader {
+  display: block;
+}
+ol>li.header>h2:before, ol>li.subheader>h2:before, ol>li.subsubheader>h2:before {
+  counter-increment: section;
+  content: counters(section,".") ". ";
+}
+ol>li>h2 {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+.header>h2 {
+  font-size: 2.5em;
+  color: #0000AA;
+}
+.subheader>h2 {
+  font-size: 2em;
+  color: #6666CC;
+}
+.subsubheader>h2 {
+  font-size: 1.5em;
+  color: #7777FF;
+}
+/* End nested auto-counting lists */
