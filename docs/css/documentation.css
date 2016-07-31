@@ -1,8 +1,121 @@
 /* General styles applicable to any documentation files */
 
+/* Color Palette
+ * darker
+ * 4d2b00 15% darkest
+ * 804800 25% darker
+ * aa5500 33% dark
+ * cc6611 43% medium dark
+ * dc7200 43% medium light
+ * e58100 45% light
+ * ffcf90 78% lighter
+ * fff4e6 90% lightest
+ * lighter
+ */
+
+/* Colored text */
+.darkest-text {
+  color: #4d2b00;
+}
+.darker-text {
+  color: #804800;
+}
+.dark-text {
+  color: #aa5500;
+}
+.medium-dark-text {
+  color: #cc6611;
+}
+.medium-light-text {
+  color: #dc7200;
+}
+.light-text {
+  color: #e58100;
+}
+.lighter-text {
+  color: #ffcf90;
+}
+.lightest-text {
+  color: #fff4e6;
+}
+
+/* Colored background */
+.darkest-bg {
+  background: #4d2b00;
+}
+.darker-bg {
+  background: #804800;
+}
+.dark-bg {
+  background: #aa5500;
+}
+.medium-dark-bg {
+  background: #cc6611;
+}
+.medium-light-bg {
+  background: #dc7200;
+}
+.light-bg {
+  background: #e58100;
+}
+.lighter-bg {
+  background: #ffcf90;
+}
+.lightest-bg {
+  background: #fff4e6;
+}
+
+/* Colored border */
+.darkest-border {
+  border: solid #4d2b00 1px;
+}
+.darker-border {
+  border: solid #804800 1px;
+}
+.dark-border {
+  border: solid #aa5500 1px;
+}
+.medium-dark-border {
+  border: solid #cc6611 1px;
+}
+.medium-light-border {
+  border: solid #dc7200 1px;
+}
+.light-border {
+  border: solid #e58100 1px;
+}
+.lighter-border {
+  border: solid #ffcf90 1px;
+}
+.lightest-border {
+  border: solid #fff4e6 1px;
+}
+
+/* Rounded borders */
+.light-rounding {
+  border-radius: .2em;
+}
+.medium-rounding {
+  border-radius: .5em;
+}
+.heavy-rounding {
+  border-radius: 1em;
+}
+
+
 body {
-  background: aliceblue;
+  background: #fff4e6;
   font-family: sans-serif;
+  color: #4d2b00;
+}
+table {
+  color: black;
+}
+td {
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.2em;
+  border-radius: .2em;
 }
 
 .center {
@@ -23,17 +136,6 @@ body {
   font-weight: 300;
 }
 
-table {
-  border-style: solid;
-  border-width: 1px;
-  border-color: black;
-  border-radius: 5px;
-}
-td {
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-}
-
 /*
  * Give cells in odd numbered table rows
  * alternating light and dark blue BG color,
@@ -41,16 +143,16 @@ td {
  * light and dark green BG color
  */
 tr:nth-child(odd) td:nth-child(odd) {
-	background: #ddf;
+	background: #ffcf90;
 }
 tr:nth-child(odd) td:nth-child(even) {
-	background: #ccf;
+	background: #ffbd66;
 }
 tr:nth-child(even) td:nth-child(odd) {
-	background: #dfd;
+	background: #eecca0;
 }
 tr:nth-child(even) td:nth-child(even) {
-	background: #cfc;
+	background: #e8ba7d;
 }
 
 /*
@@ -62,15 +164,46 @@ tr:nth-child(even) td:nth-child(even) {
 .note {
   font-size: 0.8em;
   font-style: italic;
-  color: #888;
+  color: #804800;
+}
+
+/*
+ * Code snippets show line numbers for reference and
+ * display text in monospace font for easy reading.
+ * Best replaced with Gist or other syntax-highlighted
+ * formatting helper for larger snippets.
+ */
+ol.snippet {
+ counter-reset: line 0;
+ font-family:courier,monospace;
+ list-style-type: none;
+ margin-left: 0px;
+ padding-left: 0px;
+}
+ol.snippet li {
+ display: block;
+ margin-bottom: .5em;
+ margin-left: 3em;
+ padding-left: .5em;
+ border-left: solid gray 1px;
+}
+ol.snippet li:nth-of-type(even) {
+ background: #F8F8F8;
+}
+ol.snippet li:before {
+ display: inline-block;
+ counter-increment: line;
+ content: counter(line) " ";
+ margin-left: -3em;
+ width: 3em;
 }
 
 /* Links share colors with Notes except when hovered */
 a:link, a:visited, a:active {
-  color: #888;
+  color: #804800;
 }
 a:hover {
-  color: #555;
+  color: #aa5500;
 }
 
 /*
@@ -100,14 +233,14 @@ ol>li>h2 {
 }
 .header>h2 {
   font-size: 2.5em;
-  color: #0000AA;
+  color: #aa5500;
 }
 .subheader>h2 {
   font-size: 2em;
-  color: #6666CC;
+  color: #cc6611;
 }
 .subsubheader>h2 {
   font-size: 1.5em;
-  color: #7777FF;
+  color: #dc7200;
 }
 /* End nested auto-counting lists */
