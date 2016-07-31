@@ -3,6 +3,8 @@
 		<title>Functional Requirements</title>
 		<link rel="stylesheet" type="text/css" href="css/functional-requirements.css">
 		<link rel="stylesheet" type="text/css" href="css/documentation.css">
+		<script type='text/javascript' src='js/jquery-3.1.0.min.js'></script>
+		<script type='text/javascript' src='js/functional-requirements.js'></script>
 	</head>
 	<body>
 		<span class='center'>
@@ -44,51 +46,59 @@
 				<hr>
 				<a name='2'></a>
 				<h2>Document Iterations</h2>
-				<p>Changes made to this document are as follows:</p>
-				<table id='iterations' class='dark-border light-rounding'>
-					<tr>
-						<td class='bold'>Author</td>
-						<td class='bold'>Date</td>
-						<td class='bold'>Version</td>
-						<td class='bold'>Changes</td>
-					</tr>
-					<tr>
-						<td>Steven Kitzes</td>
-						<td>2016.07.24</td>
-						<td>0.1.2</td>
-						<td>First documented update; includes Document iteration main section; new Definitions entries for downvote, moderator, RDBMS, UID, upvote, and votification; new Basic Feature Family entry for Moderator intervention; new Explicit Restriction entry for Path snippet content; new main section for Detailed Votification Rules; and content for the Architecture and Technology Stack, and Data Model main sections.</td>
-					</tr>
-					<tr>
-						<td>Steven Kitzes</td>
-						<td>2016.07.24</td>
-						<td>0.2.0</td>
-						<td>Migrating to HTML since my MS Office license was revoked and I'm bitter about it, and HTML is a better format for versioning anyway.  Detailed Votification Rules main section fleshed out.  Stretch Goals main section added.</td>
-					</tr>
-					<tr>
-						<td>Steven Kitzes</td>
-						<td>2016.07.27</td>
-						<td>0.2.1</td>
-						<td>Beginning HTML refactor; no content change, just separating CSS to dedicated file, and beginning effort to improve HTML-correctness.</td>
-					</tr>
-					<tr>
-						<td>Steven Kitzes</td>
-						<td>2016.07.28</td>
-						<td>1.0.0</td>
-						<td>First draft, design complete until development, consultation, and discovery necessitate changes.  Separated CSS into two files, one for general documentation use, the other one specific to our functional-requirements.html file.  Refactored HTML and CSS for much cleaner, safer, maintainable, expandable project.</td>
-					</tr>
-					<tr>
-						<td>Steven Kitzes</td>
-						<td>2016.07.30</td>
-						<td>1.0.1</td>
-						<td>Colors and styling updated, no content updates or additions.</td>
-					</tr>
-					<tr>
-						<td>Steven Kitzes</td>
-						<td>2016.07.31</td>
-						<td>1.0.2</td>
-						<td>Removed a link that had been included for testing.</td>
-					</tr>
-				</table>
+				<p>Changes made to this document are as follows (<a id='iterations-expander' class='note' href='#2'>click to expand/collapse</a>):</p>
+				<div id='iterations-container'>
+					<table id='iterations' class='dark-border light-rounding'>
+						<tr>
+							<td class='bold'>Author</td>
+							<td class='bold'>Date</td>
+							<td class='bold'>Version</td>
+							<td class='bold'>Changes</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.31</td>
+							<td>1.0.3</td>
+							<td>Made iterations and definitions tables collapsible to reduce clutter.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.31</td>
+							<td>1.0.2</td>
+							<td>Removed a link that had been included for testing.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.30</td>
+							<td>1.0.1</td>
+							<td>Colors and styling updated, no content updates or additions.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.28</td>
+							<td>1.0.0</td>
+							<td>First draft, design complete until development, consultation, and discovery necessitate changes.  Separated CSS into two files, one for general documentation use, the other one specific to our functional-requirements.html file.  Refactored HTML and CSS for much cleaner, safer, maintainable, expandable project.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.27</td>
+							<td>0.2.1</td>
+							<td>Beginning HTML refactor; no content change, just separating CSS to dedicated file, and beginning effort to improve HTML-correctness.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.24</td>
+							<td>0.2.0</td>
+							<td>Migrating to HTML since my MS Office license was revoked and I'm bitter about it, and HTML is a better format for versioning anyway.  Detailed Votification Rules main section fleshed out.  Stretch Goals main section added.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.24</td>
+							<td>0.1.2</td>
+							<td>First documented update; includes Document iteration main section; new Definitions entries for downvote, moderator, RDBMS, UID, upvote, and votification; new Basic Feature Family entry for Moderator intervention; new Explicit Restriction entry for Path snippet content; new main section for Detailed Votification Rules; and content for the Architecture and Technology Stack, and Data Model main sections.</td>
+						</tr>
+					</table>
+				</div>
 				<p class='note'><a href='#0'>back to top</a></p>
 			</li>
 
@@ -96,90 +106,92 @@
 				<hr>
 				<a name='3'></a>
 				<h2>Definitions</h2>
-				<p>The following terms used throughout this document warrant further explanation:</p>
-				<table id='definitions' class='dark-border light-rounding'>
-					<tr>
-						<td class='bold'>Term</td>
-						<td class='bold'>Definition</td>
-					</tr>
-					<tr>
-						<td>account</td>
-						<td>Unless otherwise specified, a CYOAG account. Not to be confused with a linked social media account, which in this document shall be referred to as such to prevent confusion.</td>
-					</tr>
-					<tr>
-						<td>AMI</td>
-						<td>Amazon Machine Image - a virtual machine image provided by Amazon AWS for hosting web services.</td>
-					</tr>
-					<tr>
-						<td>child</td>
-						<td>Any node, reachable via a path, that follows immediately after the current node.</td>
-					</tr>
-					<tr>
-						<td>CYOAG</td>
-						<td>Create Your Own Adventure Game - the name of this web application.</td>
-					</tr>
-					<tr>
-						<td>downvote</td>
-						<td>A vote by a user against a specific node, indicating negative sentiment.</td>
-					</tr>
-					<tr>
-						<td>moderator</td>
-						<td>A user with a CYOAG 
-						linked to a social media account, and who has special privileges granted for purposes of editing or removing content that violates site usage guidelines (e.g. a story snippet containing spam, or other abusive site usage).</td>
-					</tr>
-					<tr>
-						<td>node</td>
-						<td>A collection of all data representing a particular point in the story. This includes snippet and ID data for the current part of the story, the current node's parent, and zero or more paths.</td>
-					</tr>
-					<tr>
-						<td>node ID</td>
-						<td>The UID of the current node.</td>
-					</tr>
-					<tr>
-						<td>node snippet</td>
-						<td>The main story content (prose) at the current node.</td>
-					</tr>
-					<tr>
-						<td>parent</td>
-						<td>The node immediately preceding the current node; in other words, the current node is reachable via a path from the parent.</td>
-					</tr>
-					<tr>
-						<td>path</td>
-						<td>One option (usually of several) for story progression, leading away from the current node toward another, subsequent node.</td>
-					</tr>
-					<tr>
-						<td>path snippet</td>
-						<td>A short piece of text describing one of a reader's potential choices for progressing the story past the current node. Note that a given node's path snippet is displayed with that node's parent, to provide an option for progression that leads from said parent to the current node.</td>
-					</tr>
-					<tr>
-						<td>RDBMS</td>
-						<td>Relational database management system - a technology for defining and constructing a database, and maintaining data therein; e.g. MySQL.</td>
-					</tr>
-					<tr>
-						<td>root node</td>
-						<td>The very first node of the story, provided free of charge by Steven Kitzes, from which all paths and subsequent nodes follow.</td>
-					</tr>
-					<tr>
-						<td>trajectory</td>
-						<td>A complete series of paths leading from the root node all the way to the current node.</td>
-					</tr>
-					<tr>
-						<td>UID</td>
-						<td>Unique identifier - a randomly generated string with astronomically small odds of a collision.</td>
-					</tr>
-					<tr>
-						<td>upvote</td>
-						<td>A vote by a user in favor of a specific node, indicating positive sentiment.</td>
-					</tr>
-					<tr>
-						<td>user ID</td>
-						<td>A user's UID.</td>
-					</tr>
-					<tr>
-						<td>votify, votified, votification</td>
-						<td>A promoted node state that ensures the path to said node will be visible as a primary choice from that node's parent; this promotion occurs when user votes raise a node's vote count higher than its siblings, and can be a default state in the case that a node has few or no siblings.</td>
-					</tr>
-				</table>
+				<p>The following terms used throughout this document warrant further explanation (<a id='definitions-expander' class='note' href='#3'>click to expand/collapse</a>):</p>
+				<div id='definitions-container'>
+					<table id='definitions' class='dark-border light-rounding'>
+						<tr>
+							<td class='bold'>Term</td>
+							<td class='bold'>Definition</td>
+						</tr>
+						<tr>
+							<td>account</td>
+							<td>Unless otherwise specified, a CYOAG account. Not to be confused with a linked social media account, which in this document shall be referred to as such to prevent confusion.</td>
+						</tr>
+						<tr>
+							<td>AMI</td>
+							<td>Amazon Machine Image - a virtual machine image provided by Amazon AWS for hosting web services.</td>
+						</tr>
+						<tr>
+							<td>child</td>
+							<td>Any node, reachable via a path, that follows immediately after the current node.</td>
+						</tr>
+						<tr>
+							<td>CYOAG</td>
+							<td>Create Your Own Adventure Game - the name of this web application.</td>
+						</tr>
+						<tr>
+							<td>downvote</td>
+							<td>A vote by a user against a specific node, indicating negative sentiment.</td>
+						</tr>
+						<tr>
+							<td>moderator</td>
+							<td>A user with a CYOAG
+							linked to a social media account, and who has special privileges granted for purposes of editing or removing content that violates site usage guidelines (e.g. a story snippet containing spam, or other abusive site usage).</td>
+						</tr>
+						<tr>
+							<td>node</td>
+							<td>A collection of all data representing a particular point in the story. This includes snippet and ID data for the current part of the story, the current node's parent, and zero or more paths.</td>
+						</tr>
+						<tr>
+							<td>node ID</td>
+							<td>The UID of the current node.</td>
+						</tr>
+						<tr>
+							<td>node snippet</td>
+							<td>The main story content (prose) at the current node.</td>
+						</tr>
+						<tr>
+							<td>parent</td>
+							<td>The node immediately preceding the current node; in other words, the current node is reachable via a path from the parent.</td>
+						</tr>
+						<tr>
+							<td>path</td>
+							<td>One option (usually of several) for story progression, leading away from the current node toward another, subsequent node.</td>
+						</tr>
+						<tr>
+							<td>path snippet</td>
+							<td>A short piece of text describing one of a reader's potential choices for progressing the story past the current node. Note that a given node's path snippet is displayed with that node's parent, to provide an option for progression that leads from said parent to the current node.</td>
+						</tr>
+						<tr>
+							<td>RDBMS</td>
+							<td>Relational database management system - a technology for defining and constructing a database, and maintaining data therein; e.g. MySQL.</td>
+						</tr>
+						<tr>
+							<td>root node</td>
+							<td>The very first node of the story, provided free of charge by Steven Kitzes, from which all paths and subsequent nodes follow.</td>
+						</tr>
+						<tr>
+							<td>trajectory</td>
+							<td>A complete series of paths leading from the root node all the way to the current node.</td>
+						</tr>
+						<tr>
+							<td>UID</td>
+							<td>Unique identifier - a randomly generated string with astronomically small odds of a collision.</td>
+						</tr>
+						<tr>
+							<td>upvote</td>
+							<td>A vote by a user in favor of a specific node, indicating positive sentiment.</td>
+						</tr>
+						<tr>
+							<td>user ID</td>
+							<td>A user's UID.</td>
+						</tr>
+						<tr>
+							<td>votify, votified, votification</td>
+							<td>A promoted node state that ensures the path to said node will be visible as a primary choice from that node's parent; this promotion occurs when user votes raise a node's vote count higher than its siblings, and can be a default state in the case that a node has few or no siblings.</td>
+						</tr>
+					</table>
+				</div>
 				<p class='note'><a href='#0'>back to top</a></p>
 			</li>
 
