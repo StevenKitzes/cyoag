@@ -58,6 +58,12 @@
 						<tr>
 							<td>Steven Kitzes</td>
 							<td>2016.07.31</td>
+							<td>1.1.0</td>
+							<td>Added details to user account under basic feature families.  Added user stories and made it collapsable due to its size.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.31</td>
 							<td>1.0.3</td>
 							<td>Made iterations and definitions tables collapsible to reduce clutter.</td>
 						</tr>
@@ -118,6 +124,10 @@
 							<td>Unless otherwise specified, a CYOAG account. Not to be confused with a linked social media account, which in this document shall be referred to as such to prevent confusion.</td>
 						</tr>
 						<tr>
+							<td>accounted user</td>
+							<td>A user with an account registered and linked to social media on CYOAG.  Typically, it is implied that this user is logged in when referred to in this document unless otherwise specified.</td>
+						</tr>
+						<tr>
 							<td>AMI</td>
 							<td>Amazon Machine Image - a virtual machine image provided by Amazon AWS for hosting web services.</td>
 						</tr>
@@ -171,12 +181,20 @@
 							<td>The very first node of the story, provided free of charge by Steven Kitzes, from which all paths and subsequent nodes follow.</td>
 						</tr>
 						<tr>
+							<td>terminal [node]</td>
+							<td>Any node with no paths yet defined leading out from it.  A node that terminates a story trajectory.</td>
+						</tr>
+						<tr>
 							<td>trajectory</td>
 							<td>A complete series of paths leading from the root node all the way to the current node.</td>
 						</tr>
 						<tr>
 							<td>UID</td>
 							<td>Unique identifier - a randomly generated string with astronomically small odds of a collision.</td>
+						</tr>
+						<tr>
+							<td>unaccounted user</td>
+							<td>A user with no registered account on CYOAG, <i>or</i> an accounted user or moderator who is not currently logged in.</td>
 						</tr>
 						<tr>
 							<td>upvote</td>
@@ -189,6 +207,10 @@
 						<tr>
 							<td>votify, votified, votification</td>
 							<td>A promoted node state that ensures the path to said node will be visible as a primary choice from that node's parent; this promotion occurs when user votes raise a node's vote count higher than its siblings, and can be a default state in the case that a node has few or no siblings.</td>
+						</tr>
+						<tr>
+							<td>welcome page</td>
+							<td>The first page displayed to any user when visiting the CYOAG site if cookies are not enabled, if the user is not logged in, or if the user is starting from scratch with a new trajectory.</td>
 						</tr>
 					</table>
 				</div>
@@ -207,7 +229,7 @@
 					</li>
 					<li class='subheader'>
 						<h2>User accounts</h2>
-						<p><strong>Any user</strong> shall be able to create and log into a CYOAG account by associating a social media account.</p>
+						<p><strong>Any user</strong> shall be able to create and log into a CYOAG account by associating a social media account, and shall be able to "delete" their account (dissociate social media accounts from CYOAG).  Posts under that account shall thenceforth be permanent, only able to be deleted by a moderator.</p>
 					</li>
 					<li class='subheader'>
 						<h2>Continuation</h2>
@@ -233,7 +255,71 @@
 				<hr>
 				<a name='5'></a>
 				<h2>User Stories</h2>
-				<p>The following specific use cases elaborate and expand on the Basic Feature Families described above.</p>
+				<p>The following specific use cases elaborate and expand on the Basic Feature Families described above (<a id='user-stories-expander' class='note' href='#5'>click to expand/collapse</a>):</p>
+				<div id='user-stories-container'>
+					<ol>
+						<li class='subheader'>
+							<h2>Read the story</h2>
+							<p>The following user stories relate to the basic feature family of viewing content on CYOAG.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, read the story.</h2>
+									<p>An unaccounted user shall be able to recursively read the node snippet at the current node, and see and select from votified path snippets at that node.  Upon initial page load, unaccounted users shall be shown the welcome page, except as specified below under the Continuation feature family.  Unaccounted users shall be able to follow an entire story trajectory from the welcome page through any terminal node.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user or moderator, read the story.</h2>
+									<p>Accounted users and moderators shall be able to recursively read the node snippet at the current node, and see and select from votified path snippets at that node.  Accounted users and moderators shall have the option to expand, view, and select from a list of non-votified paths if desired.  Upon initial page load, accounted users and moderators shall be shown the welcome page, except as specified below under the Continuation feature family.  Accounted users and moderators shall be able to follow an entire story trajectory from the welcome page through any terminal node, including any trajectory that includes non-votified paths.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As any type of user, scrap the current trajectory and start over.</h2>
+									<p>Any user shall have the option to return to the welcome page to start a new trajectory.  In this case, any information linking the user's session and/or account to a stored node for continuation shall be reset as well, so the user shall be notified of this danger and given a chance to confirm before proceeding.</p>
+								</li>
+							</ol>
+						</li>
+						<li class='subheader'>
+							<h2>User accounts</h2>
+							<p>The following user stories relate to user account management.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, be invited to create an account.</h2>
+									<p>When any user visits any CYOAG page unaccounted, all features reliant upon user account association shall display instead as an invitation to either log in or create an account.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, log into any CYOAG account from any CYOAG page.</h2>
+									<p>When any user visits any CYOAG page unaccounted, user interface elements shall be presented to allow that user to log in.  Once credentials have been validated, the user shall be presented either with negative feedback, or with a page update showing all features available as appropriate for that user's account type (i.e. accounted user or moderator).</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, create an account.</h2>
+									<p>What an unaccounted user visits any CYOAG page, user interface elements shall be presented to allow that user to create an account by logging in through social media.  These elements shall follow alongside the login UI elements, and shall include Facebook, Twitter, and Google+.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a moderator, suspend an account.</h2>
+									<p>A moderator, and <i>only</i> a moderator, shall be able to see a node's author displayed with that node's snippet.  The moderator shall have the option on that snippet to suspend the snippet's author, causing an email to be sent to that author explaining why the user was suspended.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a moderator, terminate/ban an account.</h2>
+									<p>A moderator, and <i>only</i> a moderator, shall be able to see a node's author displayed with that node's snippet.  The moderator shall have the option on that snippet to terminate/ban the snippet's author, causing an email to be sent to that author explaining why the user's account was terminated.  Each node generated by the terminated account shall be deleted if that node has no children.</p>
+								</li>
+							</ol>
+						</li>
+						<li class='subheader'>
+							<h2>Continuation</h2>
+							<p><strong>Any user</strong> with cookies enabled shall be able to pick up where the story left off if they stop reading in the middle of a trajectory.</p>
+						</li>
+						<li class='subheader'>
+							<h2>Contribution</h2>
+							<p><strong>Any user</strong> who is logged in shall be able to create new paths, leading to new story nodes from existing nodes.</p>
+						</li>
+						<li class='subheader'>
+							<h2>Votification</h2>
+							<p><strong>Any user</strong> who is logged in shall be able to apply positive or negative reversible sentiment to any node to which they have navigated.</p>
+						</li>
+						<li class='subheader'>
+							<h2>Moderator intervention</h2>
+							<p><strong>A moderator</strong> shall have special privileges granted for the purposes of improving quality (e.g. correcting typos) and enforcing CYOAG rules and guidelines (e.g. removing spam or other abusive content). This includes modifying content posted by users, deleting content, and blocking users from posting new content, but does not include the ability to override content contribution rules (e.g. a moderator may not contribute multiple paths to a node or contribute consecutive nodes).</p>
+						</li>
+					</ol>
+				</div>
 				<p class='note'><a href='#0'>back to top</a></p>
 			</li>
 
@@ -340,7 +426,7 @@
 				<ol>
 					<li class='subheader'>
 						<h2>Table: users</h2>
-						<p>The users table shall contain information defining and pertaining to specific user accounts. Since login duties for CYOAG are designed to be offloaded to third party authentication services such as Facebook and Google+, this table shall contain minimal information, including a unique identifier (UID) linked to an email address provided by the third party authenticator; after which point, all user identification shall be done through the UID and cookies.</p>
+						<p>The users table shall contain information defining and pertaining to specific user accounts. Since login duties for CYOAG are designed to be offloaded to third party authentication services such as Facebook and Twitter, this table shall contain minimal information, including a unique identifier (UID) linked to an email address provided by the third party authenticator; after which point, all user identification shall be done through the UID and cookies.</p>
 					</li>
 					<li class='subheader'>
 						<h2>Table: nodes</h2>
