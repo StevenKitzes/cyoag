@@ -58,6 +58,12 @@
 						<tr>
 							<td>Steven Kitzes</td>
 							<td>2016.07.31</td>
+							<td>1.1.1</td>
+							<td>Added more user stories, particularly to the User Accounts and Continuation sections.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.31</td>
 							<td>1.1.0</td>
 							<td>Added details to user account under basic feature families.  Added user stories and made it collapsable due to its size.</td>
 						</tr>
@@ -125,7 +131,7 @@
 						</tr>
 						<tr>
 							<td>accounted user</td>
-							<td>A user with an account registered and linked to social media on CYOAG.  Typically, it is implied that this user is logged in when referred to in this document unless otherwise specified.</td>
+							<td>A user with an account registered and linked to social media on CYOAG.  Typically, it is implied that this user is logged in when referred to in this document unless otherwise specified.  Note that moderators are counted among accounted users.</td>
 						</tr>
 						<tr>
 							<td>AMI</td>
@@ -146,7 +152,7 @@
 						<tr>
 							<td>moderator</td>
 							<td>A user with a CYOAG
-							linked to a social media account, and who has special privileges granted for purposes of editing or removing content that violates site usage guidelines (e.g. a story snippet containing spam, or other abusive site usage).</td>
+							linked to a social media account, and who has special privileges granted for purposes of editing or removing content that violates site usage guidelines (e.g. a story snippet containing spam, or other abusive site usage).  Note that moderators are counted among accounted users.</td>
 						</tr>
 						<tr>
 							<td>node</td>
@@ -304,7 +310,39 @@
 						</li>
 						<li class='subheader'>
 							<h2>Continuation</h2>
-							<p><strong>Any user</strong> with cookies enabled shall be able to pick up where the story left off if they stop reading in the middle of a trajectory.</p>
+							<p>The following user stories describe how CYOAG pages should behave when a user leaves, and later returns.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As a user navigating CYOAG with cookies enabled, my progress shall be tracked.</h2>
+									<p>CYOAG pages shall track user progress through story trajectories using cookies.  If a user is logged in via social media, this progress shall be recorded on the CYOAG cloud, as well.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a user returning to CYOAG with cookies disabled, land on welcome page.</h2>
+									<p>If a user navigates CYOAG without cookies enabled, there will be no way to track the user's progress through the story if the user leaves the page.  The user shall be able to follow a trajectory and enjoy the story as far as desired in a single sitting, but if the user leaves the page, progres will not be saved and the user's place will be lost.</p>
+									<p>Incidentally, if cookies are disabled, a user attempting to log in via social media will find that they are unable to remain logged in if they leave the site and return at a later time.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user returning to CYOAG with cookies enabled on the same device, return to last visited node.</h2>
+									<p>If an unaccounted user returns to CYOAG after leaving, with cookies enabled, the cookie shall restore the most recently visited node.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user returning to CYOAG on a different device, land on welcome page.</h2>
+									<p>There is no way to track an unaccounted user across devices, so in this situation the unaccounted user will necessarily be treated as a brand new, unaccounted user.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user, my progress shall be tracked on the cloud.</h2>
+									<p>In addition to story trajectory progress tracking on a given device via cookies, the story trajectory progress of accounted users shall be tracked on the cloud so that accounted users can maintain their position across devices.  This cloud tracking shall always supersede cookie tracking.</p>
+									<p>When logging in via social media, the server shall overwrite any stored progress in cookies with progress associated with that social media account as stored on the cloud.  Every path traversal made by an accounted user that is logged in shall update both the local cookie and the CYOAG server.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user returning to CYOAG on the same device, logged in, with cookies enabled, remain logged in.</h2>
+									<p>Cookies shall help CYOAG to remember that a given social media account was logged in by associating a GUID with that social media account and storing that in a cookie.  CYOAG shall preserve that account's login status until the user logs out or the cookie expires.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user departing CYOAG while logged in, with cookies disabled, I shall be logged out.</h2>
+									<p>There is no way to track login status when a browser is closed without cookies, so in this situation the social media account shall be logged out.</p>
+								</li>
+							</ol>
 						</li>
 						<li class='subheader'>
 							<h2>Contribution</h2>
