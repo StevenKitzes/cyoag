@@ -29,7 +29,6 @@
 					<li><a href='#7'>Detailed Votification Rules</a></li>
 					<li><a href='#8'>Architecture and Technology Stack</a></li>
 					<li><a href='#9'>Data Model</a></li>
-					<li><a href='#10'>Stretch Goals</a></li>
 				</ol><br>
 			</li>
 
@@ -54,6 +53,12 @@
 							<td class='bold'>Date</td>
 							<td class='bold'>Version</td>
 							<td class='bold'>Changes</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.06</td>
+							<td>1.2.3</td>
+							<td>Stretch Goals main section removed, multi-root stretch goal moved to User Stories main section.</td>
 						</tr>
 						<tr>
 							<td>Steven Kitzes</td>
@@ -424,6 +429,10 @@
 									<h2>As a user, I shall be able to see a visualization of my trajectory.</h2>
 									<p>All users shall, from any node, be able to view a visualization of the tree-traversal that led them to the current node.</p>
 								</li>
+								<li class='subsubheader'>
+									<h2>As a user, I shall be able to pick from several root nodes.</h2>
+									<p>Any user visiting CYOAG shall have the option of beginning a trajectory from one of several root nodes, to enjoy stories of diverse tone, direction, setting, etc.  Depending on the balance between user interest and moderator availability, and complexity of implementation, user submissions for new root nodes shall be accepted.</p>
+								</li>
 							</ol>
 						</li>
 					</ol>
@@ -547,20 +556,6 @@
 					<li class='subheader'>
 						<h2>Table: votes</h2>
 						<p>The votes table shall contain data relating user sentiment to the nodes for which that sentiment is expressed. Each row shall contain as a compound primary key a user UID and a node UID, so that each such combination is unique, preventing a user from casting multiple votes on the same node. Each row shall contain as a third datum a flag defining the user's sentiment as positive or negative. This flag can be switched in order to reflect a change in sentiment, or an entire row can be deleted to reflect a user's desire to express no sentiment on a node.</p>
-					</li>
-				</ol>
-				<p class='note'><a href='#0'>back to top</a></p>
-			</li>
-
-			<li class='header'>
-				<hr>
-				<a name='10'></a>
-				<h2>Stretch Goals</h2>
-				<p>All of the essential mission objectives of the CYOAG project have been listed in the above sections of this document.  If all of the above objectives are met, the project will be a great success.  There are some additional objectives, however, that have been identified as nice to have, if they prove feasible to implement.</p>
-				<ol>
-					<li class='subheader'>
-						<h2>Additional root nodes</h2>
-						<p>With a single root node, all trajectories must launch from the same place.  If more root nodes are made available, then there are more opportunities for a variety of trajectories to develop, each with different tone, genre, etc.  Depending on the balance between user interest and moderator availability, it may even be possible to accept user submissions for new root nodes.</p>
 					</li>
 				</ol>
 				<p class='note'><a href='#0'>back to top</a></p>
