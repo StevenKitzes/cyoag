@@ -56,6 +56,18 @@
 						</tr>
 						<tr>
 							<td>Steven Kitzes</td>
+							<td>2016.08.13</td>
+							<td>1.2.5</td>
+							<td>Updated maximum node snippet length to 2,000.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.07</td>
+							<td>1.2.4</td>
+							<td>Tweaked database design and added table diagrams.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
 							<td>2016.08.06</td>
 							<td>1.2.3</td>
 							<td>Stretch Goals main section removed, multi-root stretch goal moved to User Stories main section.</td>
@@ -464,7 +476,7 @@
 					</li>
 					<li class='subheader'>
 						<h2>Snippet length</h2>
-						<p>A node snippet shall have a minimum length of 250 characters, and a maximum length of 1,000 characters. A path snippet shall have a minimum length of 3 characters, and a maximum length of 100 characters.  <em>No exception for moderators.</em></p>
+						<p>A node snippet shall have a minimum length of 250 characters, and a maximum length of 2,000 characters. A path snippet shall have a minimum length of 3 characters, and a maximum length of 100 characters.  <em>No exception for moderators.</em></p>
 					</li>
 					<li class='subheader'>
 						<h2>Path snippet content</h2>
@@ -544,18 +556,101 @@
 					<li class='subheader'>
 						<h2>Table: users</h2>
 						<p>The users table shall contain information defining and pertaining to specific user accounts. Since login duties for CYOAG are designed to be offloaded to third party authentication services such as Facebook and Twitter, this table shall contain minimal information, including a unique identifier (UID) linked to an email address provided by the third party authenticator; after which point, all user identification shall be done through the UID and cookies.</p>
+						<table class='table-desc dark-border light-rouding'>
+							<th>users</th>
+							<tr>
+								<td><strong>Key</strong></td>
+								<td><strong>Unique</strong></td>
+								<td><strong>Column</strong></td>
+								<td><strong>Type</strong></td>
+							</tr>
+							<tr>
+								<td>PK</td>
+								<td>yes</td>
+								<td>uid</td>
+								<td>char(50)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>yes</td>
+								<td>email</td>
+								<td>char(50)</td>
+							</tr>
+						</table><br>
 					</li>
 					<li class='subheader'>
 						<h2>Table: nodes</h2>
-						<p>The nodes table shall contain information defining a given node, but not information defining relationships between nodes or defining user sentiment toward a node. In other words, this table shall contain a node's node snippet, path snippet, snippet UID, and author UID; but it shall not contain information on a node's parent, children, upvotes, or downvotes.</p>
-					</li>
-					<li class='subheader'>
-						<h2>Table: lineage</h2>
-						<p>The lineage table shall define the familial relationships between nodes. In other words, a row in the lineage table shall define the relationship between two single nodes, a parent and a child. It is worth noting that in this particular table, the primary key will need to be the UID of the child in the relationship. This is because logically a child node in the CYOAG tree structure can only ever have one parent; whereas a parent can have several children.</p>
+						<p>The nodes table shall contain information defining a given node, including information defining relationships between nodes, but <em>not</em> defining user sentiment toward a node. In other words, this table shall contain a node's UID, the UID of its parent, the UID of its parent, the node's snippet, and its path snippet; but it shall not contain information on the node's children, or any upvotes, or downvotes cast on the node.</p>
+						<table class='table-desc dark-border light-rouding'>
+							<th>nodes</th>
+							<tr>
+								<td><strong>Key</strong></td>
+								<td><strong>Unique</strong></td>
+								<td><strong>Column</strong></td>
+								<td><strong>Type</strong></td>
+							</tr>
+							<tr>
+								<td>PK</td>
+								<td>yes</td>
+								<td>uid</td>
+								<td>char(50)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>parent_uid</td>
+								<td>char(50)</td>
+							</tr>
+							<tr>
+								<td>FK</td>
+								<td>no</td>
+								<td>author_uid</td>
+								<td>char(50)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>path_snippet</td>
+								<td>char(100)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>node_snippet</td>
+								<td>varchar(2000)</td>
+							</tr>
+						</table><br>
 					</li>
 					<li class='subheader'>
 						<h2>Table: votes</h2>
 						<p>The votes table shall contain data relating user sentiment to the nodes for which that sentiment is expressed. Each row shall contain as a compound primary key a user UID and a node UID, so that each such combination is unique, preventing a user from casting multiple votes on the same node. Each row shall contain as a third datum a flag defining the user's sentiment as positive or negative. This flag can be switched in order to reflect a change in sentiment, or an entire row can be deleted to reflect a user's desire to express no sentiment on a node.</p>
+						<table class='table-desc dark-border light-rouding'>
+							<th>votes</th>
+							<tr>
+								<td><strong>Key</strong></td>
+								<td><strong>Unique</strong></td>
+								<td><strong>Column</strong></td>
+								<td><strong>Type</strong></td>
+							</tr>
+							<tr>
+								<td>PK + FK</td>
+								<td>yes</td>
+								<td>node_uid</td>
+								<td>char(50)</td>
+							</tr>
+							<tr>
+								<td>PK + FK</td>
+								<td>yes</td>
+								<td>author_uid</td>
+								<td>char(50)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>sentiment</td>
+								<td>int(2)</td>
+							</tr>
+						</table>
 					</li>
 				</ol>
 				<p class='note'><a href='#0'>back to top</a></p>

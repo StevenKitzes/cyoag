@@ -15,3 +15,24 @@
   counter-increment: item;
   content: counter(item) ". ";
 }
+
+.table-desc th {
+	font-family: monospace;
+	font-size: .75em;
+	padding-left: 1em;
+	padding-top: .5em;
+	padding-bottom: .5em;
+	text-align: left;
+}
+.table-desc tr td:nth-child(1) {
+	width: 6em;
+}
+.table-desc tr td:nth-child(2) {
+	width: 6em;
+}
+.table-desc tr td:nth-child(3) {
+	width: 16em;
+}
+.table-desc tr td:nth-child(4) {
+	width: 16em;
+}
