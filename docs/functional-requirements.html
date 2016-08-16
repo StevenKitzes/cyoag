@@ -56,9 +56,15 @@
 						</tr>
 						<tr>
 							<td>Steven Kitzes</td>
+							<td>2016.08.15</td>
+							<td>Updated Data Model to reflect a need to store session IDs and current page locations for users; updated hashed and uid lengths to 32.</td>
+							<td>1.2.6</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
 							<td>2016.08.13</td>
-							<td>1.2.5</td>
 							<td>Updated maximum node snippet length to 2,000.</td>
+							<td>1.2.5</td>
 						</tr>
 						<tr>
 							<td>Steven Kitzes</td>
@@ -555,7 +561,7 @@
 				<ol>
 					<li class='subheader'>
 						<h2>Table: users</h2>
-						<p>The users table shall contain information defining and pertaining to specific user accounts. Since login duties for CYOAG are designed to be offloaded to third party authentication services such as Facebook and Twitter, this table shall contain minimal information, including a unique identifier (UID) linked to an email address provided by the third party authenticator; after which point, all user identification shall be done through the UID and cookies.</p>
+						<p>The users table shall contain information defining and pertaining to specific user accounts. The table shall include fields to record a user's name, salt, salted-and-hashed password, unique ID, current session ID, and current node.  Since login duties for CYOAG are hoped to be offloaded to third party authentication services such as Facebook and Twitter in the future, this table shall also contain minimal third-party authentication information, including an email address provided by the third party authenticator in place of user name and password.</p>
 						<table class='table-desc dark-border light-rouding'>
 							<th>users</th>
 							<tr>
@@ -568,7 +574,37 @@
 								<td>PK</td>
 								<td>yes</td>
 								<td>uid</td>
-								<td>char(50)</td>
+								<td>char(32)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>yes</td>
+								<td>name</td>
+								<td>char(16)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>salt</td>
+								<td>char(32)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>salted_pass</td>
+								<td>char(32)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>yes</td>
+								<td>session</td>
+								<td>char(32)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>current_node</td>
+								<td>char(32)</td>
 							</tr>
 							<tr>
 								<td></td>
@@ -593,19 +629,19 @@
 								<td>PK</td>
 								<td>yes</td>
 								<td>uid</td>
-								<td>char(50)</td>
+								<td>char(32)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>parent_uid</td>
-								<td>char(50)</td>
+								<td>char(32)</td>
 							</tr>
 							<tr>
 								<td>FK</td>
 								<td>no</td>
 								<td>author_uid</td>
-								<td>char(50)</td>
+								<td>char(32)</td>
 							</tr>
 							<tr>
 								<td></td>
@@ -636,19 +672,19 @@
 								<td>PK + FK</td>
 								<td>yes</td>
 								<td>node_uid</td>
-								<td>char(50)</td>
+								<td>char(32)</td>
 							</tr>
 							<tr>
 								<td>PK + FK</td>
 								<td>yes</td>
 								<td>author_uid</td>
-								<td>char(50)</td>
+								<td>char(32)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>sentiment</td>
-								<td>int(2)</td>
+								<td>int</td>
 							</tr>
 						</table>
 					</li>
