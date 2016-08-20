@@ -56,6 +56,12 @@
 						</tr>
 						<tr>
 							<td>Steven Kitzes</td>
+							<td>2016.08.20</td>
+							<td>Data Model updated to remove circular dependency in users and nodes tables.  Updated all UID fields from length 32 to 40.</td>
+							<td>1.2.7</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
 							<td>2016.08.15</td>
 							<td>Updated Data Model to reflect a need to store session IDs and current page locations for users; updated hashed and uid lengths to 32.</td>
 							<td>1.2.6</td>
@@ -561,7 +567,7 @@
 				<ol>
 					<li class='subheader'>
 						<h2>Table: users</h2>
-						<p>The users table shall contain information defining and pertaining to specific user accounts. The table shall include fields to record a user's name, salt, salted-and-hashed password, unique ID, current session ID, and current node.  Since login duties for CYOAG are hoped to be offloaded to third party authentication services such as Facebook and Twitter in the future, this table shall also contain minimal third-party authentication information, including an email address provided by the third party authenticator in place of user name and password.</p>
+						<p>The users table shall contain information defining and pertaining to specific user accounts. The table shall include fields to record a user's chosen name, random password salt, salted password, randomized unique ID (UID), and current session ID (UID format).  Since login duties for CYOAG are hoped to be offloaded to third party authentication services such as Facebook and Twitter in the future, this table shall also contain minimal third-party authentication information, including an email address (to be provided by the third party authenticator in place of user name and password).</p>
 						<table class='table-desc dark-border light-rouding'>
 							<th>users</th>
 							<tr>
@@ -574,7 +580,7 @@
 								<td>PK</td>
 								<td>yes</td>
 								<td>uid</td>
-								<td>char(32)</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td></td>
@@ -586,25 +592,19 @@
 								<td></td>
 								<td>no</td>
 								<td>salt</td>
-								<td>char(32)</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>salted_pass</td>
-								<td>char(32)</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>yes</td>
-								<td>session</td>
-								<td>char(32)</td>
-							</tr>
-							<tr>
-								<td></td>
-								<td>no</td>
-								<td>current_node</td>
-								<td>char(32)</td>
+								<td>session_uid</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td></td>
@@ -616,7 +616,7 @@
 					</li>
 					<li class='subheader'>
 						<h2>Table: nodes</h2>
-						<p>The nodes table shall contain information defining a given node, including information defining relationships between nodes, but <em>not</em> defining user sentiment toward a node. In other words, this table shall contain a node's UID, the UID of its parent, the UID of its parent, the node's snippet, and its path snippet; but it shall not contain information on the node's children, or any upvotes, or downvotes cast on the node.</p>
+						<p>The nodes table shall contain information defining a given node, including information defining relationships between nodes, but <em>not</em> defining user sentiment toward a node. In other words, this table shall contain a node's UID, the UID of its parent, the node's snippet, and its path snippet; but it shall not contain information on the node's children, or any upvotes, or downvotes cast on the node.</p>
 						<table class='table-desc dark-border light-rouding'>
 							<th>nodes</th>
 							<tr>
@@ -629,19 +629,19 @@
 								<td>PK</td>
 								<td>yes</td>
 								<td>uid</td>
-								<td>char(32)</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>parent_uid</td>
-								<td>char(32)</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td>FK</td>
 								<td>no</td>
 								<td>author_uid</td>
-								<td>char(32)</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td></td>
@@ -658,6 +658,32 @@
 						</table><br>
 					</li>
 					<li class='subheader'>
+						<h2>Table: positions</h2>
+						<p>The positions table shall contain information on the current position of a user in the story tree, including the user's UID and the node's UID.</p>
+						<table class='table-desc dark-border light-rouding'>
+							<th>positions</th>
+							<tr>
+								<td><strong>Key</strong></td>
+								<td><strong>Unique</strong></td>
+								<td><strong>Column</strong></td>
+								<td><strong>Type</strong></td>
+							</tr>
+							<tr>
+								<td>PK + FK</td>
+								<td>yes</td>
+								<td>user_uid</td>
+								<td>char(40)</td>
+							</tr>
+							<tr>
+								<td>PK + FK</td>
+								<td>yes</td>
+								<td>node_uid</td>
+								<td>char(40)</td>
+							</tr>
+						</table>
+						<p><span class='note'><strong>Note:</strong> the original Data Model design called for the users table to provide a column indicating the current node position of each user.  However, this would have caused the users table to contain a foreign key from the nodes table (current node), and the nodes table to contain a foreign key from the users table (author ID).  This type circular dependency is poor practice (and not supported by MySQL in any case).</span></p><br>
+					</li>
+					<li class='subheader'>
 						<h2>Table: votes</h2>
 						<p>The votes table shall contain data relating user sentiment to the nodes for which that sentiment is expressed. Each row shall contain as a compound primary key a user UID and a node UID, so that each such combination is unique, preventing a user from casting multiple votes on the same node. Each row shall contain as a third datum a flag defining the user's sentiment as positive or negative. This flag can be switched in order to reflect a change in sentiment, or an entire row can be deleted to reflect a user's desire to express no sentiment on a node.</p>
 						<table class='table-desc dark-border light-rouding'>
@@ -672,13 +698,13 @@
 								<td>PK + FK</td>
 								<td>yes</td>
 								<td>node_uid</td>
-								<td>char(32)</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td>PK + FK</td>
 								<td>yes</td>
 								<td>author_uid</td>
-								<td>char(32)</td>
+								<td>char(40)</td>
 							</tr>
 							<tr>
 								<td></td>
