@@ -1,12 +1,46 @@
 <html>
     <head>
+		<meta charset='utf-8'>
+
         <title>Choose Your Own Stupid Adventure!</title>
+		
+		<!-- CSS -->
+		<link rel='stylesheet' type='text/css' href='css/styles.css'>
+		
+		<!-- JavaScript -->
+		<script type='text/javascript' src='js/handlebars-v4.0.5.js'></script>
+		<script type='text/javascript' src='js/jquery.min.js'></script>
+		<script type='text/javascript' src='js/combo.js'></script>
+		<!-- Pagewise JavaScript -->
+		<script type='text/javascript'>
+			var cyoBuilders;
+			function init() {
+				console.log('Page elements and artifacts loaded, beginning JS execution.');
+				cyoBuilders = Handlebars.templates;
+				renderPage();
+			}
+			
+			function renderPage() {
+				console.log('Rendering page.');
+				$('#header').html(
+					cyoBuilders['header']({pageTitle: 'Chroose Your Own Dumb Stupid Adventure!!!1'})
+				);
+				$('#trailingSnippet').html(
+					cyoBuilders['trailingSnippet']({trailingSnippet: '[... here would display an ellipsis and the last ten or fifteeen words or hundred characters or so of the text content of the previous chapter, written by Person A]'})
+				);
+				$('#lastPathSnippet').html(
+					cyoBuilders['lastPathSnippet']({lastPathSnippet: '[here would display the text of the choice you clicked, part of <strong>this</strong> chapter, written by Person B, with some max char limit]'})
+				);
+			}
+			
+			window.addEventListener('load', init, false);
+		</script>
     </head>
+
     <body>
-        <center>
-        <h1>Chroose Your Own Dumb Stupid Adventure!!!1</h1>
-        <p>[... here would display an ellipsis and the last ten or fifteeen words or hundred characters or so of the text content of the previous chapter, written by Person A]</p>
-        <p><em>[here would display the text of the choice you clicked, part of <strong>this</strong> chapter, written by Person B, with some max char limit]</em></p>
+		<div id='header'></div>
+		<div id='trailingSnippet'></div>
+        <div id='lastPathSnippet'></div>
         <p>[here would display the text of <strong>this chapter</strong>, also by Person B, that unfolds resulting from your choice, with some max char limit ... lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum]</p>
         <p><em>[here would display the final text from Person B, basically a call to action for the choices which Person C, you, get to create; some max char limit of course]</em></p><br><br>
 
@@ -15,7 +49,6 @@
             <h5>Like this adventure so far?  Cast your vote!</h5>
             <button>Radicool!</button> <button>It sucks!</button>
         </div>
-        </center>
 
         <ul>
             <li><a href="#">[here would display a path Person X already wrote before you got here]</a></li>

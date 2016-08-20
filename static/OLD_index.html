@@ -1,0 +1,26 @@
+<html>
+	<head><meta charset='UTF-8'><title>Handlebars Tutorial</title></head>
+	<body>
+		<button id='button'>Button</button>
+		<div id='person-div'></div><br>
+		<div id='car-div'></div>
+
+		<script type='text/javascript' src='js/handlebars-v4.0.5.js'></script>
+		<script type='text/javascript' src='js/combo.js'></script>
+		<script type='text/javascript'>
+			var car = {'name':'ford'};
+			
+			function init() {
+				document.getElementById('button').addEventListener('click', buttonClick, false);
+			}
+			function buttonClick() {
+				var injection = Handlebars.templates['name-table'];
+				var injection2 = Handlebars.templates['car-table'];
+				document.getElementById('person-div').innerHTML = injection();
+				document.getElementById('car-div').innerHTML = injection2(car);
+			}
+			
+			window.addEventListener('load', init, false);
+		</script>
+	</body>
+</html>
