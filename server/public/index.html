@@ -10,61 +10,17 @@
 		<!-- JavaScript -->
 		<script type='text/javascript' src='js/handlebars-v4.0.5.js'></script>
 		<script type='text/javascript' src='js/jquery.min.js'></script>
-		<script type='text/javascript' src='js/combo.js'></script>
+		<script type='text/javascript' src='js/cyoag.js'></script>
 		<!-- Pagewise JavaScript -->
 		<script type='text/javascript'>
-			var cyoBuilders;
 			function init() {
-				console.log('Page elements and artifacts loaded, beginning JS execution.');
-				cyoBuilders = Handlebars.templates;
-				renderPage();
-			}
-			
-			function renderPage() {
-				console.log('Rendering page.');
-				$('#header').html(
-					cyoBuilders['header']({pageTitle: 'Chroose Your Own Dumb Stupid Adventure!!!1'})
-				);
-				$('#trailingSnippet').html(
-					cyoBuilders['trailingSnippet']({trailingSnippet: '[... here would display an ellipsis and the last ten or fifteeen words or hundred characters or so of the text content of the previous chapter, written by Person A]'})
-				);
-				$('#lastPathSnippet').html(
-					cyoBuilders['lastPathSnippet']({lastPathSnippet: '[here would display the text of the choice you clicked, part of <strong>this</strong> chapter, written by Person B, with some max char limit]'})
-				);
-				$('#nodeSnippet').html(
-					cyoBuilders['nodeSnippet']({nodeSnippet: '[here would display the text of <strong>this chapter</strong>, also by Person B, that unfolds resulting from your choice, with some max char limit ... lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum]'})
-				);
+				console.log('Page loading complete, beginning JS execution.');
+				cyoag.buildBody();
 			}
 			
 			window.addEventListener('load', init, false);
 		</script>
     </head>
 
-    <body>
-		<div id='header' class='center'></div>
-		<div id='trailingSnippet' class='center'></div>
-        <div id='lastPathSnippet' class='center'></div>
-		<div id='nodeSnippet' class='center'></div>
-
-        <div style="border-style:solid;border-color:black;border-width: thick">
-            (i'm lazy right now but this would be styled, put somewhere that made more sense, maybe a sidebar or something)
-            <h5>Like this adventure so far?  Cast your vote!</h5>
-            <button>Radicool!</button> <button>It sucks!</button>
-        </div>
-
-        <ul>
-            <li><a href="#">[here would display a path Person X already wrote before you got here]</a></li>
-            <li><a href="#">[here would display a path Person Y already wrote before you got here]</a></li>
-            <li><a href="#">[here would display a path Person Z already wrote before you got here]</a></li>
-        </ul>
-
-        <center>
-            <h3>Add your own chapter to this story!  :D</h3>
-            <label>A path to follow, a choice to make...</label><br>
-            <textarea rows="1" cols="50">[space to write a stupid decision you can make]</textarea><br>
-            <label>Consequences to endure...</label><br>
-            <textarea rows="10" cols="50">[space to write the consequences of the stupid decision you probably made]</textarea><br>
-        </center>
-
-    </body>
+    <body></body>
 </html>

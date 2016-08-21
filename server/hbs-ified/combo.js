@@ -1,3 +1,5 @@
+var Handlebars = require('handlebars');
+
 // header
 (function() {
   var template = Handlebars.template, templates = Handlebars.templates = Handlebars.templates || {};
@@ -45,3 +47,5 @@ templates['nodeSnippet'] = template({"compiler":[7,">= 4.0.0"],"main":function(c
     + "</p>";
 },"useData":true});
 })();
+
+module.exports = Handlebars;
