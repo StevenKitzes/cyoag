@@ -5,3 +5,22 @@ body {
 #lastPathSnippet {
 	font-style: italic;
 }
+
+.center {
+	text-align: center;
+}
+.centeredDiv {
+	margin: 0 auto;
+}
+
+/*
+ * Notes are light gray, and can include links
+ * that are formatted to match the surrouding
+ * text, except with the customary underlining
+ * intact.
+ */
+.note {
+  font-size: 0.8em;
+  font-style: italic;
+  color: #808080;
+}

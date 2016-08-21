@@ -31,6 +31,9 @@
 				$('#lastPathSnippet').html(
 					cyoBuilders['lastPathSnippet']({lastPathSnippet: '[here would display the text of the choice you clicked, part of <strong>this</strong> chapter, written by Person B, with some max char limit]'})
 				);
+				$('#nodeSnippet').html(
+					cyoBuilders['nodeSnippet']({nodeSnippet: '[here would display the text of <strong>this chapter</strong>, also by Person B, that unfolds resulting from your choice, with some max char limit ... lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum]'})
+				);
 			}
 			
 			window.addEventListener('load', init, false);
@@ -38,11 +41,10 @@
     </head>
 
     <body>
-		<div id='header'></div>
-		<div id='trailingSnippet'></div>
-        <div id='lastPathSnippet'></div>
-        <p>[here would display the text of <strong>this chapter</strong>, also by Person B, that unfolds resulting from your choice, with some max char limit ... lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum lorem ipsum]</p>
-        <p><em>[here would display the final text from Person B, basically a call to action for the choices which Person C, you, get to create; some max char limit of course]</em></p><br><br>
+		<div id='header' class='center'></div>
+		<div id='trailingSnippet' class='center'></div>
+        <div id='lastPathSnippet' class='center'></div>
+		<div id='nodeSnippet' class='center'></div>
 
         <div style="border-style:solid;border-color:black;border-width: thick">
             (i'm lazy right now but this would be styled, put somewhere that made more sense, maybe a sidebar or something)
