@@ -10,6 +10,7 @@ cyoag.buildBody = function() {
 			console.log('Got response from server on /buildBody endpoint');
 			if(response.hasOwnProperty('error')) {
 				// handle error
+				console.log('ERROR FATALE: ' + response.error);
 				return;
 			}
 			$('body').html(response.html);
