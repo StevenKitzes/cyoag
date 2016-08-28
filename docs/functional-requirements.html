@@ -681,7 +681,7 @@
 								<td>char(40)</td>
 							</tr>
 						</table>
-						<p><span class='note'><strong>Note:</strong> the original Data Model design called for the users table to provide a column indicating the current node position of each user.  However, this would have caused the users table to contain a foreign key from the nodes table (current node), and the nodes table to contain a foreign key from the users table (author ID).  This type circular dependency is poor practice (and not supported by MySQL in any case).</span></p><br>
+						<p><span class='note'><strong>Note:</strong> the original Data Model design called for the users table to provide a column indicating the current node position of each user.  However, this would have caused the users table to contain a foreign key from the nodes table (current node), and the nodes table to contain a foreign key from the users table (author ID).  This type of circular dependency is poor practice (and not supported by MySQL in any case).</span></p><br>
 					</li>
 					<li class='subheader'>
 						<h2>Table: votes</h2>
