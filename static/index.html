@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <script src='react.min.js'></script>
+    <script src='react-dom.min.js'></script>
+    <script src='babel-browser.min.js'></script>
+    <style>
+      .red-class {
+        color: red;
+      }
+      #italic-id {
+        font-style: italic;
+      }
+    </style>
+  </head>
+  <body>
+    <div id='mount-point'></div>
+    <script type='text/babel'>
+      var HelloWorldComponent = React.createClass({
+        render: function() {
+          return (
+            <h1 id='italic-id' className='red-class'>Hello, {this.props.name}!</h1>
+          );
+        }
+      });
+      ReactDOM.render(
+        <HelloWorldComponent name='Cruel World' />,
+        document.getElementById('mount-point')
+      );
+    </script>
+  </body>
+</html>
