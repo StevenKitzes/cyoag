@@ -19,7 +19,7 @@ var StateComponent = React.createClass({
   },
   getInitialState: function() {
     return {
-      count: 5
+      count: 0
     }
   },
   render: function() {
@@ -50,7 +50,18 @@ var FilteredList = React.createClass({
         'lime',
         'mango',
         'nyoromien',
-        'orange'
+        'orange',
+        'plane',
+        'quarantine',
+        'range',
+        'steve',
+        'turing',
+        'uranus',
+        'voldemort',
+        'watermelon',
+        'xenomorph',
+        'yucatan',
+        'zealot'
       ],
       items: []
     };

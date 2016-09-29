@@ -76,7 +76,7 @@
 	  },
 	  getInitialState: function () {
 	    return {
-	      count: 5
+	      count: 0
 	    };
 	  },
 	  render: function () {
@@ -104,7 +104,7 @@
 	
 	  getInitialState: function () {
 	    return {
-	      initialItems: ['apple', 'banana', 'crocodile', 'duck', 'elephant', 'falafel', 'gnocci', 'hummus', 'ice', 'jelly', 'kahlua', 'lime', 'mango', 'nyoromien', 'orange'],
+	      initialItems: ['apple', 'banana', 'crocodile', 'duck', 'elephant', 'falafel', 'gnocci', 'hummus', 'ice', 'jelly', 'kahlua', 'lime', 'mango', 'nyoromien', 'orange', 'plane', 'quarantine', 'range', 'steve', 'turing', 'uranus', 'voldemort', 'watermelon', 'xenomorph', 'yucatan', 'zealot'],
 	      items: []
 	    };
 	  },
