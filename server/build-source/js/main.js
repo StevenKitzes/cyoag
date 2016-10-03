@@ -99,6 +99,50 @@ var DisplayList = React.createClass({
   }
 });
 
+var ButtonHolder = React.createClass({
+  getInitialState: function() {
+    return {
+      content: ''
+    };
+  },
+  componentWillMount: function() {
+    this.setState({content: this.state.content});
+  },
+  serverPost: function() {
+    var xmlHttp = new XMLHttpRequest();
+    var shadowThis = this;  // cross-browser alternative t0 ...
+    // xmlHttp.onreadystatechange = () => {...}
+    xmlHttp.onreadystatechange = function () {
+      if( xmlHttp.readyState == 4 && xmlHttp.status == 200 ) {
+        shadowThis.setState({content: xmlHttp.responseText});
+        console.log('used shadowThis!!');
+      }
+      else {
+        console.log('HTTP response status: ' + xmlHttp.status);
+      }
+    }
+    xmlHttp.open('POST', '/testPost');
+    xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xmlHttp.send(JSON.stringify({foo: "bar"}));
+  },
+  render: function() {
+    if (!this.state.content || this.state.content == '') {
+      return (
+        <div>
+          No content<br/>
+          <button onClick={this.serverPost}>Touch Server</button>
+        </div>
+      );
+    }
+    return (
+      <div>
+        Content: {this.state.content}<br/>
+        <button onClick={this.serverPost}>Touch Server</button>
+      </div>
+    );
+  }
+});
+
 ReactDOM.render(
   <HelloWorldComponent name='Cruel World' />,
   document.getElementById('welcome-point')
@@ -110,4 +154,8 @@ ReactDOM.render(
 ReactDOM.render(
   <FilteredList/>,
   document.getElementById('list-point')
+);
+ReactDOM.render(
+  <ButtonHolder/>,
+  document.getElementById('button-point')
 );

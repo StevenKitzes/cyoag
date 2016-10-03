@@ -145,9 +145,66 @@
 	  }
 	});
 	
+	var ButtonHolder = React.createClass({
+	  displayName: 'ButtonHolder',
+	
+	  getInitialState: function () {
+	    return {
+	      content: ''
+	    };
+	  },
+	  componentWillMount: function () {
+	    this.setState({ content: this.state.content });
+	  },
+	  serverPost: function () {
+	    var xmlHttp = new XMLHttpRequest();
+	    var shadowThis = this; // cross-browser alternative t0 ...
+	    // xmlHttp.onreadystatechange = () => {...}
+	    xmlHttp.onreadystatechange = function () {
+	      if (xmlHttp.readyState == 4 && xmlHttp.status == 200) {
+	        shadowThis.setState({ content: xmlHttp.responseText });
+	        console.log('used shadowThis!!');
+	      } else {
+	        console.log('HTTP response status: ' + xmlHttp.status);
+	      }
+	    };
+	    xmlHttp.open('POST', '/testPost');
+	    xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	    xmlHttp.send(JSON.stringify({ foo: "bar" }));
+	  },
+	  render: function () {
+	    if (!this.state.content || this.state.content == '') {
+	      return React.createElement(
+	        'div',
+	        null,
+	        'No content',
+	        React.createElement('br', null),
+	        React.createElement(
+	          'button',
+	          { onClick: this.serverPost },
+	          'Touch Server'
+	        )
+	      );
+	    }
+	    return React.createElement(
+	      'div',
+	      null,
+	      'Content: ',
+	      this.state.content,
+	      React.createElement('br', null),
+	      React.createElement(
+	        'button',
+	        { onClick: this.serverPost },
+	        'Touch Server'
+	      )
+	    );
+	  }
+	});
+	
 	ReactDOM.render(React.createElement(HelloWorldComponent, { name: 'Cruel World' }), document.getElementById('welcome-point'));
 	ReactDOM.render(React.createElement(StateComponent, null), document.getElementById('state-point'));
 	ReactDOM.render(React.createElement(FilteredList, null), document.getElementById('list-point'));
+	ReactDOM.render(React.createElement(ButtonHolder, null), document.getElementById('button-point'));
 
 /***/ },
 /* 1 */
