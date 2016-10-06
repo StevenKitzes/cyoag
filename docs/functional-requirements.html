@@ -56,8 +56,14 @@
 						</tr>
 						<tr>
 							<td>Steven Kitzes</td>
+							<td>2016.10.06</td>
+							<td>Updated column name in <em>votes</em> table from <em>author_uid</em> to <em>voter_uid</em> for clarity.</td>
+							<td>1.2.10</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
 							<td>2016.10.05</td>
-							<td>Data Model updated use VARCHAR instead of CHAR everywhere since using CHAR in just a few places adds no benefit.  Also changed an INT to TINYINT, for what it's worth.</td>
+							<td>Data Model updated to use VARCHAR instead of CHAR everywhere since using CHAR in just a few places adds no benefit.  Also changed an INT to TINYINT, for what it's worth.</td>
 							<td>1.2.9</td>
 						</tr>
 						<tr>
@@ -721,7 +727,7 @@
 							<tr>
 								<td>PK + FK</td>
 								<td>yes</td>
-								<td>author_uid</td>
+								<td>voter_uid</td>
 								<td>varchar(40)</td>
 							</tr>
 							<tr>
