@@ -56,6 +56,18 @@
 						</tr>
 						<tr>
 							<td>Steven Kitzes</td>
+							<td>2016.10.05</td>
+							<td>Data Model updated use VARCHAR instead of CHAR everywhere since using CHAR in just a few places adds no benefit.  Also changed an INT to TINYINT, for what it's worth.</td>
+							<td>1.2.9</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.10.04</td>
+							<td>Data Model updated to include user account type (e.g. moderator vs user).</td>
+							<td>1.2.8</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
 							<td>2016.08.20</td>
 							<td>Data Model updated to remove circular dependency in users and nodes tables.  Updated all UID fields from length 32 to 40.</td>
 							<td>1.2.7</td>
@@ -580,43 +592,43 @@
 								<td>PK</td>
 								<td>yes</td>
 								<td>uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>yes</td>
 								<td>name</td>
-								<td>char(16)</td>
+								<td>varchar(16)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>acct_type</td>
-								<td>char(16)</td>
+								<td>varchar(16)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>salt</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>salted_pass</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>yes</td>
 								<td>session_uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>yes</td>
 								<td>email</td>
-								<td>char(50)</td>
+								<td>varchar(50)</td>
 							</tr>
 						</table><br>
 					</li>
@@ -635,25 +647,25 @@
 								<td>PK</td>
 								<td>yes</td>
 								<td>uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>parent_uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td>FK</td>
 								<td>no</td>
 								<td>author_uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>path_snippet</td>
-								<td>char(100)</td>
+								<td>varchar(100)</td>
 							</tr>
 							<tr>
 								<td></td>
@@ -678,13 +690,13 @@
 								<td>PK + FK</td>
 								<td>yes</td>
 								<td>user_uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td>PK + FK</td>
 								<td>yes</td>
 								<td>node_uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 						</table>
 						<p><span class='note'><strong>Note:</strong> the original Data Model design called for the users table to provide a column indicating the current node position of each user.  However, this would have caused the users table to contain a foreign key from the nodes table (current node), and the nodes table to contain a foreign key from the users table (author ID).  This type of circular dependency is poor practice (and not supported by MySQL in any case).</span></p><br>
@@ -704,19 +716,19 @@
 								<td>PK + FK</td>
 								<td>yes</td>
 								<td>node_uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td>PK + FK</td>
 								<td>yes</td>
 								<td>author_uid</td>
-								<td>char(40)</td>
+								<td>varchar(40)</td>
 							</tr>
 							<tr>
 								<td></td>
 								<td>no</td>
 								<td>sentiment</td>
-								<td>int</td>
+								<td>tinyint</td>
 							</tr>
 						</table>
 					</li>
