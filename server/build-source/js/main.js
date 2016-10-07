@@ -1,14 +1,8 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-// Hello World component: display a simple prop
-var HelloWorldComponent = React.createClass({
-  render: function() {
-    return (
-      <h1 id='italic-id' className='red-class'>Hello, {this.props.name}!</h1>
-    );
-  }
-});
+require('./HelloWorldComponent')();
+
 // State component to display simple state
 var StateComponent = React.createClass({
   // ReactJS Event
@@ -143,10 +137,6 @@ var ButtonHolder = React.createClass({
   }
 });
 
-ReactDOM.render(
-  <HelloWorldComponent name='Cruel World' />,
-  document.getElementById('welcome-point')
-);
 ReactDOM.render(
   <StateComponent/>,
   document.getElementById('state-point')
