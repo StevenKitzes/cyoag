@@ -1,6 +1,22 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+console.log('Starting off with a cookie check.');
+var xmlHttp = new XMLHttpRequest();
+// xmlHttp.onreadystatechange = () => {...}
+xmlHttp.onreadystatechange = function () {
+  if( xmlHttp.readyState == 4 && xmlHttp.status == 200 ) {
+    console.log('Performed initial cookie check.  Got response: ' + xmlHttp.responseText);
+    document.getElementById('body').innerHTML += xmlHttp.responseText;
+  }
+  else {
+    console.log('Tried initial cookie check.  Got HTTP response status: ' + xmlHttp.status);
+  }
+}
+xmlHttp.open('POST', '/cookieCheck');
+xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+xmlHttp.send();
+
 // Hello World component: display a simple prop
 var HelloWorldComponent = React.createClass({
   render: function() {
