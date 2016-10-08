@@ -7,17 +7,27 @@ app.use(cookieParser());
 
 /* GET home page. */
 router.post('/', function(req, res, next) {
-  console.log('got cookies: ' + JSON.stringify(req.cookies));
-  if(req.cookies.name) {
-    console.log('name cookie found');
-    res.send('Cookie already there: ' + req.cookies.name + '!');
-    return;
+  var responseString = '';
+
+  if (!req.cookies.name) {
+    console.log('name cookie not found, creating');
+    res.cookie('name', 'steverino');
+    responseString += 'Added name cookie ';
   }
   else {
-    console.log('name cookie NOT found, creating');
-    res.cookie('name', 'steverino').send('Name cookie did not exist, but I created it for you.  You are welcome.');
-    return;
+    responseString += 'Name cookie already existed. ';
   }
+
+  if(!req.cookies.number) {
+    console.log('number cookie not found, creating');
+    res.cookie('number', 12345);
+    responseString += 'Added number cookie ';
+  }
+  else {
+    responseString += 'Number cookie already existed. ';
+  }
+
+  res.send('Cookies managed ... ' + responseString);
 });
 
 module.exports = router;
