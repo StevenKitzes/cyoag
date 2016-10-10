@@ -1,0 +1,33 @@
+CREATE TABLE IF NOT EXISTS users (
+uid VARCHAR(40) UNIQUE PRIMARY KEY,
+name VARCHAR(16) UNIQUE,
+acct_type VARCHAR(16),
+salt VARCHAR(40),
+salted_pass VARCHAR(40),
+session_uid VARCHAR(40),
+email VARCHAR(50) UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS nodes (
+uid VARCHAR(40) UNIQUE PRIMARY KEY,
+parent_uid VARCHAR(40),
+author_uid VARCHAR(40),
+path_snippet VARCHAR(100),
+node_snippet VARCHAR(2000),
+FOREIGN KEY (author_uid) REFERENCES users(uid)
+);
+
+CREATE TABLE IF NOT EXISTS positions (
+user_uid VARCHAR(40),
+node_uid VARCHAR(40),
+PRIMARY KEY (user_uid, node_uid),
+FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
+FOREIGN KEY (node_uid) REFERENCES nodes(uid) ON DELETE CASCADE
+);
+
+CREATE TABLE IF NOT EXISTS votes (
+voter_uid VARCHAR(40),
+node_uid VARCHAR(40),
+sentiment TINYINT,
+PRIMARY KEY (voter_uid, node_uid)
+);
