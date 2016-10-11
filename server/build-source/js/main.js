@@ -1,30 +1,33 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-console.log('Starting off with a cookie check.');
-var xmlHttp = new XMLHttpRequest();
-// xmlHttp.onreadystatechange = () => {...}
-xmlHttp.onreadystatechange = function () {
-  if( xmlHttp.readyState == 4 && xmlHttp.status == 200 ) {
-    console.log('Performed initial cookie check.  Got response: ' + xmlHttp.responseText);
-    document.getElementById('body').innerHTML += xmlHttp.responseText;
-  }
-  else {
-    console.log('Tried initial cookie check.  Got HTTP response status: ' + xmlHttp.status);
-  }
-}
-xmlHttp.open('POST', '/cookieCheck');
-xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-xmlHttp.send();
-
 // Hello World component: display a simple prop
 var HelloWorldComponent = React.createClass({
+  componentWillMount: function() {
+    console.log('+ + +Starting off with a cookie check.');
+    var xhr = new XMLHttpRequest();
+    // xmlHttp.onreadystatechange = () => {...}
+    xhr.onreadystatechange = function () {
+      if( xhr.readyState == 4 && xhr.status == 200 ) {
+        console.log('Performed initial cookie check.  Got response: ' + xhr.responseText);
+        document.getElementById('body').insertAdjacentHTML('beforeend','<div>'+xhr.responseText+'</div>');
+      }
+      else {
+        console.log('Tried initial cookie check.  Got HTTP response status: ' + xhr.status);
+      }
+    }
+    xhr.open('POST', '/cookieCheck');
+    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xhr.send();
+    console.log('+ + + Cookie check done.');
+  },
   render: function() {
     return (
       <h1 id='italic-id' className='red-class'>Hello, {this.props.name}!</h1>
     );
   }
 });
+
 // State component to display simple state
 var StateComponent = React.createClass({
   // ReactJS Event
@@ -41,7 +44,7 @@ var StateComponent = React.createClass({
   render: function() {
     return (
       <div className='increment-component'>
-        <h3 className='red-class'>Such and many count: {this.state.count}.</h3>
+        <h3 className='red-class'>Count: {this.state.count}.</h3>
         <button onClick={this.incrementCount}>Boing!</button>
       </div>
     );
