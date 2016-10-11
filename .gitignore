@@ -1,4 +1,4 @@
 server/node_modules
 resources
 *.log
-server/js/build.js
+server/public/js/build.js
