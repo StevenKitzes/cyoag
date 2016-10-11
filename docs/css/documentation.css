@@ -155,6 +155,11 @@ tr:nth-child(even) td:nth-child(even) {
 	background: #e8ba7d;
 }
 
+/* Omit bullet or number from a list item */
+.no-marker {
+  list-style-type: none;
+}
+
 /*
  * Notes are light gray, and can include links
  * that are formatted to match the surrouding

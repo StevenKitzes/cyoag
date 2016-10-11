@@ -1,0 +1,142 @@
+<html>
+	<head>
+		<title>Functional Requirements</title>
+		<link rel="stylesheet" type="text/css" href="css/documentation.css">
+	</head>
+	<body>
+    <h1 class='center title dark-text no-gaps'>Component Design for CYOAG</h1>
+    <hr />
+
+    <p>This document describes the ReactJS component hierarchy for CYOAG.  This includes a description of the component state, on which
+      the React component structure depends.  In other words, depending on the state of the top-most parent component, it will be decided
+      which descendents will be rendered and what their content will be.  This can be thought of, in some sense, as a state tree, and
+      that is how this component documentation will be structured.  Each node in this tree represents a component, and each branch
+      from that node represents a potential data state.</p>
+    <p>Using the top-most node as an example, we render the CyoagMain component.  If there is a session cookie on the page to begin with,
+      then the CyoagMain component's children will be a story component and its children.  Otherwise, the CyoagMain component's children
+      will represent login UI elements so that the user can log in and obtain a session ID, at which point the state will update so that
+      the CyoagMain component will re-render with different children.</p>
+    <hr />
+
+    <h1 class='dark-text no-gaps'>Component Hierarchy</h1>
+    <p>A brief overview of components and their relationships</p>
+    <ul>
+      <li>
+        &lt;CyoagMain&gt; <span class='note'>The top-most ReactJS component, and that which manages application state</span>
+
+        <ul>
+          <li>
+            &lt;HeaderBar&gt; <span class='note'>header bar of the page, including title</span>
+          </li>
+          <li>
+            &lt;MainColumn&gt; <span class='note'>main section of the page, containing story content, navigation, voting, and authoring</span>
+
+            <ul>
+              <li>
+                &lt;Story&gt; <span class='note'>includes review snippet, previous path choice snippet, and node snippet, as appropriate</span>
+              </li>
+              <li>
+                &lt;Votification&gt; <span class='note'>if user logged in, otherwise</span> &lt;VotificationLogin&gt;
+              </li>
+              <li>
+                &lt;Paths&gt; <span class='note'>display paths out from the current node</span>
+
+                <ul>
+                  <li>
+                    &lt;CollapsedPaths&gt; <span class='note'>up to four paths with others link-gated, otherwise</span> &lt;ExpandedPaths&gt;
+                  </li>
+                </ul>
+
+              </li>
+              <li>
+                &lt;Authoring&gt; <span class='note'>instructions and input fields for users to author new story paths and nodes</span>
+
+                <ul>
+                  <li>
+                    &lt;CollapsedAuthoring&gt; <span class='note'>a link to reveal authoring elements, otherwise</span> &lt;ExpandedAuthoring&gt;
+                  </li>
+                </ul>
+
+              </li>
+            </ul>
+
+          </li>
+          <li>
+            &lt;OptionsColumn&gt; <span class='note'>smaller side section of page, containing options, login/logout, and miscellany</span>
+          </li>
+
+          <ul>
+            <li>
+              &lt;Login&gt; <span class='note'>if no session marked in cookie, otherwise</span> &lt;Logout&gt;
+            </li>
+          </ul>
+
+          <li>
+            &lt;FooterBar&gt; <span class='note'>footer bar of the page, including license, links, etc</span>
+          </li>
+        </ul>
+
+      </li>
+    </ul>
+    <hr />
+
+    <h1 class='dark-text no-gaps'>State and Prop Design</h1>
+    <p>Preliminary design for state and prop management on components</p>
+    <ul>
+      <li>
+        <h3 class='medium-light-text no-gaps'>&lt;CyoagMain&gt;</h3>
+        <p>The main component maintains the state for the entire application.  This is done by defining an admittedly complex state,
+          as well as functions for modifying state, then passing the functions down to child components as props.  In many cases, child
+          components will propagate these props down to their children as well.</p>
+
+        <p>Meanwhile, the main component will act not only as a state manager through which children can change state and initiate
+          re-renders; the main component will also be the central point from which AJAJ(X) calls are made to the backend.  When a child
+          needs to communicate with the backend, this will be done by proxy through the main component.</p>
+
+        <p>No descendent of CyoagMain is intended to maintain its own state.</p>
+
+        <p><strong>State</strong></p>
+
+        <ul>
+          <li>
+            <p class='no-gaps'><strong>nodeId</strong> - the ID of the current node for positioning</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>reviewSnippet</strong> - the trailing end of the previous node, as a reminder</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>lastPathSnippet</strong> - path snippet chosen to lead to the current node</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>nodeSnippet</strong> - main plot text for the current node</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>loggedIn</strong> - simple Boolean to track whether a user is logged in</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>votificationStatus</strong> - whether the current user regards the current node with positive,
+              negative, or neutral sentiment</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>pathsCollapsed</strong> - whether paths should appear collapsed or expanded</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>pathList</strong> - a list of all paths out from the given node, sorted by votification, and
+              displayed collapsed or uncollapsed based on the <em>pathsCollapsed</em> state</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>authoringCollapsed</strong> - whether authoring should appear collapsed or expanded</p>
+          </li>
+          <li>
+            <p class='no-gaps'><strong>options</strong> - JSON object listing usage options (feature planning in ideation)</p>
+          </li>
+        </ul>
+
+        <p><strong>Props</strong></p>
+
+        <p>No props are used by the CyoagMain component.  It only maintains state, and passes properties of its state down to its
+          descendents as props of their own.</p>
+      </li>
+    </ul>
+  </body>
+</html>
