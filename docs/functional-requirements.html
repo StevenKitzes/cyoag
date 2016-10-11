@@ -1,0 +1,749 @@
+<html>
+	<head>
+		<title>Functional Requirements</title>
+		<link rel="stylesheet" type="text/css" href="css/functional-requirements.css">
+		<link rel="stylesheet" type="text/css" href="css/documentation.css">
+		<script type='text/javascript' src='js/jquery-3.1.0.min.js'></script>
+		<script type='text/javascript' src='js/functional-requirements.js'></script>
+	</head>
+	<body>
+		<span class='center'>
+		<h1 class='title no-gaps dark-text'>CYOAG</h1>
+		<h3 class='no-gaps darker-text'>Choose Your Own Adventure Game</h3>
+		<p class='no-gaps darker-text'>A user-generated text-adventure</p>
+		</span>
+
+		<ol>
+			<li class='header'>
+				<hr>
+				<a name='0'></a>
+				<h2>Table of Contents</h2><br>
+				<ol id='toc-internal'>
+					<li><a href='#0'>Table of Contents</a></li>
+					<li><a href='#1'>Project Statement</a></li>
+					<li><a href='#1'>Document Iterations</a></li>
+					<li><a href='#3'>Definitions</a></li>
+					<li><a href='#4'>Basic Feature Families</a></li>
+					<li><a href='#5'>User Stories</a></li>
+					<li><a href='#6'>Explicit Restrictions</a></li>
+					<li><a href='#7'>Detailed Votification Rules</a></li>
+					<li><a href='#8'>Architecture and Technology Stack</a></li>
+					<li><a href='#9'>Data Model</a></li>
+				</ol><br>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='1'></a>
+				<h2>Project Statement</h2>
+				<p>Choose Your Own Adventure Game, or CYOAG for short, is an idea Steven Kitzes came up with, based on the choose-your- own-adventure books he grew up with. The basic idea behind these books was that the reader would be presented with very short chapters for context; then get to pick from a handful of options leading to different page numbers, ultimately resulting in different paths through a story that always started the same but had many possible endings.  Steven enjoyed reading, and was thrilled to discover books with variable outcomes.</p>
+				<p>Now, later in life, Steven has come to love writing as much as he loves reading. Having grown into a career in software development, and remembering his love of choose-your-own-adventure books, he decided it would be a great potential side project to build a website that combines all of these loves into one. The CYOAG is, thus, a web app that proposes to let users read and/or create content for a choose-your- own-adventure game online. This broad-strokes definition will be described in much greater detail throughout this document.</p>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='2'></a>
+				<h2>Document Iterations</h2>
+				<p>Changes made to this document are as follows (<a id='iterations-expander' class='note' href='#2'>click to expand/collapse</a>):</p>
+				<div id='iterations-container'>
+					<table id='iterations' class='dark-border light-rounding'>
+						<tr>
+							<td class='bold'>Author</td>
+							<td class='bold'>Date</td>
+							<td class='bold'>Version</td>
+							<td class='bold'>Changes</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.10.06</td>
+							<td>Updated column name in <em>votes</em> table from <em>author_uid</em> to <em>voter_uid</em> for clarity.</td>
+							<td>1.2.10</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.10.05</td>
+							<td>Data Model updated to use VARCHAR instead of CHAR everywhere since using CHAR in just a few places adds no benefit.  Also changed an INT to TINYINT, for what it's worth.</td>
+							<td>1.2.9</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.10.04</td>
+							<td>Data Model updated to include user account type (e.g. moderator vs user).</td>
+							<td>1.2.8</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.20</td>
+							<td>Data Model updated to remove circular dependency in users and nodes tables.  Updated all UID fields from length 32 to 40.</td>
+							<td>1.2.7</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.15</td>
+							<td>Updated Data Model to reflect a need to store session IDs and current page locations for users; updated hashed and uid lengths to 32.</td>
+							<td>1.2.6</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.13</td>
+							<td>Updated maximum node snippet length to 2,000.</td>
+							<td>1.2.5</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.07</td>
+							<td>1.2.4</td>
+							<td>Tweaked database design and added table diagrams.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.06</td>
+							<td>1.2.3</td>
+							<td>Stretch Goals main section removed, multi-root stretch goal moved to User Stories main section.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.01</td>
+							<td>1.2.2</td>
+							<td>Added stretch goals to User Stories.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.01</td>
+							<td>1.2.1</td>
+							<td>Corrected erroneous formatting and list ordering.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.08.01</td>
+							<td>1.2.0</td>
+							<td>Added last user stories for the first pass of this document, first pass now complete.  Let's get to developing this thing!</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.31</td>
+							<td>1.1.1</td>
+							<td>Added more user stories, particularly to the User Accounts and Continuation sections.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.31</td>
+							<td>1.1.0</td>
+							<td>Added details to user account under basic feature families.  Added user stories and made it collapsable due to its size.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.31</td>
+							<td>1.0.3</td>
+							<td>Made iterations and definitions tables collapsible to reduce clutter.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.31</td>
+							<td>1.0.2</td>
+							<td>Removed a link that had been included for testing.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.30</td>
+							<td>1.0.1</td>
+							<td>Colors and styling updated, no content updates or additions.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.28</td>
+							<td>1.0.0</td>
+							<td>First draft, design complete until development, consultation, and discovery necessitate changes.  Separated CSS into two files, one for general documentation use, the other one specific to our functional-requirements.html file.  Refactored HTML and CSS for much cleaner, safer, maintainable, expandable project.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.27</td>
+							<td>0.2.1</td>
+							<td>Beginning HTML refactor; no content change, just separating CSS to dedicated file, and beginning effort to improve HTML-correctness.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.24</td>
+							<td>0.2.0</td>
+							<td>Migrating to HTML since my MS Office license was revoked and I'm bitter about it, and HTML is a better format for versioning anyway.  Detailed Votification Rules main section fleshed out.  Stretch Goals main section added.</td>
+						</tr>
+						<tr>
+							<td>Steven Kitzes</td>
+							<td>2016.07.24</td>
+							<td>0.1.2</td>
+							<td>First documented update; includes Document iteration main section; new Definitions entries for downvote, moderator, RDBMS, UID, upvote, and votification; new Basic Feature Family entry for Moderator intervention; new Explicit Restriction entry for Path snippet content; new main section for Detailed Votification Rules; and content for the Architecture and Technology Stack, and Data Model main sections.</td>
+						</tr>
+					</table>
+				</div>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='3'></a>
+				<h2>Definitions</h2>
+				<p>The following terms used throughout this document warrant further explanation (<a id='definitions-expander' class='note' href='#3'>click to expand/collapse</a>):</p>
+				<div id='definitions-container'>
+					<table id='definitions' class='dark-border light-rounding'>
+						<tr>
+							<td class='bold'>Term</td>
+							<td class='bold'>Definition</td>
+						</tr>
+						<tr>
+							<td>account</td>
+							<td>Unless otherwise specified, a CYOAG account. Not to be confused with a linked social media account, which in this document shall be referred to as such to prevent confusion.</td>
+						</tr>
+						<tr>
+							<td>accounted user</td>
+							<td>A user with an account registered and linked to social media on CYOAG.  Typically, it is implied that this user is logged in when referred to in this document unless otherwise specified.  Note that moderators are counted among accounted users.</td>
+						</tr>
+						<tr>
+							<td>AMI</td>
+							<td>Amazon Machine Image - a virtual machine image provided by Amazon AWS for hosting web services.</td>
+						</tr>
+						<tr>
+							<td>child</td>
+							<td>Any node, reachable via a path, that follows immediately after the current node.</td>
+						</tr>
+						<tr>
+							<td>CYOAG</td>
+							<td>Create Your Own Adventure Game - the name of this web application.</td>
+						</tr>
+						<tr>
+							<td>downvote</td>
+							<td>A vote by a user against a specific node, indicating negative sentiment.</td>
+						</tr>
+						<tr>
+							<td>moderator</td>
+							<td>A user with a CYOAG
+							linked to a social media account, and who has special privileges granted for purposes of editing or removing content that violates site usage guidelines (e.g. a story snippet containing spam, or other abusive site usage).  Note that moderators are counted among accounted users.</td>
+						</tr>
+						<tr>
+							<td>node</td>
+							<td>A collection of all data representing a particular point in the story. This includes snippet and ID data for the current part of the story, the current node's parent, and zero or more paths.</td>
+						</tr>
+						<tr>
+							<td>node ID</td>
+							<td>The UID of the current node.</td>
+						</tr>
+						<tr>
+							<td>node snippet</td>
+							<td>The main story content (prose) at the current node.</td>
+						</tr>
+						<tr>
+							<td>parent</td>
+							<td>The node immediately preceding the current node; in other words, the current node is reachable via a path from the parent.</td>
+						</tr>
+						<tr>
+							<td>path</td>
+							<td>One option (usually of several) for story progression, leading away from the current node toward another, subsequent node.</td>
+						</tr>
+						<tr>
+							<td>path snippet</td>
+							<td>A short piece of text describing one of a reader's potential choices for progressing the story past the current node. Note that a given node's path snippet is displayed with that node's parent, to provide an option for progression that leads from said parent to the current node.</td>
+						</tr>
+						<tr>
+							<td>RDBMS</td>
+							<td>Relational database management system - a technology for defining and constructing a database, and maintaining data therein; e.g. MySQL.</td>
+						</tr>
+						<tr>
+							<td>root node</td>
+							<td>The very first node of the story, provided free of charge by Steven Kitzes, from which all paths and subsequent nodes follow.</td>
+						</tr>
+						<tr>
+							<td>terminal [node]</td>
+							<td>Any node with no paths yet defined leading out from it.  A node that terminates a story trajectory.</td>
+						</tr>
+						<tr>
+							<td>trajectory</td>
+							<td>A complete series of paths leading from the root node all the way to the current node.</td>
+						</tr>
+						<tr>
+							<td>UID</td>
+							<td>Unique identifier - a randomly generated string with astronomically small odds of a collision.</td>
+						</tr>
+						<tr>
+							<td>unaccounted user</td>
+							<td>A user with no registered account on CYOAG, <i>or</i> an accounted user or moderator who is not currently logged in.</td>
+						</tr>
+						<tr>
+							<td>upvote</td>
+							<td>A vote by a user in favor of a specific node, indicating positive sentiment.</td>
+						</tr>
+						<tr>
+							<td>user ID</td>
+							<td>A user's UID.</td>
+						</tr>
+						<tr>
+							<td>votify, votified, votification</td>
+							<td>A promoted node state that ensures the path to said node will be visible as a primary choice from that node's parent; this promotion occurs when user votes raise a node's vote count higher than its siblings, and can be a default state in the case that a node has few or no siblings.</td>
+						</tr>
+						<tr>
+							<td>welcome page</td>
+							<td>The first page displayed to any user when visiting the CYOAG site if cookies are not enabled, if the user is not logged in, or if the user is starting from scratch with a new trajectory.</td>
+						</tr>
+					</table>
+				</div>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='4'></a>
+				<h2>Basic Feature Families</h2>
+				<p>Observing this application at a high level, the following basic features are proposed (with further details provided later in this document):</p>
+				<ol>
+					<li class='subheader'>
+						<h2>Read the story</h2>
+						<p><strong>Any user</strong> visiting the site shall be able to read the story, making path selections to progress as far through the story as desired without needing an account.</p>
+					</li>
+					<li class='subheader'>
+						<h2>User accounts</h2>
+						<p><strong>Any user</strong> shall be able to create and log into a CYOAG account by associating a social media account, and shall be able to "delete" their account (dissociate social media accounts from CYOAG).  Posts under that account shall thenceforth be permanent, only able to be deleted by a moderator.</p>
+					</li>
+					<li class='subheader'>
+						<h2>Continuation</h2>
+						<p><strong>Any user</strong> with cookies enabled shall be able to pick up where the story left off if they stop reading in the middle of a trajectory.</p>
+					</li>
+					<li class='subheader'>
+						<h2>Contribution</h2>
+						<p><strong>Any user</strong> who is logged in shall be able to create new paths, leading to new story nodes from existing nodes.</p>
+					</li>
+					<li class='subheader'>
+						<h2>Votification</h2>
+						<p><strong>Any user</strong> who is logged in shall be able to apply positive or negative reversible sentiment to any node to which they have navigated.</p>
+					</li>
+					<li class='subheader'>
+						<h2>Moderator intervention</h2>
+						<p><strong>A moderator</strong> shall have special privileges granted for the purposes of improving quality (e.g. correcting typos) and enforcing CYOAG rules and guidelines (e.g. removing spam or other abusive content). This includes modifying content posted by users, deleting content, and blocking users from posting new content, but does not include the ability to override content contribution rules (e.g. a moderator may not contribute multiple paths to a node or contribute consecutive nodes).</p>
+					</li>
+				</ol>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='5'></a>
+				<h2>User Stories</h2>
+				<p>Subject to the explicit restrictions listed in following sections, the following specific use cases elaborate and expand on the Basic Feature Families described above (<a id='user-stories-expander' class='note' href='#5'>click to expand/collapse</a>):</p>
+				<div id='user-stories-container'>
+					<ol>
+						<li class='subheader'>
+							<h2>Read the story</h2>
+							<p>The following user stories relate to the basic feature family of viewing content on CYOAG.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, read the story.</h2>
+									<p>An unaccounted user shall be able to recursively read the node snippet at the current node, and see and select from votified path snippets at that node.  Upon initial page load, unaccounted users shall be shown the welcome page, except as specified below under the Continuation feature family.  Unaccounted users shall be able to follow an entire story trajectory from the welcome page through any terminal node.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user or moderator, read the story.</h2>
+									<p>Accounted users and moderators shall be able to recursively read the node snippet at the current node, and see and select from votified path snippets at that node.  Accounted users and moderators shall have the option to expand, view, and select from a list of non-votified paths if desired.  Upon initial page load, accounted users and moderators shall be shown the welcome page, except as specified below under the Continuation feature family.  Accounted users and moderators shall be able to follow an entire story trajectory from the welcome page through any terminal node, including any trajectory that includes non-votified paths.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As any type of user, scrap the current trajectory and start over.</h2>
+									<p>Any user shall have the option to return to the welcome page to start a new trajectory.  In this case, any information linking the user's session and/or account to a stored node for continuation shall be reset as well, so the user shall be notified of this danger and given a chance to confirm before proceeding.</p>
+								</li>
+							</ol>
+						</li>
+						<li class='subheader'>
+							<h2>User accounts</h2>
+							<p>The following user stories relate to user account management.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, be invited to create an account.</h2>
+									<p>When any user visits any CYOAG page unaccounted, all features reliant upon user account association shall display instead as an invitation to either log in or create an account.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, log into any CYOAG account from any CYOAG page.</h2>
+									<p>When any user visits any CYOAG page unaccounted, user interface elements shall be presented to allow that user to log in.  Once credentials have been validated, the user shall be presented either with negative feedback, or with a page update showing all features available as appropriate for that user's account type (i.e. accounted user or moderator).</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, create an account.</h2>
+									<p>What an unaccounted user visits any CYOAG page, user interface elements shall be presented to allow that user to create an account by logging in through social media.  These elements shall follow alongside the login UI elements, and shall include Facebook, Twitter, and Google+.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a moderator, suspend an account.</h2>
+									<p>A moderator, and <i>only</i> a moderator, shall be able to see a node's author displayed with that node's snippet.  The moderator shall have the option on that snippet to suspend the snippet's author, causing an email to be sent to that author explaining why the user was suspended.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a moderator, terminate/ban an account.</h2>
+									<p>A moderator, and <i>only</i> a moderator, shall be able to see a node's author displayed with that node's snippet.  The moderator shall have the option on that snippet to terminate/ban the snippet's author, causing an email to be sent to that author explaining why the user's account was terminated.  Each node generated by the terminated account shall be deleted if that node has no children.  Note that in this case, the parent of the deleted node must be notified so that it can clean up paths leading to the deleted child node.</p>
+								</li>
+							</ol>
+						</li>
+						<li class='subheader'>
+							<h2>Continuation</h2>
+							<p>The following user stories describe how CYOAG pages should behave when a user leaves, and later returns.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As a user navigating CYOAG with cookies enabled, my progress shall be tracked.</h2>
+									<p>CYOAG pages shall track user progress through story trajectories using cookies.  If a user is logged in via social media, this progress shall be recorded on the CYOAG cloud, as well.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a user returning to CYOAG with cookies disabled, land on welcome page.</h2>
+									<p>If a user navigates CYOAG without cookies enabled, there will be no way to track the user's progress through the story if the user leaves the page.  The user shall be able to follow a trajectory and enjoy the story as far as desired in a single sitting, but if the user leaves the page, progres will not be saved and the user's place will be lost.</p>
+									<p>Incidentally, if cookies are disabled, a user attempting to log in via social media will find that they are unable to remain logged in if they leave the site and return at a later time.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user returning to CYOAG with cookies enabled on the same device, return to last visited node.</h2>
+									<p>If an unaccounted user returns to CYOAG after leaving, with cookies enabled, the cookie shall restore the most recently visited node.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user returning to CYOAG on a different device, land on welcome page.</h2>
+									<p>There is no way to track an unaccounted user across devices, so in this situation the unaccounted user will necessarily be treated as a brand new, unaccounted user.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user, my progress shall be tracked on the cloud.</h2>
+									<p>In addition to story trajectory progress tracking on a given device via cookies, the story trajectory progress of accounted users shall be tracked on the cloud so that accounted users can maintain their position across devices.  This cloud tracking shall always supersede cookie tracking.</p>
+									<p>When logging in via social media, the server shall overwrite any stored progress in cookies with progress associated with that social media account as stored on the cloud.  Every path traversal made by an accounted user that is logged in shall update both the local cookie and the CYOAG server.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user returning to CYOAG on the same device, logged in, with cookies enabled, remain logged in.</h2>
+									<p>Cookies shall help CYOAG to remember that a given social media account was logged in by associating a GUID with that social media account and storing that in a cookie.  CYOAG shall preserve that account's login status until the user logs out or the cookie expires.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user departing CYOAG while logged in, with cookies disabled, I shall lose my progress and my login session.</h2>
+									<p>There is no way to track login status when a browser is closed without cookies, so in this situation the social media account shall be logged out.</p>
+								</li>
+							</ol>
+						</li>
+						<li class='subheader'>
+							<h2>Contribution</h2>
+							<p>The following user story describes how accounted users can contribute new nodes and paths to CYOAG.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As an accounted user, I shall be able to post new paths from any node I view, leading to new nodes.</h2>
+									<p>When viewing any node as an accounted user, including as a moderator, user interface elements shall be displayed below the votified and expanded/collapsed paths out from that node that allow the user to fill in the details for a new node, and the path from the current node to the new child node being created.  A button shall be included for submission, and appropriate validation shall occur when this button is pressed, both in the client and the on the server.  SQL injection attack protection shall also be implemented on the server side.</p>
+								</li>
+							</ol>
+						</li>
+						<li class='subheader'>
+							<h2>Votification</h2>
+							<p>The following user stories describe the ways in which users can participate in CYOAG's votification system.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As an unaccounted user, I shall be unable to access any features associated with the votification system.</h2>
+									<p>Users that do not have accounts or are not logged in shall not be able to see or follow non-votified paths, and shall not be able to upvote or downvote nodes.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As an accounted user, I shall be able to upvote and downvote nodes.</h2>
+									<p>Users that are logged into CYOAG accounts through social media shall be presented with user interface elements allowing them to upvote or downvote the current node.  In the event an accounted user has already voted on the current node, the UI shall reflect this, and shall allow the user to change their vote from among the three distinct state possibilities for node votification: upvote, downvote, or no vote.</p>
+									<p class='note'>For example, the user may always select either the upvote or downvote button; if the user selects an unselected button, that button becomes selected, and the previously selected button, if any, becomes unselected; if the user selects an already selected button, that button becomes unselected and the no-vote state is entered.</p>
+								</li>
+							</ol>
+							<p>For more details on votification, see Detailed Votification Rules below.</p>
+						</li>
+						<li class='subheader'>
+							<h2>Moderator intervention and benefits</h2>
+							<p>The following user stories detail the ways in which moderators can enforce the spirit and rules of CYOAG.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As a moderator, I shall be presented detailed node information.</h2>
+									<p>When viewing any node, a moderator shall be presented with more information on that node than any other ordinary user, including the node's author, the node's UID, and all paths out from that node (both votified and non-votified) and those paths' UIDs.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a moderator, I shall be presented advanced node and user account management options.</h2>
+									<p>When viewing any node, a moderator shall be presented with special management options, including:</p>
+									<ul>
+										<li>An option to edit the current node, with a prompt for optional justification entry.</li>
+										<li>An option to delete the current node, with a prompt for optional justification entry.  When a node is deleted, if it has any child nodes, those must also be deleted.  More importantly, all parents of the deleted node must have the paths leading from those parents to the deleted child cleared as well.</li>
+										<li>An option to suspend the account of the current node's author, with an optional prompt for justification entry.</li>
+										<li>An option to terminate the account of the current node's author, with an optional prompt for justification entry.  When an account is terminated, nodes created by that account are not deleted unless separately specified.</li>
+									</ul>
+								</li><br>
+								<li class='subsubheader'>
+									<h2>As a moderator, I shall be able to navigate to any node by node UID.</h2>
+									<p>User interface elements shall be presented to moderators on every node page, providing the ability for moderators to navigate directly to any other node by UID.</p>
+								</li>
+							</ol>
+						</li>
+						<li class='subheader'>
+							<h2>Stretch goals</h2>
+							<p>The following user stories describe stretch goals and nice-to-haves for CYOAG.</p>
+							<ol>
+								<li class='subsubheader'>
+									<h2>As a moderator, I shall be able to see a list of nodes by author.</h2>
+									<p>Moderators shall be able to click an author's name on a node, and be presented with a list of all paths by that author, including UID, and those paths shall be clickable so that the moderator can navigate straight to any path by the aforementioned author.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a user, I shall be able to see a visualization of my trajectory.</h2>
+									<p>All users shall, from any node, be able to view a visualization of the tree-traversal that led them to the current node.</p>
+								</li>
+								<li class='subsubheader'>
+									<h2>As a user, I shall be able to pick from several root nodes.</h2>
+									<p>Any user visiting CYOAG shall have the option of beginning a trajectory from one of several root nodes, to enjoy stories of diverse tone, direction, setting, etc.  Depending on the balance between user interest and moderator availability, and complexity of implementation, user submissions for new root nodes shall be accepted.</p>
+								</li>
+							</ol>
+						</li>
+					</ol>
+				</div>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='6'></a>
+				<h2>Explicit Restrictions</h2>
+				<p>There are certain behaviors we want to disallow to prevent users from abusing the site or acting without the spirit of collaboration in mind. These behaviors are prevented or limited by design.</p>
+				<ol>
+					<li class='subheader'>
+						<h2>Editing</h2>
+						<p>Edits to a node (including its node snippet and path snippet) shall be allowed only by that node's original creator, and only if that node has zero child nodes.  This is to prevent changes from breaking story continuity or altering the flow of the story as interpreted by subsequent authors.  <em>Exception: moderators can always edit any post.</em></p>
+					</li>
+					<li class='subheader'>
+						<h2>Deletion</h2>
+						<p>Only a node's creator shall be able to delete it, and only if that node has no child nodes yet.  <em>Exception: moderators can always delete any post; deletions must cascade to child nodes to prevent database pollution.  Furthermore, parents of deleted nodes must be notified to prevent dead path links.</em></p>
+					</li>
+					<li class='subheader'>
+						<h2>Sibling paths</h2>
+						<p>No user shall be permitted to contribute more than a single path to any node.  <em>No exception for moderators.</em></p>
+					</li>
+					<li class='subheader'>
+						<h2>Consecutive paths</h2>
+						<p>A user shall not be permitted to contribute a path to a node that was created by that same user.  <em>No exception for moderators.</em></p>
+					</li>
+					<li class='subheader'>
+						<h2>Snippet length</h2>
+						<p>A node snippet shall have a minimum length of 250 characters, and a maximum length of 2,000 characters. A path snippet shall have a minimum length of 3 characters, and a maximum length of 100 characters.  <em>No exception for moderators.</em></p>
+					</li>
+					<li class='subheader'>
+						<h2>Path snippet content</h2>
+						<p>A path snippet shall not have the same content as another path snippet at the same node.  <em>No exception for moderators.</em></p>
+					</li>
+					<li class='subheader'>
+						<h2>Narcissistic votification</h2>
+						<p>No user shall be able to vote (either up or down) for their own nodes.  <em>No exception for moderators.</em></p>
+					</li>
+				</ol>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='7'></a>
+				<h2>Detailed Votification Rules</h2>
+				<p>Votification is the system by which sibling nodes are promoted to, or demoted from, the status of being a primary path choice from a given parent. Here are detailed the system of rules governing votification promotion, demotion, and the effects this state has on the user experience.</p>
+				<ol>
+					<li class='subheader'>
+						<h2>Impact of user type on votification access</h2>
+						<p>Users without accounts shall be restricted from access to votification features. These unaccounted users shall be shown:</p>
+						<ul>
+							<li>only votified paths at the current node</li>
+							<li>votification buttons that are grayed out</li>
+							<li>a suggestion alongside grayed out votification UI that the user either login or create an account by linking a social media account</li>
+							<li>grayed out and disabled input fields for adding paths to the current node</li>
+						</ul>
+						<p>Users with accounts shall have access to all public-facing votification features.  These accounted users shall be shown:</p>
+						<ul>
+							<li>all votified paths at the current node</li>
+							<li>active votification buttons that both reflect, and allow changes to, the user's votification of the current node</li>
+							<li>an option to view all paths available at a current node, not limited to votified paths; and to follow any path the user desires</li>
+						</ul>
+						<p>Moderators shall have access to all of the features available to accounted users.  the only difference in the moderator's experience is that all paths are always displayed for moderators.  This is to enable moderators quicker navigation and easier skimming of path snippets.</p>
+					</li>
+					<li class='subheader'>
+						<h2>Detailed definition of votified paths</h2>
+						<p>The top 4 highest voted paths out from a given node are defined as that node's votified paths.  If 4 or fewer paths exist in total at a given node, then those 4 or fewer paths are automatically taken as the votified paths for that node.  It is possible for a path to have user sentiment that is overall negative, but still to be votified, as long as that path is either in the top 4 paths overall at its parent node, or is one of 4 or fewer total paths at said parent.  In the case of a tie between two paths competing for votification, a winner will be selected arbitrarily as the votified path.</p>
+					</li>
+				</ol>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='8'></a>
+				<h2>Architecture and Technology Stack</h2>
+				<p>The desire to get the CYOAG project off the ground using the AWS Free Tier services will limit the technologies available. However, with the technologies made available through the AWS Free Tier, all requirements are achievable.</p>
+				<ol>
+					<li class='subheader'>
+						<h2>Server</h2>
+						<p>The server shall be a Node.js instance, running on a Linux AMI on Amazon EC2.</p>
+					</li>
+					<li class='subheader'>
+						<h2>Database</h2>
+						<p>The AWS Free Tier provides only relational database technologies, so NoSQL solutions are not available. Therefore, data shall be managed using MySQL due to availability and developer familiarity.</p>
+					</li>
+					<li class='subheader'>
+						<h2>Static file service</h2>
+						<p>CYOAG static files shall be served from an Amazon S3 bucket.</p>
+					</li>
+					<li class='subheader'>
+						<h2>Front end</h2>
+						<p>The CYOAG front end shall be delivered as a mixture of traditional vanilla HTML, CSS, and JavaScript with a templating technology to limit code duplication. As of this writing, Handlebars is the most likely candidate for use as a templating technology. In order to reduce the load on the Amazon S3 bucket (identified as a weak point in the AWS Free Tier service stack), jQuery shall be used extensively to manipulate DOM elements to modify the user interface, rather than loading a new static file for each navigation request by a user.</p>
+					</li>
+				</ol>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<li class='header'>
+				<hr>
+				<a name='9'></a>
+				<h2>Data Model</h2>
+				<p>Since the AWS Free Tier limits database technology options to RDBMS selections only (as of this writing), and since CYOAG has thus been designed to utilize MySQL, data shall be organized into a table structure. Data shall be divided into a number of tables to accommodate the limitations and requirements of relational database schemas, and to facilitate project organization and separation of concerns to the extent possible.  (See <a href="https://dev.mysql.com/doc/">MySQL</a>'s documentation for more details.)</p>
+				<ol>
+					<li class='subheader'>
+						<h2>Table: users</h2>
+						<p>The users table shall contain information defining and pertaining to specific user accounts. The table shall include fields to record a user's chosen name, random password salt, salted password, randomized unique ID (UID), and current session ID (UID format).  Since login duties for CYOAG are hoped to be offloaded to third party authentication services such as Facebook and Twitter in the future, this table shall also contain minimal third-party authentication information, including an email address (to be provided by the third party authenticator in place of user name and password).</p>
+						<table class='table-desc dark-border light-rouding'>
+							<th>users</th>
+							<tr>
+								<td><strong>Key</strong></td>
+								<td><strong>Unique</strong></td>
+								<td><strong>Column</strong></td>
+								<td><strong>Type</strong></td>
+							</tr>
+							<tr>
+								<td>PK</td>
+								<td>yes</td>
+								<td>uid</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>yes</td>
+								<td>name</td>
+								<td>varchar(16)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>acct_type</td>
+								<td>varchar(16)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>salt</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>salted_pass</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>yes</td>
+								<td>session_uid</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>yes</td>
+								<td>email</td>
+								<td>varchar(50)</td>
+							</tr>
+						</table><br>
+					</li>
+					<li class='subheader'>
+						<h2>Table: nodes</h2>
+						<p>The nodes table shall contain information defining a given node, including information defining relationships between nodes, but <em>not</em> defining user sentiment toward a node. In other words, this table shall contain a node's UID, the UID of its parent, the node's snippet, and its path snippet; but it shall not contain information on the node's children, or any upvotes, or downvotes cast on the node.</p>
+						<table class='table-desc dark-border light-rouding'>
+							<th>nodes</th>
+							<tr>
+								<td><strong>Key</strong></td>
+								<td><strong>Unique</strong></td>
+								<td><strong>Column</strong></td>
+								<td><strong>Type</strong></td>
+							</tr>
+							<tr>
+								<td>PK</td>
+								<td>yes</td>
+								<td>uid</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>parent_uid</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td>FK</td>
+								<td>no</td>
+								<td>author_uid</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>path_snippet</td>
+								<td>varchar(100)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>node_snippet</td>
+								<td>varchar(2000)</td>
+							</tr>
+						</table><br>
+					</li>
+					<li class='subheader'>
+						<h2>Table: positions</h2>
+						<p>The positions table shall contain information on the current position of a user in the story tree, including the user's UID and the node's UID.</p>
+						<table class='table-desc dark-border light-rouding'>
+							<th>positions</th>
+							<tr>
+								<td><strong>Key</strong></td>
+								<td><strong>Unique</strong></td>
+								<td><strong>Column</strong></td>
+								<td><strong>Type</strong></td>
+							</tr>
+							<tr>
+								<td>PK + FK</td>
+								<td>yes</td>
+								<td>user_uid</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td>PK + FK</td>
+								<td>yes</td>
+								<td>node_uid</td>
+								<td>varchar(40)</td>
+							</tr>
+						</table>
+						<p><span class='note'><strong>Note:</strong> the original Data Model design called for the users table to provide a column indicating the current node position of each user.  However, this would have caused the users table to contain a foreign key from the nodes table (current node), and the nodes table to contain a foreign key from the users table (author ID).  This type of circular dependency is poor practice (and not supported by MySQL in any case).</span></p><br>
+					</li>
+					<li class='subheader'>
+						<h2>Table: votes</h2>
+						<p>The votes table shall contain data relating user sentiment to the nodes for which that sentiment is expressed. Each row shall contain as a compound primary key a user UID and a node UID, so that each such combination is unique, preventing a user from casting multiple votes on the same node. Each row shall contain as a third datum a flag defining the user's sentiment as positive or negative. This flag can be switched in order to reflect a change in sentiment, or an entire row can be deleted to reflect a user's desire to express no sentiment on a node.</p>
+						<table class='table-desc dark-border light-rouding'>
+							<th>votes</th>
+							<tr>
+								<td><strong>Key</strong></td>
+								<td><strong>Unique</strong></td>
+								<td><strong>Column</strong></td>
+								<td><strong>Type</strong></td>
+							</tr>
+							<tr>
+								<td>PK + FK</td>
+								<td>yes</td>
+								<td>node_uid</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td>PK + FK</td>
+								<td>yes</td>
+								<td>voter_uid</td>
+								<td>varchar(40)</td>
+							</tr>
+							<tr>
+								<td></td>
+								<td>no</td>
+								<td>sentiment</td>
+								<td>tinyint</td>
+							</tr>
+						</table>
+					</li>
+				</ol>
+				<p class='note'><a href='#0'>back to top</a></p>
+			</li>
+
+			<hr>
+
+		</ol>
+	</body>
+</html>
