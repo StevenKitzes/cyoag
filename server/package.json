@@ -19,6 +19,7 @@
     "mysql": "^2.11.1",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
+    "request": "^2.75.0",
     "serve-favicon": "~2.3.0",
     "webpack": "^1.13.2"
   }
