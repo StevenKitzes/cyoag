@@ -1,17 +1,26 @@
 /*
-This is where Facebook redirects after handling login.
+This is the endpoint the user will hit to initiate a Facebook login request
 */
 var express = require('express');
 var request = require('request'); // easy HTTP request library
 var router = express.Router();
 var secrets = require('../secrets');
 
-router.get('/', function(req, res, next) {
+// Route to kick off a Facebook login event
+router.get('/login', function(req, res, next) {
+  var fbLoginUrl = 'https://www.facebook.com/v2.8/dialog/oauth?client_id=' +
+    secrets.APP_ID +
+    '&redirect_uri=http://localhost.cyoag.com:3000/fb/swap&response_type=code';
+  res.redirect(302, fbLoginUrl);
+});
+
+// Route to continue a Facebook login event by swapping code for access token
+router.get('/swap', function(req, res, next) {
   // Initial redirect from FB should have a "code" included as URL param; parse
   //  parse it out here, then build URL to swap "code" for user's access token
   var swapUrl = 'https://graph.facebook.com/v2.8/oauth/access_token?client_id=' +
     secrets.APP_ID +
-    '&redirect_uri=http://localhost.cyoag.com:3000/fbrdr&client_secret=' +
+    '&redirect_uri=http://localhost.cyoag.com:3000/fb/swap&client_secret=' +
     secrets.APP_SECRET +
     '&code=' +
     req.query.code;
@@ -35,7 +44,7 @@ router.get('/', function(req, res, next) {
         if(r.statusCode != 200) { console.log('Uh oh!  Got status code: ' + r.statusCode); return; }
 
         var idObj = JSON.parse(rb);
-        var userId = idObj.id;
+        var userId = 'fb-' + idObj.id;
         res.send('got user id: ' + userId);
       });
     }

@@ -6,8 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
-var fblogin = require('./routes/fblogin');
-var fbrdr = require('./routes/fbrdr');
+var fbRoutes = require('./routes/fbRoutes');
 var testPost = require('./routes/testPost');
 var cookieCheck = require('./routes/cookieCheck');
 
@@ -25,8 +24,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/index', index);
-app.use('/fblogin', fblogin);
-app.use('/fbrdr', fbrdr);
+app.use('/fb', fbRoutes);
 app.use('/testPost', testPost);
 app.use('/cookieCheck', cookieCheck);
 
