@@ -27,3 +27,17 @@ function db() {
 
 // Expose the function that returns a reference to the connection pool
 module.exports = db;
+
+/* SIMPLE USAGE SAMPLE: */
+// var mysql = require('mysql');
+// var pool  = mysql.createPool(...);
+//
+// pool.getConnection(function(err, connection) {
+//   // Use the connection
+//   connection.query( 'SELECT something FROM sometable', function(err, rows) {
+//     // And done with the connection.
+//     connection.release();
+//
+//     // Don't use the connection here, it has been returned to the pool.
+//   });
+// });
