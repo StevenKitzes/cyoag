@@ -46,89 +46,64 @@ router.get('/login', function(req, res, next) {
     // Get the body of the response
     var req_data = qs.parse(body);
     // Build user authorization URL
-    var userAuthUrl = 'https://api.twitter.com/oauth/authenticate' +
+    var userAuthorizationUrl = 'https://api.twitter.com/oauth/authenticate' +
       '?' +
       qs.stringify({oauth_token: req_data.oauth_token});
 
     // Redirect the user to the URL where Twitter asks them to authorize CYOAG
-    res.redirect(302, userAuthUrl);
+    res.redirect(302, userAuthorizationUrl);
   });
 });
-/*
-    // step 3
-    // after the user is redirected back to your server
-    var auth_data = qs.parse(body)
-      , oauth =
-        { consumer_key: CONSUMER_KEY
-        , consumer_secret: CONSUMER_SECRET
-        , token: auth_data.oauth_token
-        , token_secret: req_data.oauth_token_secret
-        , verifier: auth_data.oauth_verifier
-        }
-      , url = 'https://api.twitter.com/oauth/access_token'
-      ;
-    request.post({url:url, oauth:oauth}, function (e, r, body) {
-      // ready to make signed requests on behalf of the user
-      var perm_data = qs.parse(body)
-        , oauth =
-          { consumer_key: CONSUMER_KEY
-          , consumer_secret: CONSUMER_SECRET
-          , token: perm_data.oauth_token
-          , token_secret: perm_data.oauth_token_secret
-          }
-        , url = 'https://api.twitter.com/1.1/users/show.json'
-        , qs =
-          { screen_name: perm_data.screen_name
-          , user_id: perm_data.user_id
-          }
-        ;
-      request.get({url:url, oauth:oauth, qs:qs, json:true}, function (e, r, user) {
-        console.log(user)
-      })
-    })
-  })
-});
-*/
-// Route to continue a Facebook login event by swapping code for access token
+
 router.get('/swap', function(req, res, next) {
-  // Initial redirect from FB should have a "code" included as URL param; parse
-  //  parse it out here, then build URL to swap "code" for user's access token
-  var swapUrl = 'https://graph.facebook.com/v2.8/oauth/access_token?client_id=' +
-    secrets.APP_ID +
-    '&redirect_uri=http://localhost.cyoag.com:3000/fb/swap&client_secret=' +
-    secrets.APP_SECRET +
-    '&code=' +
-    req.query.code;
+  /*/
+  / OAuth Step 3
+  / This is the endpoint to redirect to after the user authorizes CYOAG to
+  / login using their Twitter account.  Here, we receive several OAuth items
+  / including OAuth token, secret, and verifier; all of which we can now
+  / swap for an access token, which will finally allow us to grab user info
+  / from Twitter, such as the user's userId.
+  /*/
 
-  // make the request to FB to swap the "code" for the access token
-  request(swapUrl, function(error, response, responseBody) {
-    // catch errors
-    if(error) { console.log(error); return; }
-    if(response.statusCode != 200) { console.log('Oops!  Got status code: ' + response.statusCode); return; }
+  // For this particular call, we are fielding using ExpressJS so we can access
+  // query string KVPs through the Express framework
+  // (e.g. 'req.query.[propName]')
+  var oauth = {
+    consumer_key: secrets.TW_KEY,
+    consumer_secret: secrets.TW_SECRET,
+    token: req.query.oauth_token,
+    token_secret: req.query.oauth_token_secret,
+    verifier: req.query.oauth_verifier
+  };
+  var twAccessTokenUrl = 'https://api.twitter.com/oauth/access_token';
 
-    // make a JSON object out of the response and get the token out
-    var tokenObj = JSON.parse(responseBody);
-    var token = tokenObj.access_token;
+  // Make a call to exchange updated OAuth credentials for an access token
+  request.post({url:twAccessTokenUrl, oauth:oauth}, function (e, r, body) {
+    // In the callback, we are finally ready to make Twitter API calls
+    // specifically relating to a user, e.g. to retrieve a userId.
+    var perm_data = qs.parse(body);
+    var oauth = {
+      consumer_key: secrets.TW_KEY,
+      consumer_secret: secrets.TW_SECRET,
+      token: perm_data.oauth_token,
+      token_secret: perm_data.oauth_token_secret,
+    };
+    var userDataUrl = 'https://api.twitter.com/1.1/users/show.json';
+    // Note that for this query string, the property names are defined strictly
+    // by Twitter, so we can't change them.
+    var queryStringObject = {
+      screen_name: perm_data.screen_name,
+      user_id: perm_data.user_id
+    };
 
-    // make sure we actually got the token
-    if(token) {
-      // another FB call, this time to get user ID from the access token
-      var getUserIdUrl = 'https://graph.facebook.com/me?fields=id&access_token=' + token;
-      request(getUserIdUrl, function(e, r, rb) {
-        if(e) { console.log(e); return; }
-        if(r.statusCode != 200) { console.log('Uh oh!  Got status code: ' + r.statusCode); return; }
+    // If I've understood this right, here's where we actually query for
+    // user data, and where we handle it in a callback.
+    request.get({url:userDataUrl, oauth:oauth, qs:queryStringObject, json:true}, function (e, r, user) {
+      console.log('user:');
+      console.log(JSON.stringify(user));
+    })
 
-        var idObj = JSON.parse(rb);
-        var userId = 'fb-' + idObj.id;
-        res.send('got user id: ' + userId);
-      });
-    }
-    // token not received?!
-    else {
-      var noTokenReceivedMsg = 'ERROR: no token received';
-      console.log(noTokenReceivedMsg);
-      res.send(noTokenReceivedMsg);
-    }
+    res.send('Got user: tw-' + perm_data.user_id);
   });
 });
 
