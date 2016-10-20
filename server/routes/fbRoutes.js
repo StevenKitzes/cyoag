@@ -9,7 +9,7 @@ var secrets = require('../secrets');
 // Route to kick off a Facebook login event
 router.get('/login', function(req, res, next) {
   var fbLoginUrl = 'https://www.facebook.com/v2.8/dialog/oauth?client_id=' +
-    secrets.APP_ID +
+    secrets.FB_APP_ID +
     '&redirect_uri=http://localhost.cyoag.com:3000/fb/swap&response_type=code';
   res.redirect(302, fbLoginUrl);
 });
@@ -19,9 +19,9 @@ router.get('/swap', function(req, res, next) {
   // Initial redirect from FB should have a "code" included as URL param; parse
   //  parse it out here, then build URL to swap "code" for user's access token
   var swapUrl = 'https://graph.facebook.com/v2.8/oauth/access_token?client_id=' +
-    secrets.APP_ID +
+    secrets.FB_APP_ID +
     '&redirect_uri=http://localhost.cyoag.com:3000/fb/swap&client_secret=' +
-    secrets.APP_SECRET +
+    secrets.FB_APP_SECRET +
     '&code=' +
     req.query.code;
 

@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
 var fbRoutes = require('./routes/fbRoutes');
+var twRoutes = require('./routes/twRoutes');
 var testPost = require('./routes/testPost');
 var cookieCheck = require('./routes/cookieCheck');
 
@@ -25,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/index', index);
 app.use('/fb', fbRoutes);
+app.use('/tw', twRoutes);
 app.use('/testPost', testPost);
 app.use('/cookieCheck', cookieCheck);
 
