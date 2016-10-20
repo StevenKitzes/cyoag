@@ -1,5 +1,6 @@
 // Require the MySQL library for NodeJS
 var mysql = require('mysql');
+var secrets = require('./secrets');
 
 // This is a connection pool, which will be made available to this app's routes
 var pool;
@@ -14,8 +15,8 @@ function db() {
     pool = mysql.createPool({
       connectionLimit: 10,
       host: 'localhost',
-      user: 'root',
-      password: 'root',
+      user: secrets.SQL_USER,
+      password: secrets.SQL_PASS,
       database: 'cyoag'
     });
   }
