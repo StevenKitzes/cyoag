@@ -9,7 +9,7 @@ var index = require('./routes/index');
 var fbRoutes = require('./routes/fbRoutes');
 var twRoutes = require('./routes/twRoutes');
 var testPost = require('./routes/testPost');
-var cookieCheck = require('./routes/cookieCheck');
+var session = require('./routes/session');
 
 var app = express();
 
@@ -28,7 +28,7 @@ app.use('/index', index);
 app.use('/fb', fbRoutes);
 app.use('/tw', twRoutes);
 app.use('/testPost', testPost);
-app.use('/cookieCheck', cookieCheck);
+app.use('/session', session);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,6 +1,54 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var logMgr = require('./logger').setLogSource('main.js');
+
+function checkSession() {
+  logMgr.debug('+ + + Checking session status . . .');
+  var xhr = new XMLHttpRequest();
+  // xmlHttp.onreadystatechange = () => {...}
+  xhr.onreadystatechange = function () {
+    if( xhr.readyState == 4 && xhr.status == 200 ) {
+      logMgr.debug('Good status!');
+      logMgr.verbose('Payload: ' + xhr.responseText);
+      var response = JSON.parse(xhr.responseText);
+      // do something with response
+      if(response.msg) {
+        document.getElementsByTagName('body')[0].insertAdjacentHTML('beforeend','<div>'+ response.msg +'</div>');
+      }
+      else {
+        document.getElementsByTagName('body')[0].insertAdjacentHTML('beforeend','<div>ERROR: response message missing.</div>');
+      }
+    }
+    else {
+      logMgr.debug('Tried initial cookie check.  Got HTTP response status: ' + xhr.status);
+    }
+  }
+  xhr.open('POST', '/session');
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xhr.send();
+}
+
+// Hello World component: display a simple prop
+var MainComponent = React.createClass({
+  componentWillMount: checkSession,
+  render: function() {
+    return (
+      <h1>Ready {this.props.name}!</h1>
+    );
+  }
+});
+
+ReactDOM.render(
+  <MainComponent name='Player 1' />,
+  document.getElementById('mount-main')
+);
+
+/* Everything past here is old sample code
+
+var React = require('react');
+var ReactDOM = require('react-dom');
+
 // Hello World component: display a simple prop
 var HelloWorldComponent = React.createClass({
   componentWillMount: function() {
@@ -178,3 +226,5 @@ ReactDOM.render(
   <ButtonHolder/>,
   document.getElementById('button-point')
 );
+
+*/
