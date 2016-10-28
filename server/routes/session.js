@@ -16,11 +16,13 @@ router.post('/', function(req, res, next) {
     // If missing, create and return
     var newGuid = generateGuid();
     response.msg = 'Session ID not found.  Created: ' + newGuid;
+    response.loggedIn = false;
     res.cookie('sessionId', newGuid);
   }
   else {
     // If session cookie existed, validate it
     response.msg = 'Session ID already existed: ' + req.cookies.sessionId;
+    response.loggedIn = true;
   }
 
   res.send(JSON.stringify(response));

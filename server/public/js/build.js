@@ -50,47 +50,11 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ./logger */ 172).setLogSource('main.js');
+	var MainComponent = __webpack_require__(/*! ./MainComponent */ 172);
 	
-	function checkSession() {
-	  logMgr.debug('+ + + Checking session status . . .');
-	  var xhr = new XMLHttpRequest();
-	  // xmlHttp.onreadystatechange = () => {...}
-	  xhr.onreadystatechange = function () {
-	    if (xhr.readyState == 4 && xhr.status == 200) {
-	      logMgr.debug('Good status!');
-	      logMgr.verbose('Payload: ' + xhr.responseText);
-	      var response = JSON.parse(xhr.responseText);
-	      // do something with response
-	      if (response.msg) {
-	        document.getElementsByTagName('body')[0].insertAdjacentHTML('beforeend', '<div>' + response.msg + '</div>');
-	      } else {
-	        document.getElementsByTagName('body')[0].insertAdjacentHTML('beforeend', '<div>ERROR: response message missing.</div>');
-	      }
-	    } else {
-	      logMgr.debug('Tried initial cookie check.  Got HTTP response status: ' + xhr.status);
-	    }
-	  };
-	  xhr.open('POST', '/session');
-	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-	  xhr.send();
-	}
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('main.js');
 	
-	// Hello World component: display a simple prop
-	var MainComponent = React.createClass({
-	  displayName: 'MainComponent',
-	
-	  componentWillMount: checkSession,
-	  render: function () {
-	    return React.createElement(
-	      'h1',
-	      null,
-	      'Ready ',
-	      this.props.name,
-	      '!'
-	    );
-	  }
-	});
+	logMgr.verbose('Kicking off initial render!');
 	
 	ReactDOM.render(React.createElement(MainComponent, { name: 'Player 1' }), document.getElementById('mount-main'));
 	
@@ -22161,45 +22125,146 @@
 
 /***/ },
 /* 172 */
+/*!******************************************!*\
+  !*** ./build-source/js/MainComponent.js ***!
+  \******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainComponent.js');
+	
+	var FacebookButton = __webpack_require__(/*! ./SocialLoginButtonComponents */ 175).FacebookButton;
+	var TwitterButton = __webpack_require__(/*! ./SocialLoginButtonComponents */ 175).TwitterButton;
+	
+	// Hello World component: display a simple prop
+	var MainComponent = React.createClass({
+	  displayName: 'MainComponent',
+	
+	  componentWillMount: function () {
+	    logMgr.debug('Checking session status . . .');
+	    var xhr = new XMLHttpRequest();
+	    // xmlHttp.onreadystatechange = () => {...}
+	    xhr.onreadystatechange = () => {
+	      if (xhr.readyState == 4 && xhr.status == 200) {
+	        logMgr.debug('Status 200!');
+	        logMgr.verbose('Cookie check response payload: ' + xhr.responseText);
+	        var response = JSON.parse(xhr.responseText);
+	        // do something with response
+	        logMgr.debug('Response message: ' + response.msg);
+	        this.setState({
+	          loggedIn: response.loggedIn
+	        });
+	      } else {
+	        logMgr.debug('Initial cookie check yielded HTTP response status: ' + xhr.status);
+	      }
+	    };
+	    xhr.open('POST', '/session');
+	    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	    xhr.send();
+	  },
+	  getInitialState: function () {
+	    return {
+	      loggedIn: false
+	    };
+	  },
+	  render: function () {
+	    logMgr.verbose('Rendering MainComponent.');
+	    var loggedStatus;
+	    if (this.state.loggedIn) {
+	      loggedStatus = React.createElement(
+	        'h3',
+	        null,
+	        'Logged in!'
+	      );
+	    } else {
+	      loggedStatus = React.createElement(
+	        'div',
+	        null,
+	        React.createElement(FacebookButton, null),
+	        React.createElement(TwitterButton, null)
+	      );
+	    }
+	    return React.createElement(
+	      'div',
+	      null,
+	      React.createElement(
+	        'h1',
+	        null,
+	        'Ready ',
+	        this.props.name,
+	        '!'
+	      ),
+	      loggedStatus
+	    );
+	  }
+	});
+	
+	module.exports = MainComponent;
+
+/***/ },
+/* 173 */
 /*!***********************************!*\
   !*** ./build-source/js/logger.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var DEBUG = __webpack_require__(/*! ./build-config */ 173).DEBUG;
-	var VERBOSE = __webpack_require__(/*! ./build-config */ 173).VERBOSE;
+	var DEBUG = __webpack_require__(/*! ./build-config */ 174).DEBUG;
+	var VERBOSE = __webpack_require__(/*! ./build-config */ 174).VERBOSE;
 	
-	var logManager = {
+	/*var logManager = {
 	
 	  logSource: 'Unknown source',
 	
-	  out: function (msg) {
+	  out: function(msg) {
 	    console.log(this.logSource + ": " + msg);
 	  },
 	
-	  debug: function (msg) {
-	    if (DEBUG) {
+	  debug: function(msg) {
+	    if(DEBUG) {
 	      console.log("[DEBUG] " + this.logSource + ": " + msg);
 	    }
 	  },
 	
-	  verbose: function (msg) {
-	    if (DEBUG && VERBOSE) {
+	  verbose: function(msg) {
+	    if(DEBUG && VERBOSE) {
 	      console.log("[VERBOSE] " + this.logSource + ": " + msg);
 	    }
 	  },
 	
-	  setLogSource: function (name) {
+	  setLogSource: function(name) {
 	    this.logSource = name;
+	    console.log('= = = Set logSource: ' + name);
 	    return this;
 	  }
 	
-	};
+	};*/
 	
-	module.exports = logManager;
+	module.exports = function (sourceName) {
+	  return {
+	    logSource: sourceName ? sourceName : 'Unknown source',
+	
+	    out: function (msg) {
+	      console.log(this.logSource + ": " + msg);
+	    },
+	
+	    debug: function (msg) {
+	      if (DEBUG) {
+	        console.log("[DEBUG] " + this.logSource + ": " + msg);
+	      }
+	    },
+	
+	    verbose: function (msg) {
+	      if (DEBUG && VERBOSE) {
+	        console.log("[VERBOSE] " + this.logSource + ": " + msg);
+	      }
+	    }
+	  };
+	};
 
 /***/ },
-/* 173 */
+/* 174 */
 /*!*****************************************!*\
   !*** ./build-source/js/build-config.js ***!
   \*****************************************/
@@ -22211,6 +22276,67 @@
 	config.VERBOSE = true;
 	
 	module.exports = config;
+
+/***/ },
+/* 175 */
+/*!********************************************************!*\
+  !*** ./build-source/js/SocialLoginButtonComponents.js ***!
+  \********************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('SocialLoginButtonComponents.js');
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var FacebookButton = React.createClass({
+	  displayName: 'FacebookButton',
+	
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { className: 'fb-button' },
+	      React.createElement(
+	        'p',
+	        null,
+	        React.createElement(
+	          'a',
+	          { href: 'http://www.facebook.com' },
+	          'Facebook Login'
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	// Twitter login button component
+	var TwitterButton = React.createClass({
+	  displayName: 'TwitterButton',
+	
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { className: 'tw-button' },
+	      React.createElement(
+	        'p',
+	        null,
+	        React.createElement(
+	          'a',
+	          { href: 'http://www.twitter.com' },
+	          'Twitter Login'
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	exports.FacebookButton = FacebookButton;
+	exports.TwitterButton = TwitterButton;
+	
+	module.exports = exports;
 
 /***/ }
 /******/ ]);
