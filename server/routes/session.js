@@ -107,7 +107,13 @@ router.post('/', function(req, res, next) {
 
         // If one row was returned, surface the found user
         else if(rows.length == 1) {
-          console.log('Found user with this session ID!');
+          var msg = 'Found user with this session ID!  Logged in.';
+          console.log(msg);
+          response.msg = msg;
+          response.loggedIn = true;
+          res.cookie('session_uid', req.cookies.session_uid);
+          res.send(JSON.stringify(response));
+          return;
         }
       });
     });

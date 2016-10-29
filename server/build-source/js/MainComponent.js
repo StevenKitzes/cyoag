@@ -3,8 +3,9 @@ var ReactDOM = require('react-dom');
 
 var logMgr = require('./logger')('MainComponent.js');
 
-var FacebookButton = require('./SocialLoginButtonComponents').FacebookButton;
-var TwitterButton = require('./SocialLoginButtonComponents').TwitterButton;
+var ReactComponents = require('./SocialLoginButtonComponents');
+// var FacebookButton = require('./SocialLoginButtonComponents').FacebookButton;
+// var TwitterButton = require('./SocialLoginButtonComponents').TwitterButton;
 
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
@@ -12,14 +13,15 @@ var MainComponent = React.createClass({
     logMgr.debug('Checking session status . . .');
     var xhr = new XMLHttpRequest();
     // xmlHttp.onreadystatechange = () => {...}
-    xhr.onreadystatechange = () => {
-      if( xhr.readyState == 4 && xhr.status == 200 ) {
+    var properThis = this;
+    xhr.onreadystatechange = function() {
+      if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
         logMgr.debug('Status 200!');
         logMgr.verbose('Cookie check response payload: ' + xhr.responseText);
         var response = JSON.parse(xhr.responseText);
         // do something with response
         logMgr.debug('Response message: ' + response.msg);
-        this.setState({
+        properThis.setState({
           loggedIn: response.loggedIn
         });
       }
@@ -40,10 +42,10 @@ var MainComponent = React.createClass({
     logMgr.verbose('Rendering MainComponent.');
     var loggedStatus;
     if(this.state.loggedIn) {
-      loggedStatus = <h3>Logged in!</h3>;
+      loggedStatus = <div><h3>Logged in!</h3><ReactComponents.LogoutButton /></div>;
     }
     else {
-      loggedStatus = <div><FacebookButton /><TwitterButton /></div>;
+      loggedStatus = <div><ReactComponents.FacebookButton /><ReactComponents.TwitterButton /></div>;
     }
     return (
       <div>
