@@ -22136,8 +22136,6 @@
 	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainComponent.js');
 	
 	var ReactComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 175);
-	// var FacebookButton = require('./SocialLoginButtonComponents').FacebookButton;
-	// var TwitterButton = require('./SocialLoginButtonComponents').TwitterButton;
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
@@ -22150,7 +22148,7 @@
 	    var properThis = this;
 	    xhr.onreadystatechange = function () {
 	      if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
-	        logMgr.debug('Status 200!');
+	        logMgr.debug('Status 200 (or 304)!');
 	        logMgr.verbose('Cookie check response payload: ' + xhr.responseText);
 	        var response = JSON.parse(xhr.responseText);
 	        // do something with response
@@ -22171,6 +22169,29 @@
 	      loggedIn: false
 	    };
 	  },
+	  logout: function () {
+	    logMgr.debug('Logging out current user . . .');
+	    var xhr = new XMLHttpRequest();
+	    // xmlHttp.onreadystatechange = () => {...}
+	    var properThis = this;
+	    xhr.onreadystatechange = function () {
+	      if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	        logMgr.debug('Status 200 (or 304)!');
+	        logMgr.verbose('Logout response payload: ' + xhr.responseText);
+	        var response = JSON.parse(xhr.responseText);
+	        // do something with response
+	        logMgr.debug('Response message: ' + response.msg);
+	        properThis.setState({
+	          loggedIn: response.loggedIn
+	        });
+	      } else {
+	        logMgr.debug('Logout attempt yielded HTTP response status: ' + xhr.status);
+	      }
+	    };
+	    xhr.open('GET', '/session/logout');
+	    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	    xhr.send();
+	  },
 	  render: function () {
 	    logMgr.verbose('Rendering MainComponent.');
 	    var loggedStatus;
@@ -22183,7 +22204,7 @@
 	          null,
 	          'Logged in!'
 	        ),
-	        React.createElement(ReactComponents.LogoutButton, null)
+	        React.createElement(ReactComponents.LogoutButton, { logoutRequest: this.logout })
 	      );
 	    } else {
 	      loggedStatus = React.createElement(
@@ -22344,15 +22365,10 @@
 	var LogoutButton = React.createClass({
 	  displayName: 'LogoutButton',
 	
-	  logoutRequest: function () {
-	    // API call to session endpoint with a body including logout request,
-	    // that checks whether user is socially logged; if so, logout and send new
-	    // visitor-type user, otherwise, no need to "log out" of a visitor type acct
-	  },
 	  render: function () {
 	    return React.createElement(
 	      'button',
-	      { onClick: this.logoutRequest },
+	      { onClick: this.props.logoutRequest },
 	      'Log Out'
 	    );
 	  }

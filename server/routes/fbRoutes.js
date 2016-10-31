@@ -136,7 +136,7 @@ function createNewSocialUser(uid, req, res, response) {
     // Create a new user to write to DB
     var newUser = {};
     newUser.uid = uid;
-    newUser.name = newUser.uid.substring(0,10);
+    newUser.name = 'fb-' + generateGuid().substring(0,7);
     newUser.acct_type = 'registered';
     newUser.session_uid = generateGuid();
 
@@ -155,7 +155,6 @@ function createNewSocialUser(uid, req, res, response) {
         var msg = 'Problem writing new Facebook user to database.';
         console.log(msg + '\nERROR:\n' + errInsert);
         response.msg = msg;
-        response.loggedIn = false;
         res.clearCookie('session_uid');
         res.send(JSON.stringify(response));
         return;
@@ -163,6 +162,52 @@ function createNewSocialUser(uid, req, res, response) {
 
       console.log('Successfully created new Facebook user!  :)');
       res.cookie('session_uid', newUser.session_uid);
+      res.redirect(302, 'http://localhost.cyoag.com:3000/');
+      return;
+    });
+  });
+}
+
+function updateUserSession(uid, req, res, response) {
+  console.log('Facebook user detected, updating session ID . . .');
+  // Create new user and write it to the DB
+  db.getConnection(function(errGetConn, connectionUpdateFB) {
+    if(errGetConn) {
+      var msg = 'Problem getting a database connection to update Facebook user session.';
+      console.log(msg + '\nERROR:\n' + errGetConn);
+      response.msg = msg;
+      res.clearCookie('session_uid');
+      res.send(JSON.stringify(response));
+      return;
+    }
+
+    console.log('Got database connection to update Facebook user session.');
+
+    // Create a new user to write to DB
+    var userStatus = {};
+    userStatus.uid = uid;
+    userStatus.session_uid = generateGuid();
+
+    var userInsertQuery = 'UPDATE users SET session_uid="' +
+      userStatus.session_uid + '" WHERE uid="' +
+      userStatus.uid + '";';
+
+    console.log('Querying to update Facebook user session ID.');
+
+    connectionUpdateFB.query(userInsertQuery, function(errInsert, rows) {
+      console.log('Facebook user session update query attempt complete.');
+      connectionUpdateFB.release();
+      if(errInsert) {
+        var msg = 'Problem writing new Facebook user session ID.';
+        console.log(msg + '\nERROR:\n' + errInsert);
+        response.msg = msg;
+        res.clearCookie('session_uid');
+        res.send(JSON.stringify(response));
+        return;
+      }
+
+      console.log('Successfully updated Facebook user session!');
+      res.cookie('session_uid', userStatus.session_uid);
       res.redirect(302, 'http://localhost.cyoag.com:3000/');
       return;
     });

@@ -29,14 +29,9 @@ var TwitterButton = React.createClass({
 
 // Logout button component
 var LogoutButton = React.createClass({
-  logoutRequest: function() {
-    // API call to session endpoint with a body including logout request,
-    // that checks whether user is socially logged; if so, logout and send new
-    // visitor-type user, otherwise, no need to "log out" of a visitor type acct
-  },
   render: function() {
     return (
-      <button onClick={this.logoutRequest}>Log Out</button>
+      <button onClick={this.props.logoutRequest}>Log Out</button>
     );
   }
 });
