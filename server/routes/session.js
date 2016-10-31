@@ -102,7 +102,9 @@ router.post('/', function(req, res, next) {
 
         // If no rows returned, no user was found with that session ID, so create and surface a new user
         else if(rows.length == 0) {
+          console.log('No user was found with the session Id sent by the browser.');
           createNewUser(req, res, response);
+          return;
         }
 
         // If one row was returned, surface the found user
