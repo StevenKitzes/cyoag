@@ -5,7 +5,9 @@ var express = require('express');
 var qs = require('querystring');  // help build and parse URL query strings
 var request = require('request'); // easy HTTP request library
 var router = express.Router();
+
 var secrets = require('../secrets');
+var socialUtils = require('../socialUtils');
 
 // Route to kick off a Twitter login event
 router.get('/login', function(req, res, next) {
@@ -91,6 +93,7 @@ router.get('/swap', function(req, res, next) {
     var userDataUrl = 'https://api.twitter.com/1.1/users/show.json';
     // Note that for this query string, the property names are defined strictly
     // by Twitter, so we can't change them.
+    console.log('HEY SO if user ID is already here, what is the point of the rest? ' + perm_data.user_id);
     var queryStringObject = {
       screen_name: perm_data.screen_name,
       user_id: perm_data.user_id
@@ -103,7 +106,8 @@ router.get('/swap', function(req, res, next) {
       console.log(JSON.stringify(user));
     })
 
-    res.send('Got user: tw-' + perm_data.user_id);
+    var user_uid = 'tw-' + perm_data.user_id;
+    socialUtils.socialLoginById(user_uid, req, res);
   });
 });
 
