@@ -1,7 +1,7 @@
 var db = require('./dbAccess')();
 var generateGuid = require('./build-source/js/uid-gen');
 
-function socialLoginById(user_uid, res) {
+function socialLoginById(user_uid, req, res) {
   var response = {};
 
   // if this user ID already exists, assign new session ID and redirect to main page
@@ -35,7 +35,7 @@ function socialLoginById(user_uid, res) {
       // if no user was registered with this ID, create new user, write it to DB, and respond
       if(rows.length == 0) {
         console.log('No user found with this ID, creating . . .');
-        createNewSocialUser(user_uid, res, response);
+        registerUser(user_uid, req.cookies.session_uid, res, response);
         return;
       }
 
@@ -57,12 +57,12 @@ function socialLoginById(user_uid, res) {
   });
 }
 
-function createNewSocialUser(uid, res, response) {
-  console.log('New Facebook user!  Attempting to create DB entry . . .');
+function registerUser(uid, session_uid, res, response) {
+  console.log('New registered user!  Attempting to create based on current visitor . . .');
   // Create new user and write it to the DB
-  db.getConnection(function(errGetConn, connectionCreateFB) {
-    if(errGetConn) {
-      var msg = 'Problem getting a database connection to create new Facebook user.';
+  db.getConnection(function(errConnection, connection) {
+    if(errConnection) {
+      var msg = 'Problem getting a database connection for user registration.';
       console.log(msg + '\nERROR:\n' + errGetConn);
       response.msg = msg;
       res.clearCookie('session_uid');
@@ -70,42 +70,83 @@ function createNewSocialUser(uid, res, response) {
       return;
     }
 
-    console.log('Got database connection to create new Facebook user.');
+    console.log('Got database connection to register new user.');
 
-    // figure out what type of social account this is going to be
-    var abbrev = uid.substring(0,3);
-
-    // Create a new user to write to DB
-    var newUser = {};
-    newUser.uid = uid;
-    newUser.name = abbrev + generateGuid().substring(0,7);
-    newUser.acct_type = 'registered';
-    newUser.session_uid = generateGuid();
-
-    var userInsertQuery = 'INSERT INTO users (uid, name, acct_type, session_uid) VALUES ("' +
-      newUser.uid + '", "' +
-      newUser.name + '", "' +
-      newUser.acct_type + '", "' +
-      newUser.session_uid + '");'
-
-    console.log('Querying to create new Facebook user.');
-
-    connectionCreateFB.query(userInsertQuery, function(errInsert, rows) {
-      console.log('Facebook user creation query attempt complete.');
-      connectionCreateFB.release();
-      if(errInsert) {
-        var msg = 'Problem writing new Facebook user to database.';
-        console.log(msg + '\nERROR:\n' + errInsert);
+    // the first thing to do is get the position of the current session
+    var getPosQuery = 'SELECT positions.node_uid FROM positions INNER JOIN users ON users.uid=positions.user_uid WHERE users.session_uid=' + connection.escape(session_uid) + ';';
+    connection.query(getPosQuery, function(errGetPos, rows) {
+      if(errGetPos) {
+        var msg = 'Problem getting current session position from database.';
+        console.log(msg + '\nERROR:\n' + errGetPos);
         response.msg = msg;
-        res.clearCookie('session_uid');
+        res.cookie('session_uid', session_uid);
         res.send(JSON.stringify(response));
+        connection.release();
+        return;
+      }
+      if(rows.length != 1) {
+        var msg = 'Found multiple results for current session position where only 1 expected.';
+        console.log(msg);
+        response.msg = msg;
+        res.cookie('session_uid', session_uid);
+        res.send(JSON.stringify(response));
+        connection.release();
         return;
       }
 
-      console.log('Successfully created new Facebook user!  :)');
-      res.cookie('session_uid', newUser.session_uid);
-      res.redirect(302, 'http://localhost.cyoag.com:3000/');
-      return;
+      var position_uid = rows[0]['node_uid'];
+
+      // figure out what type of social account this is going to be
+      var abbrev = uid.substring(0,3);
+
+      // Create a new user to write to DB
+      var newUser = {};
+      newUser.uid = uid;
+      newUser.name = abbrev + generateGuid().substring(0,7);
+      newUser.acct_type = 'registered';
+      newUser.session_uid = generateGuid();
+
+      var userInsertQuery = 'INSERT INTO users (uid, name, acct_type, session_uid) VALUES ("' +
+        newUser.uid + '", "' +
+        newUser.name + '", "' +
+        newUser.acct_type + '", "' +
+        newUser.session_uid + '");'
+
+      console.log('Querying to register new user.');
+
+      connection.query(userInsertQuery, function(errInsert) {
+        if(errInsert) {
+          var msg = 'Problem writing new user to database.';
+          console.log(msg + '\nERROR:\n' + errInsert);
+          response.msg = msg;
+          res.clearCookie('session_uid');
+          res.send(JSON.stringify(response));
+          connection.release();
+          return;
+        }
+
+        console.log('Query to write new user to database complete, trying to set position.');
+
+        var setPosQuery = 'INSERT INTO positions (user_uid, node_uid) VALUES (' + connection.escape(newUser.uid) + ', ' + connection.escape(position_uid) + ');';
+
+        connection.query(setPosQuery, function(errSetPos) {
+          if(errSetPos) {
+            var msg = 'Problem writing new user position to database.';
+            console.log(msg + '\nERROR:\n' + errInsert);
+            response.msg = msg;
+            res.clearCookie('session_uid');
+            res.send(JSON.stringify(response));
+            connection.release();
+            return;
+          }
+
+          console.log('Successfully registered new registered user!  :)');
+          connection.release();
+          res.cookie('session_uid', newUser.session_uid);
+          res.redirect(302, 'http://localhost.cyoag.com:3000/');
+          return;
+        });
+      });
     });
   });
 }

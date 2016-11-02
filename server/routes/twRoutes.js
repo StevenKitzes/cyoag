@@ -84,27 +84,27 @@ router.get('/swap', function(req, res, next) {
     // In the callback, we are finally ready to make Twitter API calls
     // specifically relating to a user, e.g. to retrieve a userId.
     var perm_data = qs.parse(body);
-    var oauth = {
-      consumer_key: secrets.TW_KEY,
-      consumer_secret: secrets.TW_SECRET,
-      token: perm_data.oauth_token,
-      token_secret: perm_data.oauth_token_secret,
-    };
-    var userDataUrl = 'https://api.twitter.com/1.1/users/show.json';
+    // var oauth = {
+    //   consumer_key: secrets.TW_KEY,
+    //   consumer_secret: secrets.TW_SECRET,
+    //   token: perm_data.oauth_token,
+    //   token_secret: perm_data.oauth_token_secret,
+    // };
+    // var userDataUrl = 'https://api.twitter.com/1.1/users/show.json';
     // Note that for this query string, the property names are defined strictly
     // by Twitter, so we can't change them.
-    console.log('HEY SO if user ID is already here, what is the point of the rest? ' + perm_data.user_id);
-    var queryStringObject = {
-      screen_name: perm_data.screen_name,
-      user_id: perm_data.user_id
-    };
+    // console.log('HEY SO if user ID is already here, what is the point of the rest? ' + perm_data.user_id);
+    // var queryStringObject = {
+    //   screen_name: perm_data.screen_name,
+    //   user_id: perm_data.user_id
+    // };
 
     // If I've understood this right, here's where we actually query for
     // user data, and where we handle it in a callback.
-    request.get({url:userDataUrl, oauth:oauth, qs:queryStringObject, json:true}, function (e, r, user) {
-      console.log('user:');
-      console.log(JSON.stringify(user));
-    })
+    // request.get({url:userDataUrl, oauth:oauth, qs:queryStringObject, json:true}, function (e, r, user) {
+    //   console.log('user:');
+    //   console.log(JSON.stringify(user));
+    // })
 
     var user_uid = 'tw-' + perm_data.user_id;
     socialUtils.socialLoginById(user_uid, req, res);

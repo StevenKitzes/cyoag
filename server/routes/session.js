@@ -114,6 +114,7 @@ function createNewUser(req, res, response, successMsg) {
       return;
     }
 
+    console.log('Got DB connection to create new user.');
     // Create a new user to write to DB
     var newUser = {};
     newUser.uid = generateGuid();
@@ -127,15 +128,27 @@ function createNewUser(req, res, response, successMsg) {
       newUser.acct_type + '", "' +
       newUser.session_uid + '");'
 
-    connection.query(userInsertQuery, function(err, rows) {
-      connection.release();
-      if(err) {
-        respond(res, response, 'clear', false, 'Problem getting response from database creating new user.', err);
+    connection.query(userInsertQuery, function(errUserQuery) {
+      if(errUserQuery) {
+        respond(res, response, 'clear', false, 'Problem getting response from database creating new user.', errUserQuery);
         return;
       }
 
-      respond(res, response, newUser.session_uid, false, successMsg, null);
-      return;
+      console.log('Query completed to create user, now setting new user position to "start" node.');
+
+      var positionInsertQuery = 'INSERT INTO positions (user_uid, node_uid) VALUES (' +
+        connection.escape(newUser.uid) + ', "start");';
+
+      connection.query(positionInsertQuery, function(errPosQuery) {
+        if(errPosQuery) {
+          respond(res, response, newUser.session_uid, false, 'Problem getting response from database setting position of new user.', errPosQuery);
+          return;
+        }
+
+        connection.release();
+        respond(res, response, newUser.session_uid, false, successMsg, null);
+        return;
+      });
     });
   });
 }
