@@ -22162,6 +22162,13 @@
 	    };
 	    xhr.open('POST', '/session');
 	    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	    xhr.timeout = 3000;
+	    xhr.ontimeout = function () {
+	      xhr.abort();
+	      properThis.setState({
+	        loggedIn: false
+	      });
+	    };
 	    xhr.send();
 	  },
 	  getInitialState: function () {
@@ -22230,6 +22237,10 @@
 	});
 	
 	module.exports = MainComponent;
+	
+	function mountXhrHandler(context) {
+	  console.log('lol');
+	}
 
 /***/ },
 /* 173 */
