@@ -65,6 +65,11 @@ var MainComponent = React.createClass({
     }
     xhr.open('GET', '/session/logout');
     xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+    xhr.timeout = 3000;
+    xhr.ontimeout = function() {
+      xhr.abort();
+      alert('Logout request took to long, server unresponsive; you are still logged in!');
+    }
     xhr.send();
   },
   render: function() {
