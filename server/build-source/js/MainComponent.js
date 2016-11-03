@@ -7,7 +7,7 @@ var ReactComponents = require('./SocialLoginButtonComponents');
 
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
-  componentWillMount: function() {
+  componentDidMount: function() {
     logMgr.debug('Checking session status . . .');
     var xhr = new XMLHttpRequest();
     // xmlHttp.onreadystatechange = () => {...}
@@ -32,9 +32,7 @@ var MainComponent = React.createClass({
     xhr.timeout = 3000;
     xhr.ontimeout = function() {
       xhr.abort();
-      properThis.setState({
-        loggedIn: false
-      })
+      alert('Server response timed out; unable to detect your login status.');
     }
     xhr.send();
   },
