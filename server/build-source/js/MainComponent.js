@@ -3,30 +3,27 @@ var ReactDOM = require('react-dom');
 
 var logMgr = require('./logger')('MainComponent.js');
 
-var ReactComponents = require('./SocialLoginButtonComponents');
+var MarginLoginComponent = require('./MarginLoginComponent');
 
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   getInitialState: function() {
     return {
-      loggedIn: false
+      loggedIn: false,
     };
   },
-  logout: logoutXhrHandler,
+  logoutRequest: logoutXhrHandler,
   render: function() {
     logMgr.verbose('Rendering MainComponent.');
-    var loggedStatus;
-    if(this.state.loggedIn) {
-      loggedStatus = <div><h3>Logged in!</h3><ReactComponents.LogoutButton logoutRequest={this.logout} /></div>;
-    }
-    else {
-      loggedStatus = <div><ReactComponents.FacebookButton /><ReactComponents.TwitterButton /></div>;
-    }
+
+    var context = {};
+    context.state = this.state;
+    context.logoutRequest = this.logoutRequest;
+
     return (
       <div>
-        <h1>Ready {this.props.name}!</h1>
-        {loggedStatus}
+        <MarginLoginComponent.MarginLogin context={context} />
       </div>
     );
   }
@@ -37,7 +34,7 @@ module.exports = MainComponent;
 function mountXhrHandler() {
   logMgr.debug('Checking session status . . .');
   var xhr = new XMLHttpRequest();
-  var context = this;
+  var properThis = this;
   // xmlHttp.onreadystatechange = () => {...}
   xhr.onreadystatechange = function() {
     if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
@@ -46,7 +43,7 @@ function mountXhrHandler() {
       var response = JSON.parse(xhr.responseText);
       // do something with response
       logMgr.debug('Response message: ' + response.msg);
-      context.setState({
+      properThis.setState({
         loggedIn: response.loggedIn
       });
     }
@@ -68,7 +65,7 @@ function logoutXhrHandler() {
   logMgr.debug('Logging out current user . . .');
   var xhr = new XMLHttpRequest();
   // xmlHttp.onreadystatechange = () => {...}
-  var context = this;
+  var properThis = this;
   xhr.onreadystatechange = function() {
     if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
       logMgr.debug('Status 200 (or 304)!');
@@ -76,7 +73,7 @@ function logoutXhrHandler() {
       var response = JSON.parse(xhr.responseText);
       // do something with response
       logMgr.debug('Response message: ' + response.msg);
-      context.setState({
+      properThis.setState({
         loggedIn: response.loggedIn
       });
     }

@@ -22135,7 +22135,7 @@
 	
 	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainComponent.js');
 	
-	var ReactComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 175);
+	var MarginLoginComponent = __webpack_require__(/*! ./MarginLoginComponent */ 176);
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
@@ -22147,40 +22147,18 @@
 	      loggedIn: false
 	    };
 	  },
-	  logout: logoutXhrHandler,
+	  logoutRequest: logoutXhrHandler,
 	  render: function () {
 	    logMgr.verbose('Rendering MainComponent.');
-	    var loggedStatus;
-	    if (this.state.loggedIn) {
-	      loggedStatus = React.createElement(
-	        'div',
-	        null,
-	        React.createElement(
-	          'h3',
-	          null,
-	          'Logged in!'
-	        ),
-	        React.createElement(ReactComponents.LogoutButton, { logoutRequest: this.logout })
-	      );
-	    } else {
-	      loggedStatus = React.createElement(
-	        'div',
-	        null,
-	        React.createElement(ReactComponents.FacebookButton, null),
-	        React.createElement(ReactComponents.TwitterButton, null)
-	      );
-	    }
+	
+	    var context = {};
+	    context.state = this.state;
+	    context.logoutRequest = this.logoutRequest;
+	
 	    return React.createElement(
 	      'div',
 	      null,
-	      React.createElement(
-	        'h1',
-	        null,
-	        'Ready ',
-	        this.props.name,
-	        '!'
-	      ),
-	      loggedStatus
+	      React.createElement(MarginLoginComponent.MarginLogin, { context: context })
 	    );
 	  }
 	});
@@ -22190,7 +22168,7 @@
 	function mountXhrHandler() {
 	  logMgr.debug('Checking session status . . .');
 	  var xhr = new XMLHttpRequest();
-	  var context = this;
+	  var properThis = this;
 	  // xmlHttp.onreadystatechange = () => {...}
 	  xhr.onreadystatechange = function () {
 	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
@@ -22199,7 +22177,7 @@
 	      var response = JSON.parse(xhr.responseText);
 	      // do something with response
 	      logMgr.debug('Response message: ' + response.msg);
-	      context.setState({
+	      properThis.setState({
 	        loggedIn: response.loggedIn
 	      });
 	    } else {
@@ -22220,7 +22198,7 @@
 	  logMgr.debug('Logging out current user . . .');
 	  var xhr = new XMLHttpRequest();
 	  // xmlHttp.onreadystatechange = () => {...}
-	  var context = this;
+	  var properThis = this;
 	  xhr.onreadystatechange = function () {
 	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
 	      logMgr.debug('Status 200 (or 304)!');
@@ -22228,7 +22206,7 @@
 	      var response = JSON.parse(xhr.responseText);
 	      // do something with response
 	      logMgr.debug('Response message: ' + response.msg);
-	      context.setState({
+	      properThis.setState({
 	        loggedIn: response.loggedIn
 	      });
 	    } else {
@@ -22340,15 +22318,11 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { className: 'fb-button' },
+	      { id: 'cyoag-fb-login' },
 	      React.createElement(
-	        'p',
-	        null,
-	        React.createElement(
-	          'a',
-	          { href: '/fb/login' },
-	          'Facebook Login'
-	        )
+	        'a',
+	        { href: '/fb/login' },
+	        'Facebook'
 	      )
 	    );
 	  }
@@ -22361,15 +22335,11 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { className: 'tw-button' },
+	      { id: 'cyoag-tw-button' },
 	      React.createElement(
-	        'p',
-	        null,
-	        React.createElement(
-	          'a',
-	          { href: '/tw/login' },
-	          'Twitter Login'
-	        )
+	        'a',
+	        { href: '/tw/login' },
+	        'Twitter'
 	      )
 	    );
 	  }
@@ -22391,6 +22361,62 @@
 	exports.FacebookButton = FacebookButton;
 	exports.TwitterButton = TwitterButton;
 	exports.LogoutButton = LogoutButton;
+	
+	module.exports = exports;
+
+/***/ },
+/* 176 */
+/*!*************************************************!*\
+  !*** ./build-source/js/MarginLoginComponent.js ***!
+  \*************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('MarginLoginComponent.js');
+	
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 175);
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var MarginLogin = React.createClass({
+	  displayName: 'MarginLogin',
+	
+	  render: function () {
+	    var context = this.props.context;
+	    var content;
+	
+	    if (context.state.loggedIn) {
+	      content = React.createElement(
+	        'div',
+	        { id: 'cyoag-logout' },
+	        React.createElement(
+	          'h3',
+	          null,
+	          'Logged in!'
+	        ),
+	        React.createElement(SocialLoginButtonComponents.LogoutButton, { logoutRequest: context.logoutRequest })
+	      );
+	    } else {
+	      content = React.createElement(
+	        'div',
+	        { id: 'cyoag-login' },
+	        React.createElement(SocialLoginButtonComponents.FacebookButton, null),
+	        React.createElement(SocialLoginButtonComponents.TwitterButton, null)
+	      );
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-login-logout-container' },
+	      content
+	    );
+	  }
+	});
+	
+	exports.MarginLogin = MarginLogin;
 	
 	module.exports = exports;
 
