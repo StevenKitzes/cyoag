@@ -9,8 +9,8 @@ var exports = {};
 var FacebookButton = React.createClass({
   render: function() {
     return (
-      <div id='cyoag-fb-login'>
-        <a href='/fb/login'>Facebook</a>
+      <div className='cyoag-fb-login'>
+        <a className='cyoag-link' href='/fb/login'>Facebook</a>
       </div>
     );
   }
@@ -20,8 +20,8 @@ var FacebookButton = React.createClass({
 var TwitterButton = React.createClass({
   render: function() {
     return (
-      <div id='cyoag-tw-button'>
-        <a href='/tw/login'>Twitter</a>
+      <div className='cyoag-tw-button'>
+        <a className='cyoag-link' href='/tw/login'>Twitter</a>
       </div>
     );
   }

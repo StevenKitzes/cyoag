@@ -4,13 +4,22 @@ var ReactDOM = require('react-dom');
 var logMgr = require('./logger')('MainComponent.js');
 
 var MarginLoginComponent = require('./MarginLoginComponent');
+var VotificationComponents = require('./VotificationComponents');
 
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   getInitialState: function() {
     return {
+      currentNode: null,
       loggedIn: false,
+      votification: 'none',
+      snippet: {
+        trailing: null,
+        lastPath: null,
+        current: null,
+      },
+      paths: []
     };
   },
   logoutRequest: logoutXhrHandler,
@@ -20,13 +29,26 @@ var MainComponent = React.createClass({
     var context = {};
     context.state = this.state;
     context.logoutRequest = this.logoutRequest;
+    context.voteDown = this.voteDown;
+    context.voteUp = this.voteUp;
+
+    var votificationComponent;
+    if(this.state.loggedIn) {
+      votificationComponent = <VotificationComponents.Votification context={context} />;
+    }
+    else {
+      votificationComponent = <VotificationComponents.BegLogin context={context} />;
+    }
 
     return (
-      <div>
+      <div id='cyoag-main'>
         <MarginLoginComponent.MarginLogin context={context} />
+        {votificationComponent}
       </div>
     );
-  }
+  },
+  voteDown: castDownVote,
+  voteUp: castUpVote
 });
 
 module.exports = MainComponent;
@@ -89,4 +111,17 @@ function logoutXhrHandler() {
     alert('Logout request took to long, server unresponsive; you are still logged in!');
   }
   xhr.send();
+}
+
+function castUpVote() {
+  logMgr.debug('Setting votification UP');
+  this.setState({
+    votification: 'up'
+  });
+}
+function castDownVote() {
+  logMgr.debug('Setting votification DOWN');
+  this.setState({
+    votification: 'down'
+  });
 }

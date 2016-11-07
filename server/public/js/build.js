@@ -22135,7 +22135,8 @@
 	
 	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainComponent.js');
 	
-	var MarginLoginComponent = __webpack_require__(/*! ./MarginLoginComponent */ 176);
+	var MarginLoginComponent = __webpack_require__(/*! ./MarginLoginComponent */ 175);
+	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 177);
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
@@ -22144,7 +22145,15 @@
 	  componentDidMount: mountXhrHandler,
 	  getInitialState: function () {
 	    return {
-	      loggedIn: false
+	      currentNode: null,
+	      loggedIn: false,
+	      votification: 'none',
+	      snippet: {
+	        trailing: null,
+	        lastPath: null,
+	        current: null
+	      },
+	      paths: []
 	    };
 	  },
 	  logoutRequest: logoutXhrHandler,
@@ -22154,13 +22163,25 @@
 	    var context = {};
 	    context.state = this.state;
 	    context.logoutRequest = this.logoutRequest;
+	    context.voteDown = this.voteDown;
+	    context.voteUp = this.voteUp;
+	
+	    var votificationComponent;
+	    if (this.state.loggedIn) {
+	      votificationComponent = React.createElement(VotificationComponents.Votification, { context: context });
+	    } else {
+	      votificationComponent = React.createElement(VotificationComponents.BegLogin, { context: context });
+	    }
 	
 	    return React.createElement(
 	      'div',
-	      null,
-	      React.createElement(MarginLoginComponent.MarginLogin, { context: context })
+	      { id: 'cyoag-main' },
+	      React.createElement(MarginLoginComponent.MarginLogin, { context: context }),
+	      votificationComponent
 	    );
-	  }
+	  },
+	  voteDown: castDownVote,
+	  voteUp: castUpVote
 	});
 	
 	module.exports = MainComponent;
@@ -22221,6 +22242,19 @@
 	    alert('Logout request took to long, server unresponsive; you are still logged in!');
 	  };
 	  xhr.send();
+	}
+	
+	function castUpVote() {
+	  logMgr.debug('Setting votification UP');
+	  this.setState({
+	    votification: 'up'
+	  });
+	}
+	function castDownVote() {
+	  logMgr.debug('Setting votification DOWN');
+	  this.setState({
+	    votification: 'down'
+	  });
 	}
 
 /***/ },
@@ -22299,6 +22333,67 @@
 
 /***/ },
 /* 175 */
+/*!*************************************************!*\
+  !*** ./build-source/js/MarginLoginComponent.js ***!
+  \*************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('MarginLoginComponent.js');
+	
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 176);
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var MarginLogin = React.createClass({
+	  displayName: 'MarginLogin',
+	
+	  render: function () {
+	    var context = this.props.context;
+	    var content;
+	
+	    if (context.state.loggedIn) {
+	      content = React.createElement(
+	        'div',
+	        { id: 'cyoag-margin-logout' },
+	        React.createElement(
+	          'h3',
+	          null,
+	          'Logged in!'
+	        ),
+	        React.createElement(SocialLoginButtonComponents.LogoutButton, { logoutRequest: context.logoutRequest })
+	      );
+	    } else {
+	      content = React.createElement(
+	        'div',
+	        { id: 'cyoag-margin-login' },
+	        React.createElement(
+	          'h3',
+	          null,
+	          'Login with:'
+	        ),
+	        React.createElement(SocialLoginButtonComponents.FacebookButton, null),
+	        React.createElement(SocialLoginButtonComponents.TwitterButton, null)
+	      );
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-margin-login-container' },
+	      content
+	    );
+	  }
+	});
+	
+	exports.MarginLogin = MarginLogin;
+	
+	module.exports = exports;
+
+/***/ },
+/* 176 */
 /*!********************************************************!*\
   !*** ./build-source/js/SocialLoginButtonComponents.js ***!
   \********************************************************/
@@ -22318,10 +22413,10 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { id: 'cyoag-fb-login' },
+	      { className: 'cyoag-fb-login' },
 	      React.createElement(
 	        'a',
-	        { href: '/fb/login' },
+	        { className: 'cyoag-link', href: '/fb/login' },
 	        'Facebook'
 	      )
 	    );
@@ -22335,10 +22430,10 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { id: 'cyoag-tw-button' },
+	      { className: 'cyoag-tw-button' },
 	      React.createElement(
 	        'a',
-	        { href: '/tw/login' },
+	        { className: 'cyoag-link', href: '/tw/login' },
 	        'Twitter'
 	      )
 	    );
@@ -22365,58 +22460,82 @@
 	module.exports = exports;
 
 /***/ },
-/* 176 */
-/*!*************************************************!*\
-  !*** ./build-source/js/MarginLoginComponent.js ***!
-  \*************************************************/
+/* 177 */
+/*!***************************************************!*\
+  !*** ./build-source/js/VotificationComponents.js ***!
+  \***************************************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('MarginLoginComponent.js');
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('VotificationComponents.js');
 	
-	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 175);
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 176);
 	
 	var exports = {};
 	
 	// Facebook login button component
-	var MarginLogin = React.createClass({
-	  displayName: 'MarginLogin',
+	var BegLogin = React.createClass({
+	  displayName: 'BegLogin',
 	
 	  render: function () {
 	    var context = this.props.context;
-	    var content;
 	
-	    if (context.state.loggedIn) {
-	      content = React.createElement(
+	    if (!context.state.loggedIn) {
+	      return React.createElement(
 	        'div',
-	        { id: 'cyoag-logout' },
+	        { id: 'cyoag-beg-login' },
 	        React.createElement(
 	          'h3',
 	          null,
-	          'Logged in!'
+	          'Register to have your position in the story automagically bookmarked!'
 	        ),
-	        React.createElement(SocialLoginButtonComponents.LogoutButton, { logoutRequest: context.logoutRequest })
-	      );
-	    } else {
-	      content = React.createElement(
-	        'div',
-	        { id: 'cyoag-login' },
 	        React.createElement(SocialLoginButtonComponents.FacebookButton, null),
 	        React.createElement(SocialLoginButtonComponents.TwitterButton, null)
 	      );
 	    }
+	  }
+	});
+	
+	var Votification = React.createClass({
+	  displayName: 'Votification',
+	
+	  render: function () {
+	    var context = this.props.context;
+	    var upImgPath, downImgPath;
+	
+	    switch (context.state.votification) {
+	      case 'up':
+	        upImgPath = 'images/upLit.png';
+	        downImgPath = 'images/down.png';
+	        break;
+	      case 'down':
+	        upImgPath = 'images/up.png';
+	        downImgPath = 'images/downLit.png';
+	        break;
+	      default:
+	        upImgPath = 'images/up.png';
+	        downImgPath = 'images/down.png';
+	        break;
+	    }
 	
 	    return React.createElement(
 	      'div',
-	      { id: 'cyoag-login-logout-container' },
-	      content
+	      { id: 'votification-container' },
+	      React.createElement(
+	        'h4',
+	        null,
+	        'How did you like this chapter?'
+	      ),
+	      React.createElement('img', { id: 'cyoag-upvote-button', onClick: context.voteUp, src: upImgPath }),
+	      React.createElement('img', { id: 'cyoag-downvote-button', onClick: context.voteDown, src: downImgPath })
 	    );
 	  }
 	});
 	
-	exports.MarginLogin = MarginLogin;
+	exports.BegLogin = BegLogin;
+	exports.Votification = Votification;
 	
 	module.exports = exports;
 
