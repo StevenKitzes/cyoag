@@ -19,7 +19,8 @@ var MainComponent = React.createClass({
         lastPath: null,
         current: null,
       },
-      paths: []
+      paths: [],
+      error: null
     };
   },
   logoutRequest: logoutXhrHandler,
@@ -63,11 +64,7 @@ function mountXhrHandler() {
       logMgr.debug('Status 200 (or 304)!');
       logMgr.verbose('Cookie check response payload: ' + xhr.responseText);
       var response = JSON.parse(xhr.responseText);
-      // do something with response
-      logMgr.debug('Response message: ' + response.msg);
-      properThis.setState({
-        loggedIn: response.loggedIn
-      });
+      validateResponse(properThis, response);
     }
     else {
       logMgr.debug('Initial cookie check yielded HTTP response status: ' + xhr.status);
@@ -93,11 +90,7 @@ function logoutXhrHandler() {
       logMgr.debug('Status 200 (or 304)!');
       logMgr.verbose('Logout response payload: ' + xhr.responseText);
       var response = JSON.parse(xhr.responseText);
-      // do something with response
-      logMgr.debug('Response message: ' + response.msg);
-      properThis.setState({
-        loggedIn: response.loggedIn
-      });
+      validateResponse(properThis, response);
     }
     else {
       logMgr.debug('Logout attempt yielded HTTP response status: ' + xhr.status);
@@ -124,4 +117,49 @@ function castDownVote() {
   this.setState({
     votification: 'down'
   });
+}
+
+function validateResponse(properThis, response) {
+  if(!response) {
+    // wow... if you don't even get a response, something is nightmarishly wrong
+  }
+  if(response.error) {
+    // set an error state based on the returned error
+  }
+  if(!response.hasOwnProperty('currentNode')) {
+    // can't even determine where we are; set error state, display error content
+  }
+  if(!response.hasOwnProperty('loggedIn')) {
+    // can't determine whether user is logged in; set err, display err content
+  }
+  if(
+    !response.hasOwnProperty('votification') ||
+    (response.votification != 'none' && response.votification != 'up' && response.votification != 'down')) {
+    // can't determine votification status; set err, display err content
+  }
+  if(!response.hasOwnProperty('snippet')) {
+    // no snippet to display, set error state and display error content
+  }
+  if(
+    !response.snippet.hasOwnProperty('trailing') ||
+    !response.snippet.hasOwnProperty('lastPath') ||
+    !response.snippet.hasOwnProperty('current')) {
+    // snippet information missing, set error state and display error content
+  }
+  if(!response.hasOwnProperty('paths')) {
+    // no paths given, set error state and display error content
+  }
+  // if no errors were caught, we can set our state!
+  if(response.msg) {
+    logMgr.debug(response.msg);
+  }
+  var newState = {};
+  properThis.setState(
+    currentNode: response.currentNode,
+    loggedIn: response.loggedIn,
+    votification: response.votification,
+    snippet: response.snippet,
+    paths: response.paths,
+    error: null
+  );
 }
