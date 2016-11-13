@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var constants = require('../../constants');
 var logMgr = require('./logger')('MarginLoginComponent.js');
 
 var SocialLoginButtonComponents = require('./SocialLoginButtonComponents');
@@ -13,7 +14,7 @@ var MarginLogin = React.createClass({
     var context = this.props.context;
     var content;
 
-    if(context.state.loggedIn) {
+    if(context.state.acctType != constants.acctTypeVisitor) {
       content =
         <div id='cyoag-margin-logout'>
           <h3>Logged in!</h3>

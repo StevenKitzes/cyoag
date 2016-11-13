@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var constants = require('../../constants');
 var logMgr = require('./logger')('VotificationComponents.js');
 
 var SocialLoginButtonComponents = require('./SocialLoginButtonComponents');
@@ -12,7 +13,7 @@ var BegLogin = React.createClass({
   render: function() {
     var context = this.props.context;
 
-    if(!context.state.loggedIn) {
+    if(context.state.acctType == constants.acctTypeVisitor) {
       return(
         <div id='cyoag-beg-login'>
           <h3>Register to have your position in the story automagically bookmarked!</h3>

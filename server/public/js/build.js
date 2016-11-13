@@ -22133,6 +22133,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
+	var constants = __webpack_require__(/*! ../../constants */ 178);
 	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainComponent.js');
 	
 	var MarginLoginComponent = __webpack_require__(/*! ./MarginLoginComponent */ 175);
@@ -22145,13 +22146,14 @@
 	  componentDidMount: mountXhrHandler,
 	  getInitialState: function () {
 	    return {
-	      currentNode: null,
-	      loggedIn: false,
-	      votification: 'none',
+	      nodeUid: null,
+	      userName: null,
+	      acctType: constants.acctTypeVisitor,
+	      votification: constants.votificationNone,
 	      snippet: {
-	        trailing: null,
+	        trailingSnippet: null,
 	        lastPath: null,
-	        current: null
+	        nodeSnippet: null
 	      },
 	      paths: [],
 	      error: null
@@ -22168,7 +22170,7 @@
 	    context.voteUp = this.voteUp;
 	
 	    var votificationComponent;
-	    if (this.state.loggedIn) {
+	    if (this.state.acctType != constants.acctTypeVisitor) {
 	      votificationComponent = React.createElement(VotificationComponents.Votification, { context: context });
 	    } else {
 	      votificationComponent = React.createElement(VotificationComponents.BegLogin, { context: context });
@@ -22240,47 +22242,72 @@
 	function castUpVote() {
 	  logMgr.debug('Setting votification UP');
 	  this.setState({
-	    votification: 'up'
+	    votification: constants.votificationUp
 	  });
 	}
 	function castDownVote() {
 	  logMgr.debug('Setting votification DOWN');
 	  this.setState({
-	    votification: 'down'
+	    votification: constants.votificationDown
 	  });
 	}
 	
 	function validateResponse(properThis, response) {
+	  logMgr.debug('Attempting to validate response from server . . .');
 	  if (!response) {
 	    // wow... if you don't even get a response, something is nightmarishly wrong
+	    logMgr.out('Got no valid response object from server.');
 	  }
 	  if (response.error) {
 	    // set an error state based on the returned error
+	    logMgr.out(response.error);
 	  }
-	  if (!response.hasOwnProperty('currentNode')) {
+	  if (!response.hasOwnProperty('nodeUid')) {
 	    // can't even determine where we are; set error state, display error content
+	    logMgr.out('Got no node UID from server.');
 	  }
-	  if (!response.hasOwnProperty('loggedIn')) {
-	    // can't determine whether user is logged in; set err, display err content
+	  if (!response.hasOwnProperty('acctType')) {
+	    // can't determine account type; set err, display err content
+	    logMgr.out('Got no user account type from server.');
 	  }
-	  if (!response.hasOwnProperty('votification') || response.votification != 'none' && response.votification != 'up' && response.votification != 'down') {
+	  if (!response.hasOwnProperty('userName')) {
+	    // can't figure out user's name; set err, display err content
+	    logMgr.out('Got no user name from server.');
+	  }
+	  if (!response.hasOwnProperty('votification') || response.votification != constants.votificationNone && response.votification != constants.votificationUp && response.votification != constants.votificationDown) {
 	    // can't determine votification status; set err, display err content
+	    logMgr.out('Got no votification information from server.');
+	  }
+	  if (!response.hasOwnProperty('paths')) {
+	    // no paths given, set error state and display error content
+	    logMgr.out('Got no pathing information from server.');
 	  }
 	  if (!response.hasOwnProperty('snippet')) {
 	    // no snippet to display, set error state and display error content
+	    logMgr.out('Got no snippet data from server.');
 	  }
-	  if (!response.snippet.hasOwnProperty('trailing') || !response.snippet.hasOwnProperty('lastPath') || !response.snippet.hasOwnProperty('current')) {
+	  if (!response.snippet.hasOwnProperty('trailingNodeSnippet') || !response.snippet.hasOwnProperty('trailingPathSnippet') || !response.snippet.hasOwnProperty('nodeSnippet')) {
 	    // snippet information missing, set error state and display error content
+	    logMgr.out('Some snippet details were missing in response from server.');
 	  }
-	  if (!response.hasOwnProperty('paths')) {}
-	  // no paths given, set error state and display error content
-	
-	  // if no errors were caught, we can set our state!
+	  // if message or warning was bundled, handle that
 	  if (response.msg) {
 	    logMgr.debug(response.msg);
 	  }
-	  var newState = {};
-	  properThis.setState(currentNode, loggedIn, votification, snippet, paths, error);
+	  if (response.warning) {
+	    logMgr.warn(response.warning);
+	  }
+	  logMgr.verbose('Trying to set state after validation . . .');
+	  properThis.setState({
+	    nodeUid: response.nodeUid,
+	    userName: response.userName,
+	    acctType: response.acctType,
+	    votification: response.votification,
+	    nodeSnippet: response.nodeSnippet,
+	    paths: response.paths,
+	    error: null
+	  });
+	  logMgr.verbose('State was set successfully after validation!');
 	}
 
 /***/ },
@@ -22293,34 +22320,6 @@
 	var DEBUG = __webpack_require__(/*! ./build-config */ 174).DEBUG;
 	var VERBOSE = __webpack_require__(/*! ./build-config */ 174).VERBOSE;
 	
-	/*var logManager = {
-	
-	  logSource: 'Unknown source',
-	
-	  out: function(msg) {
-	    console.log(this.logSource + ": " + msg);
-	  },
-	
-	  debug: function(msg) {
-	    if(DEBUG) {
-	      console.log("[DEBUG] " + this.logSource + ": " + msg);
-	    }
-	  },
-	
-	  verbose: function(msg) {
-	    if(DEBUG && VERBOSE) {
-	      console.log("[VERBOSE] " + this.logSource + ": " + msg);
-	    }
-	  },
-	
-	  setLogSource: function(name) {
-	    this.logSource = name;
-	    console.log('= = = Set logSource: ' + name);
-	    return this;
-	  }
-	
-	};*/
-	
 	module.exports = function (sourceName) {
 	  return {
 	    logSource: sourceName ? sourceName : 'Unknown source',
@@ -22332,6 +22331,12 @@
 	    debug: function (msg) {
 	      if (DEBUG) {
 	        console.log("[DEBUG] " + this.logSource + ": " + msg);
+	      }
+	    },
+	
+	    warn: function (warning) {
+	      if (DEBUG) {
+	        console.log("[WARNING] " + this.logSource + ": " + warning);
 	      }
 	    },
 	
@@ -22367,6 +22372,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
+	var constants = __webpack_require__(/*! ../../constants */ 178);
 	var logMgr = __webpack_require__(/*! ./logger */ 173)('MarginLoginComponent.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 176);
@@ -22381,7 +22387,7 @@
 	    var context = this.props.context;
 	    var content;
 	
-	    if (context.state.loggedIn) {
+	    if (context.state.acctType != constants.acctTypeVisitor) {
 	      content = React.createElement(
 	        'div',
 	        { id: 'cyoag-margin-logout' },
@@ -22495,6 +22501,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
+	var constants = __webpack_require__(/*! ../../constants */ 178);
 	var logMgr = __webpack_require__(/*! ./logger */ 173)('VotificationComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 176);
@@ -22508,7 +22515,7 @@
 	  render: function () {
 	    var context = this.props.context;
 	
-	    if (!context.state.loggedIn) {
+	    if (context.state.acctType == constants.acctTypeVisitor) {
 	      return React.createElement(
 	        'div',
 	        { id: 'cyoag-beg-login' },
@@ -22564,6 +22571,31 @@
 	exports.Votification = Votification;
 	
 	module.exports = exports;
+
+/***/ },
+/* 178 */
+/*!**********************!*\
+  !*** ./constants.js ***!
+  \**********************/
+/***/ function(module, exports) {
+
+	var constants = {}
+	
+	constants.acctTypeVisitor = 'visitor';
+	constants.acctTypeRegistered = 'registered';
+	constants.acctTypeModerator = 'moderator';
+	
+	constants.rootTrailingNodeSnippet = '... and a cold wind blows.';
+	constants.rootTrailingPathSnippet = 'The writer takes up his pen.';
+	
+	constants.sessionCookie = 'session_uid';
+	
+	constants.votificationNone = 'none';
+	constants.votificationUp = 'up';
+	constants.votificationDown = 'down';
+	
+	module.exports = constants;
+
 
 /***/ }
 /******/ ]);

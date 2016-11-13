@@ -4,6 +4,7 @@ var cookieParser = require('cookie-parser');
 
 var generateGuid = require('../build-source/js/uid-gen');
 var db = require('../dbAccess')();
+var responder = require('../responder');
 
 var app = express();
 app.use(cookieParser());
@@ -24,7 +25,7 @@ router.post('/', function(req, res, next) {
 
     var session_uid = req.cookies.session_uid;
     if(session_uid.length != 40) {
-      respond(res, response, 'clear', false, 'Session ID length was not 40.  User sent:\n' + session_uid, null);
+      responder.respond(res, session_uid);
       return;
     }
 
@@ -33,7 +34,7 @@ router.post('/', function(req, res, next) {
       console.log('Got DB connection from pool to check if any user has this session.');
       // If there's an error getting DB connection to check users with this session ID
       if(err) {
-        respond(res, response, req.cookies.session_uid, false, 'There was a problem getting a database connection.  Cannot validate session ID.', err);
+        responder.respondError(res, 'There was a problem getting a database connection.  Cannot validate session ID.');
         return;
       }
 
@@ -44,7 +45,7 @@ router.post('/', function(req, res, next) {
       connection.query(findSessionUidQuery, function(err, rows) {
         connection.release();
         if(err) {
-          respond(res, response, req.cookies.session_uid, false, 'Problem getting response from database checking session ID.', err);
+          responder.respondError(res, 'Problem getting response from database checking session ID.');
           return;
         }
 
@@ -54,7 +55,7 @@ router.post('/', function(req, res, next) {
           console.log('Found ' + rows.length + ' matching rows.  Removing duplicate session IDs in DB.');
           db.getConnection(function(e, conn) {
             if(e) {
-              respond(res, response, req.cookies.session_uid, false, 'Error getting a connection to the database to clear matching session IDs.', e);
+              responder.respondError(res, 'Error getting a connection to the database to clear matching session IDs.');
               return;
             }
 
@@ -62,11 +63,11 @@ router.post('/', function(req, res, next) {
             conn.query(clearDupesQuery, function(innerErr, r) {
               conn.release();
               if(innerErr) {
-                respond(res, response, req.cookies.session_uid, false, 'Error clearing matching session IDs at the database level.', innerErr);
+                responder.respondError(res, 'Error clearing matching session IDs at the database level.');
                 return;
               }
 
-              respond(res, response, req.cookies.session_uid, false, 'Multiple users detected with the same session ID.  Cleared matching session IDs.', null);
+              responder.respond(res, session_uid);
               return;
             });
           });
@@ -83,7 +84,7 @@ router.post('/', function(req, res, next) {
         else if(rows.length == 1) {
           var uid = rows[0]['uid'];
           var loginStatus = (uid.indexOf('fb-') > -1 || uid.indexOf('tw-') > -1) ? true : false;
-          respond(res, response, req.cookies.session_uid, loginStatus, 'Found user with this session ID!  Logged in.', null);
+          responder.respond(res, session_uid);
           return;
         }
       });
@@ -105,12 +106,7 @@ function createNewUser(req, res, response, successMsg) {
   // Create new user and write it to the DB
   db.getConnection(function(err, connection) {
     if(err) {
-      respond(res, response, 'clear', false, 'There was a problem getting a database connection.  New user cannot be created.', err);
-      console.log(msg + '\nERROR:\n' + err);
-      response.msg = msg;
-      response.loggedIn = false;
-      res.clearCookie('session_uid');
-      res.send(JSON.stringify(response));
+      responder.respondError(res, 'There was a problem getting a database connection.  New user cannot be created.');
       return;
     }
 
@@ -130,7 +126,7 @@ function createNewUser(req, res, response, successMsg) {
 
     connection.query(userInsertQuery, function(errUserQuery) {
       if(errUserQuery) {
-        respond(res, response, 'clear', false, 'Problem getting response from database creating new user.', errUserQuery);
+        responder.respondError(res, 'Problem getting response from database creating new user.');
         return;
       }
 
@@ -141,32 +137,14 @@ function createNewUser(req, res, response, successMsg) {
 
       connection.query(positionInsertQuery, function(errPosQuery) {
         if(errPosQuery) {
-          respond(res, response, newUser.session_uid, false, 'Problem getting response from database setting position of new user.', errPosQuery);
+          responder.respond(res, 'Problem getting response from database setting position of new user.');
           return;
         }
 
         connection.release();
-        respond(res, response, newUser.session_uid, false, successMsg, null);
+        responder.respond(res, newUser.session_uid);
         return;
       });
     });
   });
-}
-
-function respond(res, payload, cookieVal, loginStatus, msg, errorMsg) {
-  if(errorMsg) {
-    console.log(msg + '\nERROR:\n' + errorMsg);
-  }
-  else {
-    console.log(msg);
-  }
-  payload.msg = msg;
-  payload.loggedIn = loginStatus;
-  if(cookieVal == 'clear') {
-    res.clearCookie('session_uid');
-  }
-  else {
-    res.cookie('session_uid', cookieVal);
-  }
-  res.send(JSON.stringify(payload));
 }

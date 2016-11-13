@@ -5,6 +5,7 @@ var express = require('express');
 var request = require('request'); // easy HTTP request library
 var router = express.Router();
 
+var responder = require('../responder');
 var secrets = require('../secrets');
 var socialUtils = require('../socialUtils');
 
@@ -58,9 +59,9 @@ router.get('/swap', function(req, res, next) {
     }
     // token not received?!
     else {
-      var noTokenReceivedMsg = 'ERROR: no token received';
+      var noTokenReceivedMsg = 'ERROR: no token received from Facebook.';
       console.log(noTokenReceivedMsg);
-      res.send(noTokenReceivedMsg);
+      responder.respondError(res, noTokenReceivedMsg);
     }
   });
 });

@@ -1,5 +1,6 @@
 var db = require('./dbAccess')();
 var generateGuid = require('./build-source/js/uid-gen');
+var responder = require('./responder');
 
 function socialLoginById(user_uid, req, res) {
   var response = {};
@@ -9,12 +10,7 @@ function socialLoginById(user_uid, req, res) {
   db.getConnection(function(errGetConn, connectionCheckUser) {
     if(errGetConn) {
       // handle any error getting connection from pool
-      var msg = 'Problem getting a database connection.  Unable to check user status.';
-      console.log(msg + '\nERROR:\n' + errGetConn);
-      response.msg = msg;
-      response.loggedIn = false;
-      res.clearCookie('session_uid');
-      res.send(JSON.stringify(response));
+      responder.respondError(res, 'Problem getting a database connection.  Unable to check user status.');
       return;
     }
 
@@ -24,11 +20,7 @@ function socialLoginById(user_uid, req, res) {
       connectionCheckUser.release();
       if(errQuery) {
         // handle any error querying for users with this user ID
-        var msg = 'Problem querying database for user status.';
-        console.log(msg + '\nERROR:\n' + errQuery);
-        response.msg = msg;
-        res.clearCookie('session_uid');
-        res.send(JSON.stringify(response));
+        responder.respondError(res, 'Problem querying database for user status.');
         return;
       }
 
@@ -47,11 +39,7 @@ function socialLoginById(user_uid, req, res) {
       }
 
       // handle some mysterious uncaught Error
-      var msg = 'Error: unexpected number of results checking user status on database.';
-      console.log(msg);
-      response.msg = msg;
-      res.clearCookie('session_uid');
-      res.send(JSON.stringify(response));
+      responder.respondError(res, 'Error: unexpected number of results checking user status on database.');
       return;
     });
   });
@@ -62,11 +50,7 @@ function registerUser(uid, session_uid, res, response) {
   // Create new user and write it to the DB
   db.getConnection(function(errConnection, connection) {
     if(errConnection) {
-      var msg = 'Problem getting a database connection for user registration.';
-      console.log(msg + '\nERROR:\n' + errGetConn);
-      response.msg = msg;
-      res.clearCookie('session_uid');
-      res.send(JSON.stringify(response));
+      responder.respondError(res, 'Problem getting a database connection for user registration.');
       return;
     }
 
@@ -76,20 +60,12 @@ function registerUser(uid, session_uid, res, response) {
     var getPosQuery = 'SELECT positions.node_uid FROM positions INNER JOIN users ON users.uid=positions.user_uid WHERE users.session_uid=' + connection.escape(session_uid) + ';';
     connection.query(getPosQuery, function(errGetPos, rows) {
       if(errGetPos) {
-        var msg = 'Problem getting current session position from database.';
-        console.log(msg + '\nERROR:\n' + errGetPos);
-        response.msg = msg;
-        res.cookie('session_uid', session_uid);
-        res.send(JSON.stringify(response));
+        responder.respondError(res, 'Problem getting current session position from database.');
         connection.release();
         return;
       }
       if(rows.length != 1) {
-        var msg = 'Found multiple results for current session position where only 1 expected.';
-        console.log(msg);
-        response.msg = msg;
-        res.cookie('session_uid', session_uid);
-        res.send(JSON.stringify(response));
+        resonder.respond(res, session_uid, {warning: 'Found multiple results for current session position.'});
         connection.release();
         return;
       }
@@ -116,11 +92,7 @@ function registerUser(uid, session_uid, res, response) {
 
       connection.query(userInsertQuery, function(errInsert) {
         if(errInsert) {
-          var msg = 'Problem writing new user to database.';
-          console.log(msg + '\nERROR:\n' + errInsert);
-          response.msg = msg;
-          res.clearCookie('session_uid');
-          res.send(JSON.stringify(response));
+          responder.respondError(res, 'Problem writing new user to database.');
           connection.release();
           return;
         }
@@ -131,11 +103,7 @@ function registerUser(uid, session_uid, res, response) {
 
         connection.query(setPosQuery, function(errSetPos) {
           if(errSetPos) {
-            var msg = 'Problem writing new user position to database.';
-            console.log(msg + '\nERROR:\n' + errInsert);
-            response.msg = msg;
-            res.clearCookie('session_uid');
-            res.send(JSON.stringify(response));
+            responder.respondError(res, 'Problem writing new user position to database.');
             connection.release();
             return;
           }
@@ -152,19 +120,16 @@ function registerUser(uid, session_uid, res, response) {
 }
 
 function updateUserSession(uid, res, response) {
-  console.log('Facebook user detected, updating session ID . . .');
+  console.log('Registered user detected, updating session ID . . .');
   // Create new user and write it to the DB
-  db.getConnection(function(errGetConn, connectionUpdateFB) {
+  db.getConnection(function(errGetConn, connectionUpdateSession) {
     if(errGetConn) {
-      var msg = 'Problem getting a database connection to update Facebook user session.';
-      console.log(msg + '\nERROR:\n' + errGetConn);
-      response.msg = msg;
-      res.clearCookie('session_uid');
-      res.send(JSON.stringify(response));
+      responder.respondError(res, 'Problem getting a database connection to update registered user session.');
+      connectionUpdateSession.release();
       return;
     }
 
-    console.log('Got database connection to update Facebook user session.');
+    console.log('Got database connection to update registered user session.');
 
     // Create a new user to write to DB
     var userStatus = {};
@@ -175,21 +140,17 @@ function updateUserSession(uid, res, response) {
       userStatus.session_uid + '" WHERE uid="' +
       userStatus.uid + '";';
 
-    console.log('Querying to update Facebook user session ID.');
+    console.log('Querying to update registered user session ID.');
 
-    connectionUpdateFB.query(userInsertQuery, function(errInsert, rows) {
-      console.log('Facebook user session update query attempt complete.');
-      connectionUpdateFB.release();
+    connectionUpdateSession.query(userInsertQuery, function(errInsert, rows) {
+      console.log('Registered user session update query attempt complete.');
+      connectionUpdateSession.release();
       if(errInsert) {
-        var msg = 'Problem writing new Facebook user session ID.';
-        console.log(msg + '\nERROR:\n' + errInsert);
-        response.msg = msg;
-        res.clearCookie('session_uid');
-        res.send(JSON.stringify(response));
+        responder.respondError(res, 'Problem writing new registered user session ID.');
         return;
       }
 
-      console.log('Successfully updated Facebook user session!');
+      console.log('Successfully updated registered user session!');
       res.cookie('session_uid', userStatus.session_uid);
       res.redirect(302, 'http://localhost.cyoag.com:3000/');
       return;
