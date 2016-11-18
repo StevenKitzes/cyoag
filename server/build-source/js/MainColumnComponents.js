@@ -11,6 +11,8 @@ var exports = {};
 // Facebook login button component
 var MainColumn = React.createClass({
   render: function() {
+    logMgr.verbose('Rendering...');
+
     var context = this.props.context;
 
     var votificationComponent;
@@ -23,6 +25,7 @@ var MainColumn = React.createClass({
 
     return(
       <div id='cyoag-main-column'>
+        <h1>Main Column</h1>
         {votificationComponent}
       </div>
     );

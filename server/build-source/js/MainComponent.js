@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var constants = require('../../constants');
 var logMgr = require('./logger')('MainComponent.js');
 
 var HeaderComponents = require('./HeaderComponents');
@@ -13,20 +14,22 @@ var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   getInitialState: function() {
     return {
-      currentNode: null,
-      loggedIn: false,
-      votification: 'none',
+      nodeUid: null,
+      userName: null,
+      acctType: constants.acctTypeVisitor,
+      votification: constants.votificationNone,
       snippet: {
-        trailing: null,
+        trailingSnippet: null,
         lastPath: null,
-        current: null,
+        nodeSnippet: null,
       },
-      paths: []
+      paths: [],
+      error: null
     };
   },
   logoutRequest: logoutXhrHandler,
   render: function() {
-    logMgr.verbose('Rendering MainComponent.');
+    logMgr.verbose('Rendering...');
 
     var context = {};
     context.state = this.state;
@@ -39,7 +42,7 @@ var MainComponent = React.createClass({
         <HeaderComponents.Header />
         <MainColumnComponents.MainColumn context={context} />
         <MarginColumnComponents.MarginColumn context={context} />
-        <FooterComponents.Header />
+        <FooterComponents.Footer />
       </div>
     );
   },
@@ -59,11 +62,7 @@ function mountXhrHandler() {
       logMgr.debug('Status 200 (or 304)!');
       logMgr.verbose('Cookie check response payload: ' + xhr.responseText);
       var response = JSON.parse(xhr.responseText);
-      // do something with response
-      logMgr.debug('Response message: ' + response.msg);
-      properThis.setState({
-        loggedIn: response.loggedIn
-      });
+      validateResponse(properThis, response);
     }
     else {
       logMgr.debug('Initial cookie check yielded HTTP response status: ' + xhr.status);
@@ -89,11 +88,7 @@ function logoutXhrHandler() {
       logMgr.debug('Status 200 (or 304)!');
       logMgr.verbose('Logout response payload: ' + xhr.responseText);
       var response = JSON.parse(xhr.responseText);
-      // do something with response
-      logMgr.debug('Response message: ' + response.msg);
-      properThis.setState({
-        loggedIn: response.loggedIn
-      });
+      validateResponse(properThis, response);
     }
     else {
       logMgr.debug('Logout attempt yielded HTTP response status: ' + xhr.status);
@@ -112,12 +107,77 @@ function logoutXhrHandler() {
 function castUpVote() {
   logMgr.debug('Setting votification UP');
   this.setState({
-    votification: 'up'
+    votification: constants.votificationUp
   });
 }
 function castDownVote() {
   logMgr.debug('Setting votification DOWN');
   this.setState({
-    votification: 'down'
+    votification: constants.votificationDown
   });
+}
+
+function validateResponse(properThis, response) {
+  logMgr.debug('Attempting to validate response from server . . .');
+  if(!response) {
+    // wow... if you don't even get a response, something is nightmarishly wrong
+    logMgr.out('Got no valid response object from server.');
+  }
+  if(response.error) {
+    // set an error state based on the returned error
+    logMgr.out(response.error);
+  }
+  if(!response.hasOwnProperty('nodeUid')) {
+    // can't even determine where we are; set error state, display error content
+    logMgr.out('Got no node UID from server.');
+  }
+  if(!response.hasOwnProperty('acctType')) {
+    // can't determine account type; set err, display err content
+    logMgr.out('Got no user account type from server.');
+  }
+  if(!response.hasOwnProperty('userName')) {
+    // can't figure out user's name; set err, display err content
+    logMgr.out('Got no user name from server.');
+  }
+  if(
+    !response.hasOwnProperty('votification') ||
+    (response.votification != constants.votificationNone &&
+     response.votification != constants.votificationUp &&
+     response.votification != constants.votificationDown)) {
+    // can't determine votification status; set err, display err content
+    logMgr.out('Got no votification information from server.');
+  }
+  if(!response.hasOwnProperty('paths')) {
+    // no paths given, set error state and display error content
+    logMgr.out('Got no pathing information from server.');
+  }
+  if(!response.hasOwnProperty('snippet')) {
+    // no snippet to display, set error state and display error content
+    logMgr.out('Got no snippet data from server.');
+  }
+  if(
+    !response.snippet.hasOwnProperty('trailingNodeSnippet') ||
+    !response.snippet.hasOwnProperty('trailingPathSnippet') ||
+    !response.snippet.hasOwnProperty('nodeSnippet')) {
+    // snippet information missing, set error state and display error content
+    logMgr.out('Some snippet details were missing in response from server.');
+  }
+  // if message or warning was bundled, handle that
+  if(response.msg) {
+    logMgr.debug(response.msg);
+  }
+  if(response.warning) {
+    logMgr.warn(response.warning);
+  }
+  logMgr.verbose('Trying to set state after validation . . .');
+  properThis.setState({
+    nodeUid: response.nodeUid,
+    userName: response.userName,
+    acctType: response.acctType,
+    votification: response.votification,
+    nodeSnippet: response.nodeSnippet,
+    paths: response.paths,
+    error: null
+  });
+  logMgr.verbose('State was set successfully after validation!');
 }

@@ -1,0 +1,26 @@
+body {
+  background-color: aliceblue;
+  text-align: center;
+}
+
+div {
+  text-align: center;
+}
+
+.cyoag-link {
+  color: #0077AA;
+  padding-left: 2px;
+  padding-right: 2px;
+  text-decoration: none;
+}
+
+#mount-main {
+  text-align: center;
+  width: 100%;
+}
+
+#cyoag-upvote-button, #cyoag-downvote-button {
+  padding: 0 10px 0;
+  height: 32px;
+  width: 32px;
+}
