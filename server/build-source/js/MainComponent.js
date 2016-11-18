@@ -3,8 +3,10 @@ var ReactDOM = require('react-dom');
 
 var logMgr = require('./logger')('MainComponent.js');
 
-var MarginLoginComponent = require('./MarginLoginComponent');
-var VotificationComponents = require('./VotificationComponents');
+var HeaderComponents = require('./HeaderComponents');
+var MainColumnComponents = require('./MainColumnComponents');
+var MarginColumnComponents = require('./MarginColumnComponents');
+var FooterComponents = require('./FooterComponents');
 
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
@@ -32,18 +34,12 @@ var MainComponent = React.createClass({
     context.voteDown = this.voteDown;
     context.voteUp = this.voteUp;
 
-    var votificationComponent;
-    if(this.state.loggedIn) {
-      votificationComponent = <VotificationComponents.Votification context={context} />;
-    }
-    else {
-      votificationComponent = <VotificationComponents.BegLogin context={context} />;
-    }
-
     return (
-      <div id='cyoag-main'>
-        <MarginLoginComponent.MarginLogin context={context} />
-        {votificationComponent}
+      <div id='cyoag-react-container'>
+        <HeaderComponents.Header />
+        <MainColumnComponents.MainColumn context={context} />
+        <MarginColumnComponents.MarginColumn context={context} />
+        <FooterComponents.Header />
       </div>
     );
   },
