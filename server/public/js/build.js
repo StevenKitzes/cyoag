@@ -22164,8 +22164,8 @@
 	      React.createElement(
 	        'div',
 	        { id: 'cyoag-columns' },
-	        React.createElement(MainColumnComponents.MainColumn, { context: context }),
-	        React.createElement(MarginColumnComponents.MarginColumn, { context: context })
+	        React.createElement(MarginColumnComponents.MarginColumn, { context: context }),
+	        React.createElement(MainColumnComponents.MainColumn, { context: context })
 	      ),
 	      React.createElement(FooterComponents.Footer, null)
 	    );
@@ -22582,11 +22582,6 @@
 	        'p',
 	        { id: 'cyoag-node-snippet' },
 	        snippet.nodeSnippet
-	      ),
-	      React.createElement(
-	        'p',
-	        null,
-	        '(temp ... paths will go here)'
 	      )
 	    );
 	  }
@@ -22698,7 +22693,7 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { className: 'cyoag-fb-login' },
+	      { className: 'cyoag-fb-login inline-block' },
 	      React.createElement(
 	        'a',
 	        { className: 'cyoag-link', href: '/fb/login' },
@@ -22715,7 +22710,7 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { className: 'cyoag-tw-button' },
+	      { className: 'cyoag-tw-button inline-block' },
 	      React.createElement(
 	        'a',
 	        { className: 'cyoag-link', href: '/tw/login' },

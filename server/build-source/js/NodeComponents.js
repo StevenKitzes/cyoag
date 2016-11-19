@@ -19,7 +19,6 @@ var Node = React.createClass({
         <p id='cyoag-trailing-snippet'>{snippet.trailingSnippet}</p>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
         <p id='cyoag-node-snippet'>{snippet.nodeSnippet}</p>
-        <p>(temp ... paths will go here)</p>
       </div>
     );
   }

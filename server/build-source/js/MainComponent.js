@@ -27,8 +27,8 @@ var MainComponent = React.createClass({
       <div id='cyoag-react-container'>
         <HeaderComponents.Header />
         <div id='cyoag-columns'>
-          <MainColumnComponents.MainColumn context={context} />
           <MarginColumnComponents.MarginColumn context={context} />
+          <MainColumnComponents.MainColumn context={context} />
         </div>
         <FooterComponents.Footer />
       </div>

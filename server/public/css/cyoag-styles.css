@@ -14,9 +14,25 @@ div {
   text-decoration: none;
 }
 
+.inline-block {
+  display: inline-block;
+}
+
 #mount-main {
   text-align: center;
   width: 100%;
+}
+
+#cyoag-main-column {
+  margin-right: 260px;
+}
+#cyoag-margin-column {
+  float: right;
+  width: 250px;
+}
+
+#cyoag-footer-container {
+  clear: both;
 }
 
 #cyoag-upvote-button, #cyoag-downvote-button {
