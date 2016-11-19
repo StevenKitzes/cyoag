@@ -52,7 +52,7 @@
 	
 	var MainComponent = __webpack_require__(/*! ./MainComponent */ 172);
 	
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('main.js');
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('main.js');
 	
 	logMgr.verbose('Kicking off initial render!');
 	
@@ -22133,8 +22133,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainComponent.js');
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('MainComponent.js');
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 176);
 	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 177);
@@ -22347,58 +22347,6 @@
 
 /***/ },
 /* 173 */
-/*!***********************************!*\
-  !*** ./build-source/js/logger.js ***!
-  \***********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var DEBUG = __webpack_require__(/*! ./build-config */ 174).DEBUG;
-	var VERBOSE = __webpack_require__(/*! ./build-config */ 174).VERBOSE;
-	
-	module.exports = function (sourceName) {
-	  return {
-	    logSource: sourceName ? sourceName : 'Unknown source',
-	
-	    out: function (msg) {
-	      console.log(this.logSource + ": " + msg);
-	    },
-	
-	    debug: function (msg) {
-	      if (DEBUG) {
-	        console.log("[DEBUG] " + this.logSource + ": " + msg);
-	      }
-	    },
-	
-	    warn: function (warning) {
-	      if (DEBUG) {
-	        console.log("[WARNING] " + this.logSource + ": " + warning);
-	      }
-	    },
-	
-	    verbose: function (msg) {
-	      if (DEBUG && VERBOSE) {
-	        console.log("[VERBOSE] " + this.logSource + ": " + msg);
-	      }
-	    }
-	  };
-	};
-
-/***/ },
-/* 174 */
-/*!*****************************************!*\
-  !*** ./build-source/js/build-config.js ***!
-  \*****************************************/
-/***/ function(module, exports) {
-
-	var config = {};
-	
-	config.DEBUG = true;
-	config.VERBOSE = true;
-	
-	module.exports = config;
-
-/***/ },
-/* 175 */
 /*!**********************!*\
   !*** ./constants.js ***!
   \**********************/
@@ -22440,6 +22388,58 @@
 
 
 /***/ },
+/* 174 */
+/*!***********************************!*\
+  !*** ./build-source/js/logger.js ***!
+  \***********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var DEBUG = __webpack_require__(/*! ./build-config */ 175).DEBUG;
+	var VERBOSE = __webpack_require__(/*! ./build-config */ 175).VERBOSE;
+	
+	module.exports = function (sourceName) {
+	  return {
+	    logSource: sourceName ? sourceName : 'Unknown source',
+	
+	    out: function (msg) {
+	      console.log(this.logSource + ": " + msg);
+	    },
+	
+	    debug: function (msg) {
+	      if (DEBUG) {
+	        console.log("[DEBUG] " + this.logSource + ": " + msg);
+	      }
+	    },
+	
+	    warn: function (warning) {
+	      if (DEBUG) {
+	        console.log("[WARNING] " + this.logSource + ": " + warning);
+	      }
+	    },
+	
+	    verbose: function (msg) {
+	      if (DEBUG && VERBOSE) {
+	        console.log("[VERBOSE] " + this.logSource + ": " + msg);
+	      }
+	    }
+	  };
+	};
+
+/***/ },
+/* 175 */
+/*!*****************************************!*\
+  !*** ./build-source/js/build-config.js ***!
+  \*****************************************/
+/***/ function(module, exports) {
+
+	var config = {};
+	
+	config.DEBUG = true;
+	config.VERBOSE = true;
+	
+	module.exports = config;
+
+/***/ },
 /* 176 */
 /*!*********************************************!*\
   !*** ./build-source/js/HeaderComponents.js ***!
@@ -22449,8 +22449,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('HeaderComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('HeaderComponents.js');
 	
 	var exports = {};
 	
@@ -22498,8 +22498,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('MainColumnComponents.js');
 	
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 178);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 179);
@@ -22550,8 +22550,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('NodeComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('NodeComponents.js');
 	
 	var exports = {};
 	
@@ -22601,8 +22601,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('VotificationComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('VotificationComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 180);
 	
@@ -22682,7 +22682,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('SocialLoginButtonComponents.js');
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('SocialLoginButtonComponents.js');
 	
 	var exports = {};
 	
@@ -22749,8 +22749,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('MarginColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('MarginColumnComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 180);
 	
@@ -22836,8 +22836,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ./logger */ 173)('FooterComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('FooterComponents.js');
 	
 	var exports = {};
 	
