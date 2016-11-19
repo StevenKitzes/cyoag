@@ -12,21 +12,7 @@ var FooterComponents = require('./FooterComponents');
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
-  getInitialState: function() {
-    return {
-      nodeUid: null,
-      userName: null,
-      acctType: constants.acctTypeVisitor,
-      votification: constants.votificationNone,
-      snippet: {
-        trailingSnippet: null,
-        lastPath: null,
-        nodeSnippet: null,
-      },
-      paths: [],
-      error: null
-    };
-  },
+  getInitialState: getDefaultStateObject,
   logoutRequest: logoutXhrHandler,
   render: function() {
     logMgr.verbose('Rendering...');
@@ -40,8 +26,10 @@ var MainComponent = React.createClass({
     return (
       <div id='cyoag-react-container'>
         <HeaderComponents.Header />
-        <MainColumnComponents.MainColumn context={context} />
-        <MarginColumnComponents.MarginColumn context={context} />
+        <div id='cyoag-columns'>
+          <MainColumnComponents.MainColumn context={context} />
+          <MarginColumnComponents.MarginColumn context={context} />
+        </div>
         <FooterComponents.Footer />
       </div>
     );
@@ -121,23 +109,32 @@ function validateResponse(properThis, response) {
   logMgr.debug('Attempting to validate response from server . . .');
   if(!response) {
     // wow... if you don't even get a response, something is nightmarishly wrong
-    logMgr.out('Got no valid response object from server.');
+    var msg = 'Got no valid response object from server whatsoever.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
   }
   if(response.error) {
     // set an error state based on the returned error
     logMgr.out(response.error);
+    properThis.setState(getErrorStateObject(response.error));
   }
   if(!response.hasOwnProperty('nodeUid')) {
     // can't even determine where we are; set error state, display error content
-    logMgr.out('Got no node UID from server.');
+    var msg = 'Could not get story node data from server.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
   }
   if(!response.hasOwnProperty('acctType')) {
     // can't determine account type; set err, display err content
-    logMgr.out('Got no user account type from server.');
+    var msg = 'Could not get user account type from server.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
   }
   if(!response.hasOwnProperty('userName')) {
     // can't figure out user's name; set err, display err content
-    logMgr.out('Got no user name from server.');
+    var msg = 'Could not get user data from server.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
   }
   if(
     !response.hasOwnProperty('votification') ||
@@ -145,29 +142,30 @@ function validateResponse(properThis, response) {
      response.votification != constants.votificationUp &&
      response.votification != constants.votificationDown)) {
     // can't determine votification status; set err, display err content
-    logMgr.out('Got no votification information from server.');
+    var msg = 'Could not retrieve votification status from the server.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
   }
   if(!response.hasOwnProperty('paths')) {
     // no paths given, set error state and display error content
-    logMgr.out('Got no pathing information from server.');
+    var msg = 'Could not retrieve pathing information from server.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
   }
   if(!response.hasOwnProperty('snippet')) {
     // no snippet to display, set error state and display error content
-    logMgr.out('Got no snippet data from server.');
+    var msg = 'Could not retrieve snippet data from server.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
   }
   if(
     !response.snippet.hasOwnProperty('trailingNodeSnippet') ||
     !response.snippet.hasOwnProperty('trailingPathSnippet') ||
     !response.snippet.hasOwnProperty('nodeSnippet')) {
     // snippet information missing, set error state and display error content
-    logMgr.out('Some snippet details were missing in response from server.');
-  }
-  // if message or warning was bundled, handle that
-  if(response.msg) {
-    logMgr.debug(response.msg);
-  }
-  if(response.warning) {
-    logMgr.warn(response.warning);
+    var msg = 'Some snippet details were missing in response from server.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
   }
   logMgr.verbose('Trying to set state after validation . . .');
   properThis.setState({
@@ -177,7 +175,45 @@ function validateResponse(properThis, response) {
     votification: response.votification,
     nodeSnippet: response.nodeSnippet,
     paths: response.paths,
-    error: null
+    msg: response.msg ? response.msg : constants.emptyString,
+    warning: response.warning ? response.warning : constants.emptyString,
+    error: response.error ? response.error : constants.emptyString
   });
   logMgr.verbose('State was set successfully after validation!');
+}
+
+function getDefaultStateObject() {
+  return {
+    nodeUid: constants.defaultNodeUid,
+    userName: constants.defaultUserName,
+    acctType: constants.acctTypeVisitor,
+    votification: constants.votificationNone,
+    snippet: {
+      trailingSnippet: constants.defaultTrailingSnippet,
+      lastPath: constants.defaultLastPath,
+      nodeSnippet: constants.defaultNodeSnippet
+    },
+    paths: [],
+    msg: constants.emptyString,
+    warning: constants.emptyString,
+    error: constants.emptyString
+  };
+}
+
+function getErrorStateObject(msg) {
+  return {
+    nodeUid: constants.errorNodeUid,
+    userName: constants.errorUserName,
+    acctType: constants.acctTypeVisitor,
+    votification: constants.votificationNone,
+    snippet: {
+      trailingSnippet: constants.errorTrailingSnippet,
+      lastPath: constants.errorLastPath,
+      nodeSnippet: constants.errorNodeSnippet + '  ' + msg
+    },
+    paths: [],
+    msg: constants.emptyString,
+    warning: constants.emptyString,
+    error: msg
+  };
 }

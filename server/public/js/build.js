@@ -52,7 +52,7 @@
 	
 	var MainComponent = __webpack_require__(/*! ./MainComponent */ 172);
 	
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('main.js');
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('main.js');
 	
 	logMgr.verbose('Kicking off initial render!');
 	
@@ -22133,34 +22133,20 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('MainComponent.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainComponent.js');
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 176);
 	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 177);
-	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 180);
-	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 181);
+	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 181);
+	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 182);
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
 	  displayName: 'MainComponent',
 	
 	  componentDidMount: mountXhrHandler,
-	  getInitialState: function () {
-	    return {
-	      nodeUid: null,
-	      userName: null,
-	      acctType: constants.acctTypeVisitor,
-	      votification: constants.votificationNone,
-	      snippet: {
-	        trailingSnippet: null,
-	        lastPath: null,
-	        nodeSnippet: null
-	      },
-	      paths: [],
-	      error: null
-	    };
-	  },
+	  getInitialState: getDefaultStateObject,
 	  logoutRequest: logoutXhrHandler,
 	  render: function () {
 	    logMgr.verbose('Rendering...');
@@ -22175,8 +22161,12 @@
 	      'div',
 	      { id: 'cyoag-react-container' },
 	      React.createElement(HeaderComponents.Header, null),
-	      React.createElement(MainColumnComponents.MainColumn, { context: context }),
-	      React.createElement(MarginColumnComponents.MarginColumn, { context: context }),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-columns' },
+	        React.createElement(MainColumnComponents.MainColumn, { context: context }),
+	        React.createElement(MarginColumnComponents.MarginColumn, { context: context })
+	      ),
 	      React.createElement(FooterComponents.Footer, null)
 	    );
 	  },
@@ -22253,46 +22243,56 @@
 	  logMgr.debug('Attempting to validate response from server . . .');
 	  if (!response) {
 	    // wow... if you don't even get a response, something is nightmarishly wrong
-	    logMgr.out('Got no valid response object from server.');
+	    var msg = 'Got no valid response object from server whatsoever.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
 	  }
 	  if (response.error) {
 	    // set an error state based on the returned error
 	    logMgr.out(response.error);
+	    properThis.setState(getErrorStateObject(response.error));
 	  }
 	  if (!response.hasOwnProperty('nodeUid')) {
 	    // can't even determine where we are; set error state, display error content
-	    logMgr.out('Got no node UID from server.');
+	    var msg = 'Could not get story node data from server.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
 	  }
 	  if (!response.hasOwnProperty('acctType')) {
 	    // can't determine account type; set err, display err content
-	    logMgr.out('Got no user account type from server.');
+	    var msg = 'Could not get user account type from server.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
 	  }
 	  if (!response.hasOwnProperty('userName')) {
 	    // can't figure out user's name; set err, display err content
-	    logMgr.out('Got no user name from server.');
+	    var msg = 'Could not get user data from server.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
 	  }
 	  if (!response.hasOwnProperty('votification') || response.votification != constants.votificationNone && response.votification != constants.votificationUp && response.votification != constants.votificationDown) {
 	    // can't determine votification status; set err, display err content
-	    logMgr.out('Got no votification information from server.');
+	    var msg = 'Could not retrieve votification status from the server.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
 	  }
 	  if (!response.hasOwnProperty('paths')) {
 	    // no paths given, set error state and display error content
-	    logMgr.out('Got no pathing information from server.');
+	    var msg = 'Could not retrieve pathing information from server.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
 	  }
 	  if (!response.hasOwnProperty('snippet')) {
 	    // no snippet to display, set error state and display error content
-	    logMgr.out('Got no snippet data from server.');
+	    var msg = 'Could not retrieve snippet data from server.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
 	  }
 	  if (!response.snippet.hasOwnProperty('trailingNodeSnippet') || !response.snippet.hasOwnProperty('trailingPathSnippet') || !response.snippet.hasOwnProperty('nodeSnippet')) {
 	    // snippet information missing, set error state and display error content
-	    logMgr.out('Some snippet details were missing in response from server.');
-	  }
-	  // if message or warning was bundled, handle that
-	  if (response.msg) {
-	    logMgr.debug(response.msg);
-	  }
-	  if (response.warning) {
-	    logMgr.warn(response.warning);
+	    var msg = 'Some snippet details were missing in response from server.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
 	  }
 	  logMgr.verbose('Trying to set state after validation . . .');
 	  properThis.setState({
@@ -22302,45 +22302,58 @@
 	    votification: response.votification,
 	    nodeSnippet: response.nodeSnippet,
 	    paths: response.paths,
-	    error: null
+	    msg: response.msg ? response.msg : constants.emptyString,
+	    warning: response.warning ? response.warning : constants.emptyString,
+	    error: response.error ? response.error : constants.emptyString
 	  });
 	  logMgr.verbose('State was set successfully after validation!');
+	}
+	
+	function getDefaultStateObject() {
+	  return {
+	    nodeUid: constants.defaultNodeUid,
+	    userName: constants.defaultUserName,
+	    acctType: constants.acctTypeVisitor,
+	    votification: constants.votificationNone,
+	    snippet: {
+	      trailingSnippet: constants.defaultTrailingSnippet,
+	      lastPath: constants.defaultLastPath,
+	      nodeSnippet: constants.defaultNodeSnippet
+	    },
+	    paths: [],
+	    msg: constants.emptyString,
+	    warning: constants.emptyString,
+	    error: constants.emptyString
+	  };
+	}
+	
+	function getErrorStateObject(msg) {
+	  return {
+	    nodeUid: constants.errorNodeUid,
+	    userName: constants.errorUserName,
+	    acctType: constants.acctTypeVisitor,
+	    votification: constants.votificationNone,
+	    snippet: {
+	      trailingSnippet: constants.errorTrailingSnippet,
+	      lastPath: constants.errorLastPath,
+	      nodeSnippet: constants.errorNodeSnippet + '  ' + msg
+	    },
+	    paths: [],
+	    msg: constants.emptyString,
+	    warning: constants.emptyString,
+	    error: msg
+	  };
 	}
 
 /***/ },
 /* 173 */
-/*!**********************!*\
-  !*** ./constants.js ***!
-  \**********************/
-/***/ function(module, exports) {
-
-	var constants = {}
-	
-	constants.acctTypeVisitor = 'visitor';
-	constants.acctTypeRegistered = 'registered';
-	constants.acctTypeModerator = 'moderator';
-	
-	constants.rootTrailingNodeSnippet = '... and a cold wind blows.';
-	constants.rootTrailingPathSnippet = 'The writer takes up his pen.';
-	
-	constants.sessionCookie = 'session_uid';
-	
-	constants.votificationNone = 'none';
-	constants.votificationUp = 'up';
-	constants.votificationDown = 'down';
-	
-	module.exports = constants;
-
-
-/***/ },
-/* 174 */
 /*!***********************************!*\
   !*** ./build-source/js/logger.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var DEBUG = __webpack_require__(/*! ./build-config */ 175).DEBUG;
-	var VERBOSE = __webpack_require__(/*! ./build-config */ 175).VERBOSE;
+	var DEBUG = __webpack_require__(/*! ./build-config */ 174).DEBUG;
+	var VERBOSE = __webpack_require__(/*! ./build-config */ 174).VERBOSE;
 	
 	module.exports = function (sourceName) {
 	  return {
@@ -22371,7 +22384,7 @@
 	};
 
 /***/ },
-/* 175 */
+/* 174 */
 /*!*****************************************!*\
   !*** ./build-source/js/build-config.js ***!
   \*****************************************/
@@ -22385,6 +22398,48 @@
 	module.exports = config;
 
 /***/ },
+/* 175 */
+/*!**********************!*\
+  !*** ./constants.js ***!
+  \**********************/
+/***/ function(module, exports) {
+
+	var constants = {}
+	
+	constants.acctTypeVisitor = 'visitor';
+	constants.acctTypeRegistered = 'registered';
+	constants.acctTypeModerator = 'moderator';
+	
+	constants.defaultNodeUid = 'default';
+	constants.defaultUserName = 'Visitor';
+	constants.defaultTrailingSnippet = '... and then the user sat down in front of the keyboard, and had to make a choice.';
+	constants.defaultLastPath = 'The user visits CYOAG.';
+	constants.defaultNodeSnippet = 'You have come to CYOAG, a unique Create Your Own Adventure Game experience!  Here you will enjoy ' +
+	  'the results of collaborative efforts by writers from all across the world to write one story of many paths and branches, together! ' +
+	  '(The CYOAG experience is still loading.)';
+	
+	constants.emptyString = '';
+	
+	constants.errorNodeUid = 'error';
+	constants.errorUserName = 'Visitor';
+	constants.errorTrailingSnippet = '... and it had been a long night, and the CYOAG development team was really tired.';
+	constants.errorLastPath = 'The developer makes a horrible mistake.';
+	constants.errorNodeSnippet = 'It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, ' +
+	  'you might ask ... ?  Well, let me tell you!';
+	
+	constants.rootTrailingNodeSnippet = '... and a cold wind blows.';
+	constants.rootTrailingPathSnippet = 'The writer takes up his pen.';
+	
+	constants.sessionCookie = 'session_uid';
+	
+	constants.votificationNone = 'none';
+	constants.votificationUp = 'up';
+	constants.votificationDown = 'down';
+	
+	module.exports = constants;
+
+
+/***/ },
 /* 176 */
 /*!*********************************************!*\
   !*** ./build-source/js/HeaderComponents.js ***!
@@ -22394,8 +22449,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('HeaderComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('HeaderComponents.js');
 	
 	var exports = {};
 	
@@ -22443,10 +22498,11 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('MainColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('MainColumnComponents.js');
 	
-	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 178);
+	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 178);
+	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 179);
 	
 	var exports = {};
 	
@@ -22474,6 +22530,7 @@
 	        null,
 	        'Main Column'
 	      ),
+	      React.createElement(NodeComponents.Node, { context: context }),
 	      votificationComponent
 	    );
 	  }
@@ -22485,6 +22542,62 @@
 
 /***/ },
 /* 178 */
+/*!*******************************************!*\
+  !*** ./build-source/js/NodeComponents.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('NodeComponents.js');
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var Node = React.createClass({
+	  displayName: 'Node',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var context = this.props.context;
+	    var snippet = context.state.snippet;
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-node-container' },
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-trailing-snippet' },
+	        snippet.trailingSnippet
+	      ),
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-last-path' },
+	        snippet.lastPath
+	      ),
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-node-snippet' },
+	        snippet.nodeSnippet
+	      ),
+	      React.createElement(
+	        'p',
+	        null,
+	        '(temp ... paths will go here)'
+	      )
+	    );
+	  }
+	});
+	
+	exports.Node = Node;
+	
+	module.exports = exports;
+
+/***/ },
+/* 179 */
 /*!***************************************************!*\
   !*** ./build-source/js/VotificationComponents.js ***!
   \***************************************************/
@@ -22493,10 +22606,10 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('VotificationComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('VotificationComponents.js');
 	
-	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 179);
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 180);
 	
 	var exports = {};
 	
@@ -22565,7 +22678,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 179 */
+/* 180 */
 /*!********************************************************!*\
   !*** ./build-source/js/SocialLoginButtonComponents.js ***!
   \********************************************************/
@@ -22574,7 +22687,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('SocialLoginButtonComponents.js');
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('SocialLoginButtonComponents.js');
 	
 	var exports = {};
 	
@@ -22632,7 +22745,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 180 */
+/* 181 */
 /*!***************************************************!*\
   !*** ./build-source/js/MarginColumnComponents.js ***!
   \***************************************************/
@@ -22641,10 +22754,10 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('MarginColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('MarginColumnComponents.js');
 	
-	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 179);
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 180);
 	
 	var exports = {};
 	
@@ -22719,7 +22832,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 181 */
+/* 182 */
 /*!*********************************************!*\
   !*** ./build-source/js/FooterComponents.js ***!
   \*********************************************/
@@ -22728,8 +22841,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('FooterComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ./logger */ 173)('FooterComponents.js');
 	
 	var exports = {};
 	

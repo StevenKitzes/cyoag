@@ -4,6 +4,7 @@ var ReactDOM = require('react-dom');
 var constants = require('../../constants');
 var logMgr = require('./logger')('MainColumnComponents.js');
 
+var NodeComponents = require('./NodeComponents');
 var VotificationComponents = require('./VotificationComponents');
 
 var exports = {};
@@ -26,6 +27,7 @@ var MainColumn = React.createClass({
     return(
       <div id='cyoag-main-column'>
         <h1>Main Column</h1>
+        <NodeComponents.Node context={context} />
         {votificationComponent}
       </div>
     );
