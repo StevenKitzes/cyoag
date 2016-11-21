@@ -85,6 +85,12 @@ div {
   margin-left: auto;
 }
 
+#cyoag-node-container {
+  margin-right: auto;
+  margin-left: auto;
+  width: 85%;
+}
+
 #cyoag-trailing-snippet {
   font-style: italic;
 }

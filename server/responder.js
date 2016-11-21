@@ -44,6 +44,7 @@ function respond(res, session_uid, msg) {
         'users.acct_type as acctType, ' +         // acctType
         'positions.node_uid as nodeUid, ' +       // nodeUid
         'nodes.node_snippet as nodeSnippet, ' +   // nodeSnippet
+        'nodes.path_snippet as pathSnippet, ' +   // pathSnippet
         'nodes.parent_uid as parentUid ' +        // parentUid
       'FROM ' +
         'users ' +
@@ -78,6 +79,7 @@ function respond(res, session_uid, msg) {
       response.acctType = row.acctType;
       response.nodeUid = row.nodeUid;
       response.snippet.nodeSnippet = row.nodeSnippet;
+      response.snippet.lastPath = row.pathSnippet;
 
       var parentUid = row.parentUid;
 
@@ -135,15 +137,14 @@ function respond(res, session_uid, msg) {
           if(response.nodeUid == 'start') {
             // root node gets special one-off trailing node snippet and trailing path snippet
             response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
-            response.snippet.lastPath = constants.rootLastPath;
             res.cookie(constants.sessionCookie, session_uid);
             res.send(JSON.stringify(response));
             connection.release();
             return;
           }
-          // if we have to do a final db call to get trailing node and path snippet
+          // if we have to do a final db call to get trailing node
           else {
-            var query = 'SELECT path_snippet as lastPath, node_snippet as trailingSnippet ' +
+            var query = 'SELECT node_snippet as trailingSnippet ' +
               'FROM nodes WHERE uid=' + connection.escape(parentUid) + ';';
             connection.query(query, function(error, rows) {
               if(error) {
@@ -163,7 +164,6 @@ function respond(res, session_uid, msg) {
               var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
 
               response.snippet.trailingSnippet = trailingSnippet;
-              response.snippet.lastPath = parent.lastPath;
 
               res.cookie(constants.sessionCookie, session_uid);
               res.send(JSON.stringify(response));

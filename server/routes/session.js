@@ -88,7 +88,8 @@ router.post('/', function(req, res, next) {
         // If one row was returned...
         else if(rows.length == 1) {
           if(req.body.hasOwnProperty('navigate')) {
-            console.log('Success-ish! Attempted navigation to ' + req.body.navigate);
+            responder.respondError(res, "Got successful navigation request, but navigation not yet implemented.");
+            return;
           }
 
           // If no navigation requested, surface data for user at current location
