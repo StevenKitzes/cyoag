@@ -14,12 +14,14 @@ var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   getInitialState: getDefaultStateObject,
   logoutRequest: logoutXhrHandler,
+  navigate: navigateXhrHandler,
   render: function() {
     logMgr.verbose('Rendering...');
 
     var context = {};
     context.state = this.state;
     context.logoutRequest = this.logoutRequest;
+    context.navigate = this.navigate;
     context.voteDown = this.voteDown;
     context.voteUp = this.voteUp;
 
@@ -90,6 +92,10 @@ function logoutXhrHandler() {
     alert('Logout request took to long, server unresponsive; you are still logged in!');
   }
   xhr.send();
+}
+
+function navigateXhrHandler(id) {
+  alert('Yeah, right, wot, got requeft to nav to ' + id);
 }
 
 function castUpVote() {

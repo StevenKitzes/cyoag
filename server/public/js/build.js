@@ -22138,8 +22138,8 @@
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 176);
 	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 177);
-	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 181);
-	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 182);
+	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 182);
+	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 183);
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
@@ -22148,12 +22148,14 @@
 	  componentDidMount: mountXhrHandler,
 	  getInitialState: getDefaultStateObject,
 	  logoutRequest: logoutXhrHandler,
+	  navigate: navigateXhrHandler,
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
 	    var context = {};
 	    context.state = this.state;
 	    context.logoutRequest = this.logoutRequest;
+	    context.navigate = this.navigate;
 	    context.voteDown = this.voteDown;
 	    context.voteUp = this.voteUp;
 	
@@ -22224,6 +22226,10 @@
 	    alert('Logout request took to long, server unresponsive; you are still logged in!');
 	  };
 	  xhr.send();
+	}
+	
+	function navigateXhrHandler(id) {
+	  alert('Yeah, right, wot, got requeft to nav to ' + id);
 	}
 	
 	function castUpVote() {
@@ -22517,7 +22523,7 @@
 	
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 178);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 179);
-	var PathComponents = __webpack_require__(/*! ./PathComponents */ 183);
+	var PathComponents = __webpack_require__(/*! ./PathComponents */ 181);
 	
 	var exports = {};
 	
@@ -22624,6 +22630,7 @@
 	  displayName: 'BegLogin',
 	
 	  render: function () {
+	    logMgr.verbose('Rendering...');
 	    var context = this.props.context;
 	
 	    if (context.state.acctType == constants.acctTypeVisitor) {
@@ -22646,6 +22653,7 @@
 	  displayName: 'Votification',
 	
 	  render: function () {
+	    logMgr.verbose('Rendering...');
 	    var context = this.props.context;
 	    var upImgPath, downImgPath;
 	
@@ -22760,6 +22768,75 @@
 
 /***/ },
 /* 181 */
+/*!*******************************************!*\
+  !*** ./build-source/js/PathComponents.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('PathComponents.js');
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var Paths = React.createClass({
+	  displayName: 'Paths',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	    var paths = this.props.context.state.paths;
+	
+	    if (paths.length == 0) {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-path-list' },
+	        'No paths yet lead from this chapter.  Create your own...?'
+	      );
+	    } else {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-path-list' },
+	        React.createElement(
+	          'p',
+	          { className: 'italics' },
+	          'What happens next...?'
+	        ),
+	        paths.map(function (item) {
+	          return React.createElement(
+	            'a',
+	            { id: item.pathUid, key: item.pathUid, className: 'cyoag-link cyoag-path-item', href: '#' },
+	            item.pathSnippet
+	          );
+	        })
+	      );
+	    }
+	  },
+	  componentDidUpdate: function () {
+	    // for links created in render, set up JS listener to trigger nav XHR
+	    var context = this.props.context;
+	    var ids = context.state.paths.map(function (path) {
+	      return path.pathUid;
+	    });
+	    logMgr.debug('Path components mounted, assigning listeners to ids: ' + ids);
+	    for (var i = 0; i < ids.length; i++) {
+	      var id = ids[i];
+	      logMgr.debug('Setting up click listener for ' + id);
+	      document.getElementById(id).addEventListener('click', function (e) {
+	        context.navigate(id);
+	      }, false);
+	    }
+	  }
+	});
+	
+	exports.Paths = Paths;
+	
+	module.exports = exports;
+
+/***/ },
+/* 182 */
 /*!***************************************************!*\
   !*** ./build-source/js/MarginColumnComponents.js ***!
   \***************************************************/
@@ -22848,7 +22925,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 182 */
+/* 183 */
 /*!*********************************************!*\
   !*** ./build-source/js/FooterComponents.js ***!
   \*********************************************/
@@ -22887,63 +22964,6 @@
 	});
 	
 	exports.Footer = Footer;
-	
-	module.exports = exports;
-
-/***/ },
-/* 183 */
-/*!*******************************************!*\
-  !*** ./build-source/js/PathComponents.js ***!
-  \*******************************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var React = __webpack_require__(/*! react */ 1);
-	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
-	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('PathComponents.js');
-	
-	var exports = {};
-	
-	// Facebook login button component
-	var Paths = React.createClass({
-	  displayName: 'Paths',
-	
-	  render: function () {
-	    var paths = this.props.context.state.paths;
-	
-	    if (paths.length == 0) {
-	      return React.createElement(
-	        'div',
-	        { id: 'cyoag-path-list' },
-	        'No paths yet lead from this chapter.  Create your own...?'
-	      );
-	    } else {
-	      return React.createElement(
-	        'div',
-	        { id: 'cyoag-path-list' },
-	        React.createElement(
-	          'p',
-	          { className: 'italics' },
-	          'What happens next...?'
-	        ),
-	        paths.map(function (item) {
-	          return React.createElement(
-	            'a',
-	            { id: item.pathUid, className: 'cyoag-link cyoag-path-item', href: '#' },
-	            item.pathSnippet
-	          );
-	        })
-	      );
-	    }
-	  },
-	  componentDidMount: function () {
-	    // for links created in render, set up JS listener to trigger nav XHR
-	
-	  }
-	});
-	
-	exports.Paths = Paths;
 	
 	module.exports = exports;
 

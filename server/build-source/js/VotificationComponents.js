@@ -11,6 +11,7 @@ var exports = {};
 // Facebook login button component
 var BegLogin = React.createClass({
   render: function() {
+    logMgr.verbose('Rendering...');
     var context = this.props.context;
 
     if(context.state.acctType == constants.acctTypeVisitor) {
@@ -27,6 +28,7 @@ var BegLogin = React.createClass({
 
 var Votification = React.createClass({
   render: function() {
+    logMgr.verbose('Rendering...');
     var context = this.props.context;
     var upImgPath, downImgPath;
 
