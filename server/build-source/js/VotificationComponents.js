@@ -15,8 +15,8 @@ var BegLogin = React.createClass({
 
     if(context.state.acctType == constants.acctTypeVisitor) {
       return(
-        <div id='cyoag-beg-login'>
-          <h3>Register to have your position in the story automagically bookmarked!</h3>
+        <div id='cyoag-votification-container'>
+          <h4>Register to gain voting rights, have your position in the story automagically bookmarked, and contribute your own content to the collaborative effort!</h4>
           <SocialLoginButtonComponents.FacebookButton />
           <SocialLoginButtonComponents.TwitterButton />
         </div>
@@ -46,10 +46,10 @@ var Votification = React.createClass({
     }
 
     return (
-      <div id='votification-container'>
+      <div id='cyoag-votification-container'>
         <h4>How did you like this chapter?</h4>
-        <img id='cyoag-upvote-button' onClick={context.voteUp} src={upImgPath} />
-        <img id='cyoag-downvote-button' onClick={context.voteDown} src={downImgPath} />
+        <a href='#'><img id='cyoag-upvote-button' onClick={context.voteUp} src={upImgPath} /></a>
+        <a href='#'><img id='cyoag-downvote-button' onClick={context.voteDown} src={downImgPath} /></a>
       </div>
     );
   }

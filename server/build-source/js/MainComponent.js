@@ -112,29 +112,34 @@ function validateResponse(properThis, response) {
     var msg = 'Got no valid response object from server whatsoever.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(response.error) {
     // set an error state based on the returned error
     logMgr.out(response.error);
     properThis.setState(getErrorStateObject(response.error));
+    return;
   }
   if(!response.hasOwnProperty('nodeUid')) {
     // can't even determine where we are; set error state, display error content
     var msg = 'Could not get story node data from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(!response.hasOwnProperty('acctType')) {
     // can't determine account type; set err, display err content
     var msg = 'Could not get user account type from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(!response.hasOwnProperty('userName')) {
     // can't figure out user's name; set err, display err content
     var msg = 'Could not get user data from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(
     !response.hasOwnProperty('votification') ||
@@ -145,41 +150,46 @@ function validateResponse(properThis, response) {
     var msg = 'Could not retrieve votification status from the server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(!response.hasOwnProperty('paths')) {
     // no paths given, set error state and display error content
     var msg = 'Could not retrieve pathing information from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(!response.hasOwnProperty('snippet')) {
     // no snippet to display, set error state and display error content
     var msg = 'Could not retrieve snippet data from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(
-    !response.snippet.hasOwnProperty('trailingNodeSnippet') ||
-    !response.snippet.hasOwnProperty('trailingPathSnippet') ||
+    !response.snippet.hasOwnProperty('trailingSnippet') ||
+    !response.snippet.hasOwnProperty('lastPath') ||
     !response.snippet.hasOwnProperty('nodeSnippet')) {
     // snippet information missing, set error state and display error content
     var msg = 'Some snippet details were missing in response from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
-  logMgr.verbose('Trying to set state after validation . . .');
+  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
   properThis.setState({
     nodeUid: response.nodeUid,
     userName: response.userName,
     acctType: response.acctType,
     votification: response.votification,
-    nodeSnippet: response.nodeSnippet,
+    snippet: response.snippet,
     paths: response.paths,
     msg: response.msg ? response.msg : constants.emptyString,
     warning: response.warning ? response.warning : constants.emptyString,
     error: response.error ? response.error : constants.emptyString
   });
   logMgr.verbose('State was set successfully after validation!');
+  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 }
 
 function getDefaultStateObject() {

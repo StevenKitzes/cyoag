@@ -6,6 +6,7 @@ var logMgr = require('./logger')('MainColumnComponents.js');
 
 var NodeComponents = require('./NodeComponents');
 var VotificationComponents = require('./VotificationComponents');
+var PathComponents = require('./PathComponents');
 
 var exports = {};
 
@@ -26,9 +27,9 @@ var MainColumn = React.createClass({
 
     return(
       <div id='cyoag-main-column'>
-        <h1>Main Column</h1>
         <NodeComponents.Node context={context} />
         {votificationComponent}
+        <PathComponents.Paths context={context} />
       </div>
     );
   }

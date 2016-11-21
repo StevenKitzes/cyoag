@@ -2,8 +2,9 @@ var express = require('express');
 var router = express.Router();
 var cookieParser = require('cookie-parser');
 
-var generateGuid = require('../build-source/js/uid-gen');
+var constants = require('../constants');
 var db = require('../dbAccess')();
+var generateGuid = require('../build-source/js/uid-gen');
 var responder = require('../responder');
 
 var app = express();
@@ -115,7 +116,7 @@ function createNewUser(req, res, response, successMsg) {
     var newUser = {};
     newUser.uid = generateGuid();
     newUser.name = 'User_' + newUser.uid.substring(0,10);
-    newUser.acct_type = 'visitor';
+    newUser.acct_type = constants.acctTypeVisitor;
     newUser.session_uid = generateGuid();
 
     var userInsertQuery = 'INSERT INTO users (uid, name, acct_type, session_uid) VALUES ("' +
@@ -133,7 +134,7 @@ function createNewUser(req, res, response, successMsg) {
       console.log('Query completed to create user, now setting new user position to "start" node.');
 
       var positionInsertQuery = 'INSERT INTO positions (user_uid, node_uid) VALUES (' +
-        connection.escape(newUser.uid) + ', "start");';
+        connection.escape(newUser.uid) + ', ' + connection.escape(constants.rootNodeUid) + ');';
 
       connection.query(positionInsertQuery, function(errPosQuery) {
         if(errPosQuery) {

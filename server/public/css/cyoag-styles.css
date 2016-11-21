@@ -7,11 +7,25 @@ div {
   text-align: center;
 }
 
+.italics {
+  font-style: italic;
+}
+
 .cyoag-link {
   color: #0077AA;
   padding-left: 2px;
   padding-right: 2px;
   text-decoration: none;
+}
+
+.cyoag-path-item {
+  margin: 2px;
+  background-color: white;
+  border-style: solid;
+  border-width: 1px;
+  border-radius: 1em;
+  border-color: blue;
+  padding: 0.5em;
 }
 
 .inline-block {
@@ -31,12 +45,70 @@ div {
   width: 250px;
 }
 
+#cyoag-votification-container {
+  background-color: white;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 1em;
+  border-color: blue;
+  padding: 1em;
+  display: inline-block;
+  width: 50%;
+}
+#cyoag-votification-container h4 {
+  margin-top: 0px;
+  margin-right: auto;
+  margin-bottom: .5em;
+  margin-left: auto;
+}
+
+#cyoag-margin-login-container {
+  background-color: white;
+  border-style: solid;
+  border-width: 2px;
+  border-radius: 1em;
+  border-color: blue;
+  padding: 1em;
+  display: inline-block;
+  width: 80%;
+}
+#cyoag-margin-login-container h4 {
+  margin-top: 0px;
+  margin-right: auto;
+  margin-bottom: 0.5em;
+  margin-left: auto;
+}
+#cyoag-margin-login-container p {
+  margin-top: 0.5px;
+  margin-right: auto;
+  margin-bottom: 0.5em;
+  margin-left: auto;
+}
+
+#cyoag-trailing-snippet {
+  font-style: italic;
+}
+#cyoag-last-path {
+  font-weight: bolder;
+}
+#cyoag-node-snippet {
+  font-size: 1.2em;
+}
+
+#cyoag-path-list {
+  margin-top: 1em;
+  margin-right: auto;
+  margin-top: 1em;
+  margin-left: auto;
+  width: 40%;
+}
+
 #cyoag-footer-container {
   clear: both;
 }
 
 #cyoag-upvote-button, #cyoag-downvote-button {
   padding: 0 10px 0;
-  height: 32px;
-  width: 32px;
+  height: 16px;
+  width: 16px;
 }
