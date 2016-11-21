@@ -21,6 +21,9 @@ function respond(res, session_uid, msg) {
     if(msg.warning) {
       response.warning = msg.warning;
     }
+    else {
+      response.msg = msg;
+    }
   }
 
   // if this user ID already exists, assign new session ID and redirect to main page

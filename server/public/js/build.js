@@ -22228,8 +22228,30 @@
 	  xhr.send();
 	}
 	
-	function navigateXhrHandler(id) {
-	  alert('Yeah, right, wot, got requeft to nav to ' + id);
+	function navigateXhrHandler(nodeUid) {
+	  logMgr.debug('User attempting to navigate story nodes . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Navigation response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response);
+	    } else {
+	      logMgr.debug('Navigation attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 3000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    alert('Navigation request took to long, server unresponsive; no navigation seems to have occurred!');
+	  };
+	  var xhrPayload = JSON.stringify({ navigate: nodeUid });
+	  xhr.send(xhrPayload);
 	}
 	
 	function castUpVote() {
