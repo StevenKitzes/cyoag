@@ -21,6 +21,9 @@ function respond(res, session_uid, msg) {
     if(msg.warning) {
       response.warning = msg.warning;
     }
+    else {
+      response.msg = msg;
+    }
   }
 
   // if this user ID already exists, assign new session ID and redirect to main page
@@ -109,7 +112,7 @@ function respond(res, session_uid, msg) {
         }
 
         // now get paths out from here by finding the nodes that have this node as a parent
-        var query = 'SELECT uid as pathUid, path_snippet as pathSnippet FROM nodes WHERE parent_uid=' + connection.escape(response.nodeUid) + ';';
+        var query = 'SELECT uid as pathUid, path_snippet as pathSnippet, votification as pathVotification FROM nodes WHERE parent_uid=' + connection.escape(response.nodeUid) + ';';
         connection.query(query, function(error, rows) {
           if(error) {
             respondError(res, 'ERROR: Problem getting information on paths out of node.');
@@ -122,7 +125,8 @@ function respond(res, session_uid, msg) {
           for(var row = 0; row < rows.length; row++) {
             var path = {
               pathUid: rows[row].pathUid,
-              pathSnippet: rows[row].pathSnippet
+              pathSnippet: rows[row].pathSnippet,
+              pathVotification: rows[row].pathVotification
             };
             response.paths.push(path);
           }
@@ -130,8 +134,8 @@ function respond(res, session_uid, msg) {
           // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
           if(response.nodeUid == 'start') {
             // root node gets special one-off trailing node snippet and trailing path snippet
-            response.snippet.trailingNodeSnippet = constants.rootTrailingNodeSnippet;
-            response.snippet.trailingPathSnippet = constants.rootTrailingPathSnippet;
+            response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
+            response.snippet.lastPath = constants.rootLastPath;
             res.cookie(constants.sessionCookie, session_uid);
             res.send(JSON.stringify(response));
             connection.release();
@@ -139,7 +143,7 @@ function respond(res, session_uid, msg) {
           }
           // if we have to do a final db call to get trailing node and path snippet
           else {
-            var query = 'SELECT path_snippet as trailingPathSnippet, node_snippet as trailingNodeSnippet ' +
+            var query = 'SELECT path_snippet as lastPath, node_snippet as trailingSnippet ' +
               'FROM nodes WHERE uid=' + connection.escape(parentUid) + ';';
             connection.query(query, function(error, rows) {
               if(error) {
@@ -156,14 +160,10 @@ function respond(res, session_uid, msg) {
 
               var parent = rows[0];
 
-              var startIndex = parent.trailingNodeSnippet.length - 200;
-              if(startIndex < 0) {
-                startIndex = 0;
-              }
-              var trailingSnippet = '...' + parent.trailingNodeSnippet.substring(startIndex);
+              var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
 
-              response.snippet.trailingNodeSnippet = trailingSnippet;
-              response.snippet.trailingPathSnippet = parent.trailingPathSnippet;
+              response.snippet.trailingSnippet = trailingSnippet;
+              response.snippet.lastPath = parent.lastPath;
 
               res.cookie(constants.sessionCookie, session_uid);
               res.send(JSON.stringify(response));
@@ -175,6 +175,17 @@ function respond(res, session_uid, msg) {
       });
     });
   });
+}
+
+function getTrailingFromSnippet(full) {
+  // if the snippet already fits within the limit for trailing snippet length
+  if(full.length <= constants.trailingSnippetLength) {
+    // just return the sucker
+    return full;
+  }
+
+  var startIndex = full.length - constants.trailingSnippetLength;
+  return '...' + full.substring(startIndex);
 }
 
 var exports = {};

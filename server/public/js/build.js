@@ -22148,12 +22148,14 @@
 	  componentDidMount: mountXhrHandler,
 	  getInitialState: getDefaultStateObject,
 	  logoutRequest: logoutXhrHandler,
+	  navigate: navigateXhrHandler,
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
 	    var context = {};
 	    context.state = this.state;
 	    context.logoutRequest = this.logoutRequest;
+	    context.navigate = this.navigate;
 	    context.voteDown = this.voteDown;
 	    context.voteUp = this.voteUp;
 	
@@ -22226,6 +22228,32 @@
 	  xhr.send();
 	}
 	
+	function navigateXhrHandler(nodeUid) {
+	  logMgr.debug('User attempting to navigate story nodes . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Navigation response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response);
+	    } else {
+	      logMgr.debug('Navigation attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 3000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    alert('Navigation request took to long, server unresponsive; no navigation seems to have occurred!');
+	  };
+	  var xhrPayload = JSON.stringify({ navigate: nodeUid });
+	  xhr.send(xhrPayload);
+	}
+	
 	function castUpVote() {
 	  logMgr.debug('Setting votification UP');
 	  this.setState({
@@ -22246,67 +22274,77 @@
 	    var msg = 'Got no valid response object from server whatsoever.';
 	    logMgr.out(msg);
 	    properThis.setState(getErrorStateObject(msg));
+	    return;
 	  }
 	  if (response.error) {
 	    // set an error state based on the returned error
 	    logMgr.out(response.error);
 	    properThis.setState(getErrorStateObject(response.error));
+	    return;
 	  }
 	  if (!response.hasOwnProperty('nodeUid')) {
 	    // can't even determine where we are; set error state, display error content
 	    var msg = 'Could not get story node data from server.';
 	    logMgr.out(msg);
 	    properThis.setState(getErrorStateObject(msg));
+	    return;
 	  }
 	  if (!response.hasOwnProperty('acctType')) {
 	    // can't determine account type; set err, display err content
 	    var msg = 'Could not get user account type from server.';
 	    logMgr.out(msg);
 	    properThis.setState(getErrorStateObject(msg));
+	    return;
 	  }
 	  if (!response.hasOwnProperty('userName')) {
 	    // can't figure out user's name; set err, display err content
 	    var msg = 'Could not get user data from server.';
 	    logMgr.out(msg);
 	    properThis.setState(getErrorStateObject(msg));
+	    return;
 	  }
 	  if (!response.hasOwnProperty('votification') || response.votification != constants.votificationNone && response.votification != constants.votificationUp && response.votification != constants.votificationDown) {
 	    // can't determine votification status; set err, display err content
 	    var msg = 'Could not retrieve votification status from the server.';
 	    logMgr.out(msg);
 	    properThis.setState(getErrorStateObject(msg));
+	    return;
 	  }
 	  if (!response.hasOwnProperty('paths')) {
 	    // no paths given, set error state and display error content
 	    var msg = 'Could not retrieve pathing information from server.';
 	    logMgr.out(msg);
 	    properThis.setState(getErrorStateObject(msg));
+	    return;
 	  }
 	  if (!response.hasOwnProperty('snippet')) {
 	    // no snippet to display, set error state and display error content
 	    var msg = 'Could not retrieve snippet data from server.';
 	    logMgr.out(msg);
 	    properThis.setState(getErrorStateObject(msg));
+	    return;
 	  }
-	  if (!response.snippet.hasOwnProperty('trailingNodeSnippet') || !response.snippet.hasOwnProperty('trailingPathSnippet') || !response.snippet.hasOwnProperty('nodeSnippet')) {
+	  if (!response.snippet.hasOwnProperty('trailingSnippet') || !response.snippet.hasOwnProperty('lastPath') || !response.snippet.hasOwnProperty('nodeSnippet')) {
 	    // snippet information missing, set error state and display error content
 	    var msg = 'Some snippet details were missing in response from server.';
 	    logMgr.out(msg);
 	    properThis.setState(getErrorStateObject(msg));
+	    return;
 	  }
-	  logMgr.verbose('Trying to set state after validation . . .');
+	  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
 	  properThis.setState({
 	    nodeUid: response.nodeUid,
 	    userName: response.userName,
 	    acctType: response.acctType,
 	    votification: response.votification,
-	    nodeSnippet: response.nodeSnippet,
+	    snippet: response.snippet,
 	    paths: response.paths,
 	    msg: response.msg ? response.msg : constants.emptyString,
 	    warning: response.warning ? response.warning : constants.emptyString,
 	    error: response.error ? response.error : constants.emptyString
 	  });
 	  logMgr.verbose('State was set successfully after validation!');
+	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 	}
 	
 	function getDefaultStateObject() {
@@ -22375,10 +22413,14 @@
 	constants.errorNodeSnippet = 'It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, ' +
 	  'you might ask ... ?  Well, let me tell you!';
 	
-	constants.rootTrailingNodeSnippet = '... and a cold wind blows.';
-	constants.rootTrailingPathSnippet = 'The writer takes up his pen.';
+	constants.rootNodeUid = 'start';
+	
+	constants.rootTrailingSnippet = '... and a cold wind blows.';
+	constants.rootLastPath = 'The writer takes up his pen.';
 	
 	constants.sessionCookie = 'session_uid';
+	
+	constants.trailingSnippetLength = 200;
 	
 	constants.votificationNone = 'none';
 	constants.votificationUp = 'up';
@@ -22503,6 +22545,7 @@
 	
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 178);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 179);
+	var PathComponents = __webpack_require__(/*! ./PathComponents */ 181);
 	
 	var exports = {};
 	
@@ -22525,13 +22568,9 @@
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-main-column' },
-	      React.createElement(
-	        'h1',
-	        null,
-	        'Main Column'
-	      ),
 	      React.createElement(NodeComponents.Node, { context: context }),
-	      votificationComponent
+	      votificationComponent,
+	      React.createElement(PathComponents.Paths, { context: context })
 	    );
 	  }
 	});
@@ -22613,16 +22652,17 @@
 	  displayName: 'BegLogin',
 	
 	  render: function () {
+	    logMgr.verbose('Rendering...');
 	    var context = this.props.context;
 	
 	    if (context.state.acctType == constants.acctTypeVisitor) {
 	      return React.createElement(
 	        'div',
-	        { id: 'cyoag-beg-login' },
+	        { id: 'cyoag-votification-container' },
 	        React.createElement(
-	          'h3',
+	          'h4',
 	          null,
-	          'Register to have your position in the story automagically bookmarked!'
+	          'Register to gain voting rights, have your position in the story automagically bookmarked, and contribute your own content to the collaborative effort!'
 	        ),
 	        React.createElement(SocialLoginButtonComponents.FacebookButton, null),
 	        React.createElement(SocialLoginButtonComponents.TwitterButton, null)
@@ -22635,6 +22675,7 @@
 	  displayName: 'Votification',
 	
 	  render: function () {
+	    logMgr.verbose('Rendering...');
 	    var context = this.props.context;
 	    var upImgPath, downImgPath;
 	
@@ -22655,14 +22696,22 @@
 	
 	    return React.createElement(
 	      'div',
-	      { id: 'votification-container' },
+	      { id: 'cyoag-votification-container' },
 	      React.createElement(
 	        'h4',
 	        null,
 	        'How did you like this chapter?'
 	      ),
-	      React.createElement('img', { id: 'cyoag-upvote-button', onClick: context.voteUp, src: upImgPath }),
-	      React.createElement('img', { id: 'cyoag-downvote-button', onClick: context.voteDown, src: downImgPath })
+	      React.createElement(
+	        'a',
+	        { href: '#' },
+	        React.createElement('img', { id: 'cyoag-upvote-button', onClick: context.voteUp, src: upImgPath })
+	      ),
+	      React.createElement(
+	        'a',
+	        { href: '#' },
+	        React.createElement('img', { id: 'cyoag-downvote-button', onClick: context.voteDown, src: downImgPath })
+	      )
 	    );
 	  }
 	});
@@ -22740,7 +22789,75 @@
 	module.exports = exports;
 
 /***/ },
-/* 181 */,
+/* 181 */
+/*!*******************************************!*\
+  !*** ./build-source/js/PathComponents.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('PathComponents.js');
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var Paths = React.createClass({
+	  displayName: 'Paths',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	    var paths = this.props.context.state.paths;
+	
+	    if (paths.length == 0) {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-path-list' },
+	        'No paths yet lead from this chapter.  Create your own...?'
+	      );
+	    } else {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-path-list' },
+	        React.createElement(
+	          'p',
+	          { className: 'italics' },
+	          'What happens next...?'
+	        ),
+	        paths.map(function (item) {
+	          return React.createElement(
+	            'a',
+	            { id: item.pathUid, key: item.pathUid, className: 'cyoag-link cyoag-path-item', href: '#' },
+	            item.pathSnippet
+	          );
+	        })
+	      );
+	    }
+	  },
+	  componentDidUpdate: function () {
+	    // for links created in render, set up JS listener to trigger nav XHR
+	    var context = this.props.context;
+	    var ids = context.state.paths.map(function (path) {
+	      return path.pathUid;
+	    });
+	    logMgr.debug('Path components mounted, assigning listeners to ids: ' + ids);
+	    for (var i = 0; i < ids.length; i++) {
+	      var id = ids[i];
+	      logMgr.debug('Setting up click listener for ' + id);
+	      document.getElementById(id).addEventListener('click', function (e) {
+	        context.navigate(id);
+	      }, false);
+	    }
+	  }
+	});
+	
+	exports.Paths = Paths;
+	
+	module.exports = exports;
+
+/***/ },
 /* 182 */
 /*!***************************************************!*\
   !*** ./build-source/js/MarginColumnComponents.js ***!
@@ -22767,7 +22884,7 @@
 	    var loginComponent;
 	
 	    if (context.state.acctType != constants.acctTypeVisitor) {
-	      loginComponent = React.createElement(MarginLogout, { logoutRequest: context.logoutRequest });
+	      loginComponent = React.createElement(MarginLogout, { userName: context.state.userName, logoutRequest: context.logoutRequest });
 	    } else {
 	      loginComponent = React.createElement(MarginLogin, null);
 	    }
@@ -22775,11 +22892,6 @@
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-margin-column' },
-	      React.createElement(
-	        'h1',
-	        null,
-	        'Margin Column'
-	      ),
 	      loginComponent
 	    );
 	  }
@@ -22792,9 +22904,9 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { id: 'cyoag-margin-login' },
+	      { id: 'cyoag-margin-login-container' },
 	      React.createElement(
-	        'h3',
+	        'h4',
 	        null,
 	        'Login with:'
 	      ),
@@ -22812,11 +22924,18 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { id: 'cyoag-margin-logout' },
+	      { id: 'cyoag-margin-login-container' },
 	      React.createElement(
-	        'h3',
+	        'h4',
 	        null,
 	        'Logged in!'
+	      ),
+	      React.createElement(
+	        'p',
+	        null,
+	        'Welcome, ',
+	        this.props.userName,
+	        '!'
 	      ),
 	      React.createElement(SocialLoginButtonComponents.LogoutButton, { logoutRequest: this.props.logoutRequest })
 	    );

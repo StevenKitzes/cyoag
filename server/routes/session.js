@@ -2,22 +2,27 @@ var express = require('express');
 var router = express.Router();
 var cookieParser = require('cookie-parser');
 
-var generateGuid = require('../build-source/js/uid-gen');
+var constants = require('../constants');
 var db = require('../dbAccess')();
+var generateGuid = require('../build-source/js/uid-gen');
 var responder = require('../responder');
 
 var app = express();
 app.use(cookieParser());
 
-/* Endpoint to check if session exists, and if so, whether it is valid */
+/* Endpoint to check if session exists, and if so, whether it is valid, and if so, what to do with it */
 router.post('/', function(req, res, next) {
-  // This is the CYOAG response payload
-  var response = {};
+  if(req.body) {
+    console.log('> > > > > req.body: ' + JSON.stringify(req.body));
+  }
+  else {
+    console.log('> > > > > no req body');
+  }
 
   // If session ID is entirely missing, visitor is here for the first time!
   if (!req.cookies.session_uid || req.cookies.session_uid == '') {
     var successMsg = 'New visitor account created for browser with no session ID.';
-    createNewUser(req, res, response, successMsg);
+    createNewUser(req, res, successMsg);
   }
   else {
     // If session cookie existed, do simple validation
@@ -76,12 +81,17 @@ router.post('/', function(req, res, next) {
         // If no rows returned, no user was found with that session ID, so create and surface a new user
         else if(rows.length == 0) {
           var successMsg = 'No user found with browser session Id.  Created new visitor account.';
-          createNewUser(req, res, response, successMsg);
+          createNewUser(req, res, successMsg);
           return;
         }
 
-        // If one row was returned, surface the found user
+        // If one row was returned...
         else if(rows.length == 1) {
+          if(req.body.hasOwnProperty('navigate')) {
+            console.log('Success-ish! Attempted navigation to ' + req.body.navigate);
+          }
+
+          // If no navigation requested, surface data for user at current location
           var uid = rows[0]['uid'];
           var loginStatus = (uid.indexOf('fb-') > -1 || uid.indexOf('tw-') > -1) ? true : false;
           responder.respond(res, session_uid);
@@ -96,12 +106,12 @@ router.post('/', function(req, res, next) {
 router.get('/logout', function(req, res, next) {
   var response = {};
   var successMsg = 'Logged out user and overwrote session ID with that of a new visitor account.';
-  createNewUser(req, res, response, successMsg);
+  createNewUser(req, res, successMsg);
 });
 
 module.exports = router;
 
-function createNewUser(req, res, response, successMsg) {
+function createNewUser(req, res, successMsg) {
   console.log('New visitor!  Attempting to create DB entry . . .');
   // Create new user and write it to the DB
   db.getConnection(function(err, connection) {
@@ -115,7 +125,7 @@ function createNewUser(req, res, response, successMsg) {
     var newUser = {};
     newUser.uid = generateGuid();
     newUser.name = 'User_' + newUser.uid.substring(0,10);
-    newUser.acct_type = 'visitor';
+    newUser.acct_type = constants.acctTypeVisitor;
     newUser.session_uid = generateGuid();
 
     var userInsertQuery = 'INSERT INTO users (uid, name, acct_type, session_uid) VALUES ("' +
@@ -133,7 +143,7 @@ function createNewUser(req, res, response, successMsg) {
       console.log('Query completed to create user, now setting new user position to "start" node.');
 
       var positionInsertQuery = 'INSERT INTO positions (user_uid, node_uid) VALUES (' +
-        connection.escape(newUser.uid) + ', "start");';
+        connection.escape(newUser.uid) + ', ' + connection.escape(constants.rootNodeUid) + ');';
 
       connection.query(positionInsertQuery, function(errPosQuery) {
         if(errPosQuery) {

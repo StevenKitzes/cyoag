@@ -32,7 +32,7 @@ router.post('/', function(req, res, next) {
     });
   } else {
     // Handle failed ghetto authentication placeholder
-    res.send('Got unexpected content.');
+    res.send('Got unexpected content: ' + JSON.stringify(req));
   }
 });
 

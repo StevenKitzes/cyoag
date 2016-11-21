@@ -14,12 +14,14 @@ var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   getInitialState: getDefaultStateObject,
   logoutRequest: logoutXhrHandler,
+  navigate: navigateXhrHandler,
   render: function() {
     logMgr.verbose('Rendering...');
 
     var context = {};
     context.state = this.state;
     context.logoutRequest = this.logoutRequest;
+    context.navigate = this.navigate;
     context.voteDown = this.voteDown;
     context.voteUp = this.voteUp;
 
@@ -92,6 +94,33 @@ function logoutXhrHandler() {
   xhr.send();
 }
 
+function navigateXhrHandler(nodeUid) {
+  logMgr.debug('User attempting to navigate story nodes . . .');
+  var xhr = new XMLHttpRequest();
+  // xmlHttp.onreadystatechange = () => {...}
+  var properThis = this;
+  xhr.onreadystatechange = function() {
+    if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
+      logMgr.debug('Status 200 (or 304)!');
+      logMgr.verbose('Navigation response payload: ' + xhr.responseText);
+      var response = JSON.parse(xhr.responseText);
+      validateResponse(properThis, response);
+    }
+    else {
+      logMgr.debug('Navigation attempt yielded HTTP response status: ' + xhr.status);
+    }
+  }
+  xhr.open('POST', '/session');
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xhr.timeout = 3000;
+  xhr.ontimeout = function() {
+    xhr.abort();
+    alert('Navigation request took to long, server unresponsive; no navigation seems to have occurred!');
+  }
+  var xhrPayload = JSON.stringify({navigate: nodeUid});
+  xhr.send(xhrPayload);
+}
+
 function castUpVote() {
   logMgr.debug('Setting votification UP');
   this.setState({
@@ -112,29 +141,34 @@ function validateResponse(properThis, response) {
     var msg = 'Got no valid response object from server whatsoever.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(response.error) {
     // set an error state based on the returned error
     logMgr.out(response.error);
     properThis.setState(getErrorStateObject(response.error));
+    return;
   }
   if(!response.hasOwnProperty('nodeUid')) {
     // can't even determine where we are; set error state, display error content
     var msg = 'Could not get story node data from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(!response.hasOwnProperty('acctType')) {
     // can't determine account type; set err, display err content
     var msg = 'Could not get user account type from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(!response.hasOwnProperty('userName')) {
     // can't figure out user's name; set err, display err content
     var msg = 'Could not get user data from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(
     !response.hasOwnProperty('votification') ||
@@ -145,41 +179,46 @@ function validateResponse(properThis, response) {
     var msg = 'Could not retrieve votification status from the server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(!response.hasOwnProperty('paths')) {
     // no paths given, set error state and display error content
     var msg = 'Could not retrieve pathing information from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(!response.hasOwnProperty('snippet')) {
     // no snippet to display, set error state and display error content
     var msg = 'Could not retrieve snippet data from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
   if(
-    !response.snippet.hasOwnProperty('trailingNodeSnippet') ||
-    !response.snippet.hasOwnProperty('trailingPathSnippet') ||
+    !response.snippet.hasOwnProperty('trailingSnippet') ||
+    !response.snippet.hasOwnProperty('lastPath') ||
     !response.snippet.hasOwnProperty('nodeSnippet')) {
     // snippet information missing, set error state and display error content
     var msg = 'Some snippet details were missing in response from server.';
     logMgr.out(msg);
     properThis.setState(getErrorStateObject(msg));
+    return;
   }
-  logMgr.verbose('Trying to set state after validation . . .');
+  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
   properThis.setState({
     nodeUid: response.nodeUid,
     userName: response.userName,
     acctType: response.acctType,
     votification: response.votification,
-    nodeSnippet: response.nodeSnippet,
+    snippet: response.snippet,
     paths: response.paths,
     msg: response.msg ? response.msg : constants.emptyString,
     warning: response.warning ? response.warning : constants.emptyString,
     error: response.error ? response.error : constants.emptyString
   });
   logMgr.verbose('State was set successfully after validation!');
+  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 }
 
 function getDefaultStateObject() {

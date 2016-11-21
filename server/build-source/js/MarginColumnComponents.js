@@ -16,7 +16,7 @@ var MarginColumn = React.createClass({
     var loginComponent;
 
     if(context.state.acctType != constants.acctTypeVisitor) {
-      loginComponent = <MarginLogout logoutRequest={context.logoutRequest} />;
+      loginComponent = <MarginLogout userName={context.state.userName} logoutRequest={context.logoutRequest} />;
     }
     else {
       loginComponent = <MarginLogin />;
@@ -24,7 +24,6 @@ var MarginColumn = React.createClass({
 
     return (
       <div id='cyoag-margin-column'>
-        <h1>Margin Column</h1>
         {loginComponent}
       </div>
     );
@@ -35,8 +34,8 @@ var MarginColumn = React.createClass({
 var MarginLogin = React.createClass({
   render: function() {
     return (
-      <div id='cyoag-margin-login'>
-        <h3>Login with:</h3>
+      <div id='cyoag-margin-login-container'>
+        <h4>Login with:</h4>
         <SocialLoginButtonComponents.FacebookButton /> <SocialLoginButtonComponents.TwitterButton />
       </div>
     );
@@ -47,8 +46,9 @@ var MarginLogin = React.createClass({
 var MarginLogout = React.createClass({
   render: function() {
     return (
-      <div id='cyoag-margin-logout'>
-        <h3>Logged in!</h3>
+      <div id='cyoag-margin-login-container'>
+        <h4>Logged in!</h4>
+        <p>Welcome, {this.props.userName}!</p>
         <SocialLoginButtonComponents.LogoutButton logoutRequest={this.props.logoutRequest} />
       </div>
     );
