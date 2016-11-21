@@ -22138,8 +22138,8 @@
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 176);
 	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 177);
-	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 181);
-	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 182);
+	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 182);
+	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 183);
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
@@ -22740,7 +22740,8 @@
 	module.exports = exports;
 
 /***/ },
-/* 181 */
+/* 181 */,
+/* 182 */
 /*!***************************************************!*\
   !*** ./build-source/js/MarginColumnComponents.js ***!
   \***************************************************/
@@ -22827,7 +22828,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 182 */
+/* 183 */
 /*!*********************************************!*\
   !*** ./build-source/js/FooterComponents.js ***!
   \*********************************************/
