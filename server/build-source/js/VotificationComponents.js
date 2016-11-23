@@ -17,7 +17,7 @@ var BegLogin = React.createClass({
     if(context.state.acctType == constants.acctTypeVisitor) {
       return(
         <div id='cyoag-votification-container'>
-          <h4>Register to gain voting rights, have your position in the story automagically bookmarked, and contribute your own content to the collaborative effort!</h4>
+          <h4>Register to save your position, contribute your own story snippets, and gain voting rights!</h4>
           <SocialLoginButtonComponents.FacebookButton />
           <SocialLoginButtonComponents.TwitterButton />
         </div>

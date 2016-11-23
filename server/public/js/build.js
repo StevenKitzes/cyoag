@@ -22289,6 +22289,13 @@
 	    properThis.setState(getErrorStateObject(msg));
 	    return;
 	  }
+	  if (!response.hasOwnProperty('parentUid')) {
+	    // can't determine current node's parent; set error state, display error content
+	    var msg = 'Could not retrieve node lineage data from server.';
+	    logMgr.out(msg);
+	    properThis.setState(getErrorStateObject(msg));
+	    return;
+	  }
 	  if (!response.hasOwnProperty('acctType')) {
 	    // can't determine account type; set err, display err content
 	    var msg = 'Could not get user account type from server.';
@@ -22334,6 +22341,7 @@
 	  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
 	  properThis.setState({
 	    nodeUid: response.nodeUid,
+	    parentUid: response.parentUid,
 	    userName: response.userName,
 	    acctType: response.acctType,
 	    votification: response.votification,
@@ -22350,6 +22358,7 @@
 	function getDefaultStateObject() {
 	  return {
 	    nodeUid: constants.defaultNodeUid,
+	    parentUid: constants.defaultParentUid,
 	    userName: constants.defaultUserName,
 	    acctType: constants.acctTypeVisitor,
 	    votification: constants.votificationNone,
@@ -22368,6 +22377,7 @@
 	function getErrorStateObject(msg) {
 	  return {
 	    nodeUid: constants.errorNodeUid,
+	    parentUid: constants.errorNodeUid,
 	    userName: constants.errorUserName,
 	    acctType: constants.acctTypeVisitor,
 	    votification: constants.votificationNone,
@@ -22397,6 +22407,7 @@
 	constants.acctTypeModerator = 'moderator';
 	
 	constants.defaultNodeUid = 'default';
+	constants.defaultParentUid = '00000000000000-0000000000-00000000000000';
 	constants.defaultUserName = 'Visitor';
 	constants.defaultTrailingSnippet = '... and then the user sat down in front of the keyboard, and had to make a choice.';
 	constants.defaultLastPath = 'The user visits CYOAG.';
@@ -22604,13 +22615,20 @@
 	    var context = this.props.context;
 	    var snippet = context.state.snippet;
 	
+	    var trailingSnippetClassName = 'cyoag-link node-' + context.state.parentUid;
+	
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-node-container' },
 	      React.createElement(
-	        'p',
-	        { id: 'cyoag-trailing-snippet' },
-	        snippet.trailingSnippet
+	        'a',
+	        { id: 'cyoag-trailing-snippet', className: trailingSnippetClassName, href: '#' },
+	        snippet.trailingSnippet,
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-tooltip-regress' },
+	          'Back whence you came . . . ?'
+	        )
 	      ),
 	      React.createElement(
 	        'p',
@@ -22623,6 +22641,27 @@
 	        snippet.nodeSnippet
 	      )
 	    );
+	  },
+	  componentDidUpdate: function () {
+	    // for link created in render, set up JS listener to trigger nav XHR and tooltip listeners
+	    logMgr.debug('Node components mounted, assigning listeners to trailing snippet');
+	    var context = this.props.context;
+	    var parentUid = context.state.parentUid;
+	
+	    var trailingSnippet = document.querySelector('.node-' + parentUid);
+	    var trailingSnippetTop = trailingSnippet.getBoundingClientRect().top;
+	    var trailingSnippetLeft = trailingSnippet.getBoundingClientRect().left;
+	    var tooltip = document.querySelector('#cyoag-trailing-snippet #cyoag-tooltip-regress');
+	
+	    logMgr.debug('Setting up click listener for trailing snippet');
+	
+	    trailingSnippet.addEventListener('click', function (e) {
+	      context.navigate(parentUid);
+	    }, false);
+	    trailingSnippet.addEventListener('mousemove', function (e) {
+	      tooltip.style.top = e.clientY + 'px';
+	      tooltip.style.left = e.clientX + 'px';
+	    }, false);
 	  }
 	});
 	
@@ -22662,7 +22701,7 @@
 	        React.createElement(
 	          'h4',
 	          null,
-	          'Register to gain voting rights, have your position in the story automagically bookmarked, and contribute your own content to the collaborative effort!'
+	          'Register to save your position, contribute your own story snippets, and gain voting rights!'
 	        ),
 	        React.createElement(SocialLoginButtonComponents.FacebookButton, null),
 	        React.createElement(SocialLoginButtonComponents.TwitterButton, null)
@@ -22827,27 +22866,44 @@
 	          'What happens next...?'
 	        ),
 	        paths.map(function (item) {
+	          var pathUid = 'node-' + item.pathUid;
 	          return React.createElement(
 	            'a',
-	            { id: item.pathUid, key: item.pathUid, className: 'cyoag-link cyoag-path-item', href: '#' },
-	            item.pathSnippet
+	            { id: pathUid, key: pathUid, className: 'cyoag-link cyoag-path-item', href: '#' },
+	            item.pathSnippet,
+	            React.createElement(
+	              'div',
+	              { className: 'cyoag-tooltip-progress' },
+	              'Choose wisely . . .'
+	            )
 	          );
 	        })
 	      );
 	    }
 	  },
 	  componentDidUpdate: function () {
-	    // for links created in render, set up JS listener to trigger nav XHR
+	    // for links created in render, set up JS listener to trigger nav XHR and tooltip listeners
 	    var context = this.props.context;
 	    var ids = context.state.paths.map(function (path) {
 	      return path.pathUid;
 	    });
+	
 	    logMgr.debug('Path components mounted, assigning listeners to ids: ' + ids);
 	    for (var i = 0; i < ids.length; i++) {
 	      var id = ids[i];
-	      logMgr.debug('Setting up click listener for ' + id);
-	      document.getElementById(id).addEventListener('click', function (e) {
+	      var listItem = document.getElementById('node-' + id);
+	      var itemTop = listItem.getBoundingClientRect().top;
+	      var itemLeft = listItem.getBoundingClientRect().left;
+	      var tooltip = document.querySelector('#node-' + id + ' .cyoag-tooltip-progress');
+	
+	      logMgr.debug('Setting up click listener for node-' + id);
+	
+	      listItem.addEventListener('click', function (e) {
 	        context.navigate(id);
+	      }, false);
+	      listItem.addEventListener('mousemove', function (e) {
+	        tooltip.style.top = e.clientY + 'px';
+	        tooltip.style.left = e.clientX + 'px';
 	      }, false);
 	    }
 	  }

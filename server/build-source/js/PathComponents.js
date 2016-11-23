@@ -22,8 +22,12 @@ var Paths = React.createClass({
         <div id='cyoag-path-list'>
           <p className='italics'>What happens next...?</p>
           {paths.map(function(item) {
+            var pathUid = 'node-' + item.pathUid;
             return (
-              <a id={item.pathUid} key={item.pathUid} className='cyoag-link cyoag-path-item' href='#'>{item.pathSnippet}</a>
+              <a id={pathUid} key={pathUid} className='cyoag-link cyoag-path-item' href='#'>
+                {item.pathSnippet}
+                <div className='cyoag-tooltip-progress'>Choose wisely . . .</div>
+              </a>
             );
           })}
         </div>
@@ -31,19 +35,31 @@ var Paths = React.createClass({
     }
   },
   componentDidUpdate: function() {
-    // for links created in render, set up JS listener to trigger nav XHR
+    // for links created in render, set up JS listener to trigger nav XHR and tooltip listeners
     var context = this.props.context;
     var ids = context.state.paths.map(function(path) {
       return path.pathUid;
     });
+
     logMgr.debug('Path components mounted, assigning listeners to ids: ' + ids);
     for(var i = 0; i < ids.length; i++) {
       var id = ids[i];
-      logMgr.debug('Setting up click listener for ' + id);
-      document.getElementById(id).addEventListener('click', function(e) {
+      var listItem = document.getElementById('node-' + id);
+      var itemTop = listItem.getBoundingClientRect().top;
+      var itemLeft = listItem.getBoundingClientRect().left;
+      var tooltip = document.querySelector('#node-' + id + ' .cyoag-tooltip-progress');
+
+      logMgr.debug('Setting up click listener for node-' + id);
+
+      listItem.addEventListener('click', function(e) {
         context.navigate(id);
       }, false);
+      listItem.addEventListener('mousemove', function(e) {
+        tooltip.style.top = e.clientY + 'px';
+        tooltip.style.left = e.clientX + 'px';
+      }, false);
     }
+
   }
 });
 

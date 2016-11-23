@@ -5,6 +5,7 @@ constants.acctTypeRegistered = 'registered';
 constants.acctTypeModerator = 'moderator';
 
 constants.defaultNodeUid = 'default';
+constants.defaultParentUid = '00000000000000-0000000000-00000000000000';
 constants.defaultUserName = 'Visitor';
 constants.defaultTrailingSnippet = '... and then the user sat down in front of the keyboard, and had to make a choice.';
 constants.defaultLastPath = 'The user visits CYOAG.';

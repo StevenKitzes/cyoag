@@ -156,6 +156,13 @@ function validateResponse(properThis, response) {
     properThis.setState(getErrorStateObject(msg));
     return;
   }
+  if(!response.hasOwnProperty('parentUid')) {
+    // can't determine current node's parent; set error state, display error content
+    var msg = 'Could not retrieve node lineage data from server.';
+    logMgr.out(msg);
+    properThis.setState(getErrorStateObject(msg));
+    return;
+  }
   if(!response.hasOwnProperty('acctType')) {
     // can't determine account type; set err, display err content
     var msg = 'Could not get user account type from server.';
@@ -208,6 +215,7 @@ function validateResponse(properThis, response) {
   logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
   properThis.setState({
     nodeUid: response.nodeUid,
+    parentUid: response.parentUid,
     userName: response.userName,
     acctType: response.acctType,
     votification: response.votification,
@@ -224,6 +232,7 @@ function validateResponse(properThis, response) {
 function getDefaultStateObject() {
   return {
     nodeUid: constants.defaultNodeUid,
+    parentUid: constants.defaultParentUid,
     userName: constants.defaultUserName,
     acctType: constants.acctTypeVisitor,
     votification: constants.votificationNone,
@@ -242,6 +251,7 @@ function getDefaultStateObject() {
 function getErrorStateObject(msg) {
   return {
     nodeUid: constants.errorNodeUid,
+    parentUid: constants.errorNodeUid,
     userName: constants.errorUserName,
     acctType: constants.acctTypeVisitor,
     votification: constants.votificationNone,

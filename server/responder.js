@@ -78,10 +78,9 @@ function respond(res, session_uid, msg) {
       response.userName = row.userName;
       response.acctType = row.acctType;
       response.nodeUid = row.nodeUid;
+      response.parentUid = row.parentUid;
       response.snippet.nodeSnippet = row.nodeSnippet;
       response.snippet.lastPath = row.pathSnippet;
-
-      var parentUid = row.parentUid;
 
       // Now do Votification
       var query = 'SELECT sentiment FROM votes WHERE voter_uid=' + connection.escape(row.userUid) +
@@ -145,7 +144,7 @@ function respond(res, session_uid, msg) {
           // if we have to do a final db call to get trailing node
           else {
             var query = 'SELECT node_snippet as trailingSnippet ' +
-              'FROM nodes WHERE uid=' + connection.escape(parentUid) + ';';
+              'FROM nodes WHERE uid=' + connection.escape(response.parentUid) + ';';
             connection.query(query, function(error, rows) {
               if(error) {
                 respondError(res, 'ERROR: Failed to retrieve trailing node information.');
