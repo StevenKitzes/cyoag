@@ -28,7 +28,33 @@ div {
 }
 
 #cyoag-header-container {
+  margin-bottom: 1.5em;
+}
+
+#cyoag-message-banner {
   margin-bottom: 2em;
+}
+#cyoag-message-banner p {
+  border-radius: 2em;
+  border-style: solid;
+  border-width: medium;
+  padding-top: .5em;
+  padding-bottom: .5em;
+}
+#cyoag-message-banner .cyoag-regular-message {
+  background-color: lightgreen;
+  color: darkgreen;
+  border-color: darkgreen;
+}
+#cyoag-message-banner .cyoag-warning-message {
+  background-color: lightgoldenrodyellow;
+  color: darkgoldenrod;
+  border-color: darkgoldenrod;
+}
+#cyoag-message-banner .cyoag-error-message {
+  background-color: lightsalmon;
+  color: darkred;
+  border-color: darkred;
 }
 
 #cyoag-main-column {

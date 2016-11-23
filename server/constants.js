@@ -22,6 +22,10 @@ constants.errorLastPath = 'The developer makes a horrible mistake.';
 constants.errorNodeSnippet = 'It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, ' +
   'you might ask ... ?  Well, let me tell you!';
 
+constants.messageRegularClass = 'cyoag-regular-message';
+constants.messageWarningClass = 'cyoag-warning-message';
+constants.messageErrorClass = 'cyoag-error-message';
+
 constants.rootNodeUid = 'start';
 
 constants.rootTrailingSnippet = '... and a cold wind blows.';

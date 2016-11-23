@@ -5,6 +5,7 @@ var constants = require('../../constants');
 var logMgr = require('./logger')('MainComponent.js');
 
 var HeaderComponents = require('./HeaderComponents');
+var MessagingComponents = require('./MessagingComponents');
 var MainColumnComponents = require('./MainColumnComponents');
 var MarginColumnComponents = require('./MarginColumnComponents');
 var FooterComponents = require('./FooterComponents');
@@ -28,6 +29,7 @@ var MainComponent = React.createClass({
     return (
       <div id='cyoag-react-container'>
         <HeaderComponents.Header />
+        <MessagingComponents.Banner context={context} />
         <div id='cyoag-columns'>
           <MarginColumnComponents.MarginColumn context={context} />
           <MainColumnComponents.MainColumn context={context} />
@@ -138,9 +140,9 @@ function validateResponse(properThis, response) {
   logMgr.debug('Attempting to validate response from server . . .');
   if(!response) {
     // wow... if you don't even get a response, something is nightmarishly wrong
-    var msg = 'Got no valid response object from server whatsoever.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Got no valid response object from server whatsoever.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   if(response.error) {
@@ -151,30 +153,30 @@ function validateResponse(properThis, response) {
   }
   if(!response.hasOwnProperty('nodeUid')) {
     // can't even determine where we are; set error state, display error content
-    var msg = 'Could not get story node data from server.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Could not get story node data from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   if(!response.hasOwnProperty('parentUid')) {
     // can't determine current node's parent; set error state, display error content
-    var msg = 'Could not retrieve node lineage data from server.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Could not retrieve node lineage data from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   if(!response.hasOwnProperty('acctType')) {
     // can't determine account type; set err, display err content
-    var msg = 'Could not get user account type from server.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Could not get user account type from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   if(!response.hasOwnProperty('userName')) {
     // can't figure out user's name; set err, display err content
-    var msg = 'Could not get user data from server.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Could not get user data from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   if(
@@ -183,23 +185,23 @@ function validateResponse(properThis, response) {
      response.votification != constants.votificationUp &&
      response.votification != constants.votificationDown)) {
     // can't determine votification status; set err, display err content
-    var msg = 'Could not retrieve votification status from the server.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Could not retrieve votification status from the server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   if(!response.hasOwnProperty('paths')) {
     // no paths given, set error state and display error content
-    var msg = 'Could not retrieve pathing information from server.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Could not retrieve pathing information from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   if(!response.hasOwnProperty('snippet')) {
     // no snippet to display, set error state and display error content
-    var msg = 'Could not retrieve snippet data from server.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Could not retrieve snippet data from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   if(
@@ -207,9 +209,9 @@ function validateResponse(properThis, response) {
     !response.snippet.hasOwnProperty('lastPath') ||
     !response.snippet.hasOwnProperty('nodeSnippet')) {
     // snippet information missing, set error state and display error content
-    var msg = 'Some snippet details were missing in response from server.';
-    logMgr.out(msg);
-    properThis.setState(getErrorStateObject(msg));
+    var errorMessage = 'Some snippet details were missing in response from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
   logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
@@ -221,9 +223,9 @@ function validateResponse(properThis, response) {
     votification: response.votification,
     snippet: response.snippet,
     paths: response.paths,
-    msg: response.msg ? response.msg : constants.emptyString,
-    warning: response.warning ? response.warning : constants.emptyString,
-    error: response.error ? response.error : constants.emptyString
+    msg: response.msg ? response.msg : null,
+    warning: response.warning ? response.warning : null,
+    error: response.error ? response.error : null
   });
   logMgr.verbose('State was set successfully after validation!');
   logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
@@ -242,13 +244,13 @@ function getDefaultStateObject() {
       nodeSnippet: constants.defaultNodeSnippet
     },
     paths: [],
-    msg: constants.emptyString,
-    warning: constants.emptyString,
-    error: constants.emptyString
+    msg: null,
+    warning: null,
+    error: null
   };
 }
 
-function getErrorStateObject(msg) {
+function getErrorStateObject(errorMessage) {
   return {
     nodeUid: constants.errorNodeUid,
     parentUid: constants.errorNodeUid,
@@ -258,11 +260,11 @@ function getErrorStateObject(msg) {
     snippet: {
       trailingSnippet: constants.errorTrailingSnippet,
       lastPath: constants.errorLastPath,
-      nodeSnippet: constants.errorNodeSnippet + '  ' + msg
+      nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage
     },
     paths: [],
-    msg: constants.emptyString,
-    warning: constants.emptyString,
-    error: msg
+    msg: null,
+    warning: null,
+    error: errorMessage
   };
 }

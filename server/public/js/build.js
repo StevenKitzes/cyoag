@@ -22137,9 +22137,10 @@
 	var logMgr = __webpack_require__(/*! ./logger */ 174)('MainComponent.js');
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 176);
-	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 177);
-	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 182);
-	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 183);
+	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 177);
+	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 178);
+	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 183);
+	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 184);
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
@@ -22163,6 +22164,7 @@
 	      'div',
 	      { id: 'cyoag-react-container' },
 	      React.createElement(HeaderComponents.Header, null),
+	      React.createElement(MessagingComponents.Banner, { context: context }),
 	      React.createElement(
 	        'div',
 	        { id: 'cyoag-columns' },
@@ -22271,9 +22273,9 @@
 	  logMgr.debug('Attempting to validate response from server . . .');
 	  if (!response) {
 	    // wow... if you don't even get a response, something is nightmarishly wrong
-	    var msg = 'Got no valid response object from server whatsoever.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Got no valid response object from server whatsoever.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  if (response.error) {
@@ -22284,58 +22286,58 @@
 	  }
 	  if (!response.hasOwnProperty('nodeUid')) {
 	    // can't even determine where we are; set error state, display error content
-	    var msg = 'Could not get story node data from server.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Could not get story node data from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  if (!response.hasOwnProperty('parentUid')) {
 	    // can't determine current node's parent; set error state, display error content
-	    var msg = 'Could not retrieve node lineage data from server.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Could not retrieve node lineage data from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  if (!response.hasOwnProperty('acctType')) {
 	    // can't determine account type; set err, display err content
-	    var msg = 'Could not get user account type from server.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Could not get user account type from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  if (!response.hasOwnProperty('userName')) {
 	    // can't figure out user's name; set err, display err content
-	    var msg = 'Could not get user data from server.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Could not get user data from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  if (!response.hasOwnProperty('votification') || response.votification != constants.votificationNone && response.votification != constants.votificationUp && response.votification != constants.votificationDown) {
 	    // can't determine votification status; set err, display err content
-	    var msg = 'Could not retrieve votification status from the server.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Could not retrieve votification status from the server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  if (!response.hasOwnProperty('paths')) {
 	    // no paths given, set error state and display error content
-	    var msg = 'Could not retrieve pathing information from server.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Could not retrieve pathing information from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  if (!response.hasOwnProperty('snippet')) {
 	    // no snippet to display, set error state and display error content
-	    var msg = 'Could not retrieve snippet data from server.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Could not retrieve snippet data from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  if (!response.snippet.hasOwnProperty('trailingSnippet') || !response.snippet.hasOwnProperty('lastPath') || !response.snippet.hasOwnProperty('nodeSnippet')) {
 	    // snippet information missing, set error state and display error content
-	    var msg = 'Some snippet details were missing in response from server.';
-	    logMgr.out(msg);
-	    properThis.setState(getErrorStateObject(msg));
+	    var errorMessage = 'Some snippet details were missing in response from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
 	  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
@@ -22347,9 +22349,9 @@
 	    votification: response.votification,
 	    snippet: response.snippet,
 	    paths: response.paths,
-	    msg: response.msg ? response.msg : constants.emptyString,
-	    warning: response.warning ? response.warning : constants.emptyString,
-	    error: response.error ? response.error : constants.emptyString
+	    msg: response.msg ? response.msg : null,
+	    warning: response.warning ? response.warning : null,
+	    error: response.error ? response.error : null
 	  });
 	  logMgr.verbose('State was set successfully after validation!');
 	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
@@ -22368,13 +22370,13 @@
 	      nodeSnippet: constants.defaultNodeSnippet
 	    },
 	    paths: [],
-	    msg: constants.emptyString,
-	    warning: constants.emptyString,
-	    error: constants.emptyString
+	    msg: null,
+	    warning: null,
+	    error: null
 	  };
 	}
 	
-	function getErrorStateObject(msg) {
+	function getErrorStateObject(errorMessage) {
 	  return {
 	    nodeUid: constants.errorNodeUid,
 	    parentUid: constants.errorNodeUid,
@@ -22384,12 +22386,12 @@
 	    snippet: {
 	      trailingSnippet: constants.errorTrailingSnippet,
 	      lastPath: constants.errorLastPath,
-	      nodeSnippet: constants.errorNodeSnippet + '  ' + msg
+	      nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage
 	    },
 	    paths: [],
-	    msg: constants.emptyString,
-	    warning: constants.emptyString,
-	    error: msg
+	    msg: null,
+	    warning: null,
+	    error: errorMessage
 	  };
 	}
 
@@ -22423,6 +22425,10 @@
 	constants.errorLastPath = 'The developer makes a horrible mistake.';
 	constants.errorNodeSnippet = 'It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, ' +
 	  'you might ask ... ?  Well, let me tell you!';
+	
+	constants.messageRegularClass = 'cyoag-regular-message';
+	constants.messageWarningClass = 'cyoag-warning-message';
+	constants.messageErrorClass = 'cyoag-error-message';
 	
 	constants.rootNodeUid = 'start';
 	
@@ -22543,6 +22549,59 @@
 
 /***/ },
 /* 177 */
+/*!************************************************!*\
+  !*** ./build-source/js/MessagingComponents.js ***!
+  \************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 173);
+	var logMgr = __webpack_require__(/*! ./logger */ 174)('MessagingComponents.js');
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var Banner = React.createClass({
+	  displayName: 'Banner',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var state = this.props.context.state;
+	    var className, messageContent;
+	    if (state.error) {
+	      className = constants.messageErrorClass;
+	      messageContent = state.error;
+	    } else if (state.warning) {
+	      className = constants.messageWarningClass;
+	      messageContent = state.warning;
+	    } else if (state.msg) {
+	      className = constants.messageRegularClass;
+	      messageContent = state.msg;
+	    } else {
+	      return React.createElement('div', { id: 'cyoag-message-banner', style: { display: 'none' } });
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-message-banner' },
+	      React.createElement(
+	        'p',
+	        { className: className },
+	        messageContent
+	      )
+	    );
+	  }
+	});
+	
+	exports.Banner = Banner;
+	
+	module.exports = exports;
+
+/***/ },
+/* 178 */
 /*!*************************************************!*\
   !*** ./build-source/js/MainColumnComponents.js ***!
   \*************************************************/
@@ -22554,9 +22613,9 @@
 	var constants = __webpack_require__(/*! ../../constants */ 173);
 	var logMgr = __webpack_require__(/*! ./logger */ 174)('MainColumnComponents.js');
 	
-	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 178);
-	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 179);
-	var PathComponents = __webpack_require__(/*! ./PathComponents */ 181);
+	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 179);
+	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 180);
+	var PathComponents = __webpack_require__(/*! ./PathComponents */ 182);
 	
 	var exports = {};
 	
@@ -22591,7 +22650,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 178 */
+/* 179 */
 /*!*******************************************!*\
   !*** ./build-source/js/NodeComponents.js ***!
   \*******************************************/
@@ -22670,7 +22729,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 179 */
+/* 180 */
 /*!***************************************************!*\
   !*** ./build-source/js/VotificationComponents.js ***!
   \***************************************************/
@@ -22682,7 +22741,7 @@
 	var constants = __webpack_require__(/*! ../../constants */ 173);
 	var logMgr = __webpack_require__(/*! ./logger */ 174)('VotificationComponents.js');
 	
-	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 180);
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 181);
 	
 	var exports = {};
 	
@@ -22761,7 +22820,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 180 */
+/* 181 */
 /*!********************************************************!*\
   !*** ./build-source/js/SocialLoginButtonComponents.js ***!
   \********************************************************/
@@ -22828,7 +22887,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 181 */
+/* 182 */
 /*!*******************************************!*\
   !*** ./build-source/js/PathComponents.js ***!
   \*******************************************/
@@ -22914,7 +22973,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 182 */
+/* 183 */
 /*!***************************************************!*\
   !*** ./build-source/js/MarginColumnComponents.js ***!
   \***************************************************/
@@ -22926,7 +22985,7 @@
 	var constants = __webpack_require__(/*! ../../constants */ 173);
 	var logMgr = __webpack_require__(/*! ./logger */ 174)('MarginColumnComponents.js');
 	
-	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 180);
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 181);
 	
 	var exports = {};
 	
@@ -23003,7 +23062,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 183 */
+/* 184 */
 /*!*********************************************!*\
   !*** ./build-source/js/FooterComponents.js ***!
   \*********************************************/
