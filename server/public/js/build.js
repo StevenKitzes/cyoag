@@ -22171,7 +22171,8 @@
 	        React.createElement(MarginColumnComponents.MarginColumn, { context: context }),
 	        React.createElement(MainColumnComponents.MainColumn, { context: context })
 	      ),
-	      React.createElement(FooterComponents.Footer, null)
+	      React.createElement(FooterComponents.Footer, null),
+	      React.createElement(MessagingComponents.Modal, { context: context })
 	    );
 	  },
 	  voteDown: castDownVote,
@@ -22341,6 +22342,7 @@
 	    return;
 	  }
 	  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
+	  response.error = 'TESTING with lots of lorem ipsum maxim potubrums and stuff, including many extraneous stuffs';
 	  properThis.setState({
 	    nodeUid: response.nodeUid,
 	    parentUid: response.parentUid,
@@ -22429,6 +22431,10 @@
 	constants.messageRegularClass = 'cyoag-regular-message';
 	constants.messageWarningClass = 'cyoag-warning-message';
 	constants.messageErrorClass = 'cyoag-error-message';
+	
+	constants.modalTypeMessage = 'cyoag-modal-type-message';
+	constants.modalTypeWarning = 'cyoag-modal-type-warning';
+	constants.modalTypeError = 'cyoag-modal-type-error';
 	
 	constants.rootNodeUid = 'start';
 	
@@ -22562,10 +22568,14 @@
 	
 	var exports = {};
 	
-	// Facebook login button component
+	// a banner to display alerts of various severity to the user
 	var Banner = React.createClass({
 	  displayName: 'Banner',
 	
+	  closeBanner: function (e) {
+	    e.preventDefault();
+	    document.getElementById('cyoag-message-banner').style.display = 'none';
+	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
@@ -22590,13 +22600,72 @@
 	      React.createElement(
 	        'p',
 	        { className: className },
-	        messageContent
+	        messageContent,
+	        React.createElement(
+	          'a',
+	          { onClick: this.closeBanner, style: { 'font-weight': 'bolder', 'font-family': 'sans-serif', 'text-decoration': 'none', 'float': 'right', 'margin-right': '1em' }, href: '#' },
+	          'X'
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	// a modal alert to demand user attention to alerts of various severity to the user
+	var Modal = React.createClass({
+	  displayName: 'Modal',
+	
+	  closeModal: function (e) {
+	    e.preventDefault();
+	    document.getElementById('cyoag-modal-message-container').style.display = 'none';
+	  },
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var state = this.props.context.state;
+	    var modalType, messageContent;
+	
+	    if (state.error) {
+	      modalType = constants.modalTypeError;
+	      messageContent = state.error;
+	    } else if (state.warning) {
+	      modalType = constants.modalTypeWarning;
+	      messageContent = state.warning;
+	    } else if (state.msg) {
+	      modalType = constants.modalTypeMessage;
+	      messageContent = state.msg;
+	    } else {
+	      return React.createElement('div', { id: 'cyoag-message-modal', style: { display: 'none' } });
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-modal-message-container' },
+	      React.createElement('div', { id: 'cyoag-modal-message-overlay' }),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-message-modal', className: modalType },
+	        React.createElement(
+	          'p',
+	          { className: 'cyoag-modal-message' },
+	          messageContent
+	        ),
+	        React.createElement(
+	          'a',
+	          { onClick: this.closeModal, className: 'cyoag-link', href: '#' },
+	          React.createElement(
+	            'div',
+	            { className: 'cyoag-modal-message-button' },
+	            'Click to Acknowledge'
+	          )
+	        )
 	      )
 	    );
 	  }
 	});
 	
 	exports.Banner = Banner;
+	exports.Modal = Modal;
 	
 	module.exports = exports;
 

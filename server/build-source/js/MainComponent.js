@@ -35,6 +35,7 @@ var MainComponent = React.createClass({
           <MainColumnComponents.MainColumn context={context} />
         </div>
         <FooterComponents.Footer />
+        <MessagingComponents.Modal context={context} />
       </div>
     );
   },
@@ -215,6 +216,7 @@ function validateResponse(properThis, response) {
     return;
   }
   logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
+  response.error = 'TESTING with lots of lorem ipsum maxim potubrums and stuff, including many extraneous stuffs';
   properThis.setState({
     nodeUid: response.nodeUid,
     parentUid: response.parentUid,

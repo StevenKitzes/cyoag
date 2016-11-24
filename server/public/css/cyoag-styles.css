@@ -57,6 +57,75 @@ div {
   border-color: darkred;
 }
 
+#cyoag-modal-message-container {
+  vertical-align: middle;
+}
+#cyoag-modal-message-overlay {
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  opacity: 0.5;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99900;
+}
+#cyoag-message-modal {
+  border-style: solid;
+  border-width: 5px;
+  border-radius: 3em;
+  display: inline-block;
+  padding-right: 2.5em;
+  padding-bottom: 1.5em;
+  padding-left: 2.5em;
+  position: absolute;
+  max-width: 33%;
+  overflow: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 99909;
+}
+.cyoag-modal-type-message {
+  background-color: lightgreen;
+  border-color: darkgreen;
+  color: darkgreen;
+}
+.cyoag-modal-type-warning {
+  background-color: lightgoldenrodyellow;
+  border-color: darkgoldenrod;
+  color: darkgoldenrod;
+}
+.cyoag-modal-type-error {
+  background-color: lightsalmon;
+  border-color: darkred;
+  color: darkred;
+}
+.cyoag-modal-message-button {
+  background-color: black;
+  border-style: solid;
+  border-width: 5px;
+  border-radius: 2em;
+  display: inline-block;
+  padding-top: 0.5em;
+  padding-right: 1.5em;
+  padding-bottom: 0.5em;
+  padding-left: 1.5em;
+  font-weight: bold;
+}
+.cyoag-modal-type-message .cyoag-modal-message-button {
+  border-color: darkgreen;
+  color: lightgreen;
+}
+.cyoag-modal-type-warning .cyoag-modal-message-button {
+  border-color: darkgoldenrod;
+  color: lightgoldenrodyellow;
+}
+.cyoag-modal-type-error .cyoag-modal-message-button {
+  border-color: darkred;
+  color: lightsalmon;
+}
+
 #cyoag-main-column {
   margin-right: 260px;
 }

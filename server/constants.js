@@ -26,6 +26,10 @@ constants.messageRegularClass = 'cyoag-regular-message';
 constants.messageWarningClass = 'cyoag-warning-message';
 constants.messageErrorClass = 'cyoag-error-message';
 
+constants.modalTypeMessage = 'cyoag-modal-type-message';
+constants.modalTypeWarning = 'cyoag-modal-type-warning';
+constants.modalTypeError = 'cyoag-modal-type-error';
+
 constants.rootNodeUid = 'start';
 
 constants.rootTrailingSnippet = '... and a cold wind blows.';

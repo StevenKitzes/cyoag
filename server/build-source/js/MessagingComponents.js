@@ -6,8 +6,12 @@ var logMgr = require('./logger')('MessagingComponents.js');
 
 var exports = {};
 
-// Facebook login button component
+// a banner to display alerts of various severity to the user
 var Banner = React.createClass({
+  closeBanner: function(e) {
+    e.preventDefault();
+    document.getElementById('cyoag-message-banner').style.display = 'none';
+  },
   render: function() {
     logMgr.verbose('Rendering...');
 
@@ -31,12 +35,53 @@ var Banner = React.createClass({
 
     return(
       <div id='cyoag-message-banner'>
-        <p className={className}>{messageContent}</p>
+        <p className={className}>{messageContent}<a onClick={this.closeBanner} style={{'font-weight': 'bolder', 'font-family': 'sans-serif', 'text-decoration': 'none', 'float': 'right', 'margin-right': '1em'}} href='#'>X</a></p>
+      </div>
+    );
+  }
+});
+
+// a modal alert to demand user attention to alerts of various severity to the user
+var Modal = React.createClass({
+  closeModal: function(e) {
+    e.preventDefault();
+    document.getElementById('cyoag-modal-message-container').style.display = 'none';
+  },
+  render: function() {
+    logMgr.verbose('Rendering...');
+
+    var state = this.props.context.state;
+    var modalType, messageContent;
+
+    if(state.error) {
+      modalType = constants.modalTypeError;
+      messageContent = state.error;
+    }
+    else if(state.warning) {
+      modalType = constants.modalTypeWarning;
+      messageContent = state.warning;
+    }
+    else if(state.msg) {
+      modalType = constants.modalTypeMessage;
+      messageContent = state.msg;
+    }
+    else {
+      return(<div id='cyoag-message-modal' style={{display: 'none'}}></div>);
+    }
+
+    return(
+      <div id='cyoag-modal-message-container'>
+        <div id='cyoag-modal-message-overlay'></div>
+        <div id='cyoag-message-modal' className={modalType}>
+          <p className='cyoag-modal-message'>{messageContent}</p>
+          <a onClick={this.closeModal} className='cyoag-link' href='#'><div className='cyoag-modal-message-button'>Click to Acknowledge</div></a>
+        </div>
       </div>
     );
   }
 });
 
 exports.Banner = Banner;
+exports.Modal = Modal;
 
 module.exports = exports;
