@@ -46,15 +46,31 @@ div {
   color: darkgreen;
   border-color: darkgreen;
 }
+.cyoag-regular-message #cyoag-message-banner-x {
+  color: darkgreen;
+}
 #cyoag-message-banner .cyoag-warning-message {
   background-color: lightgoldenrodyellow;
   color: darkgoldenrod;
   border-color: darkgoldenrod;
 }
+.cyoag-warning-message #cyoag-message-banner-x {
+  color: darkgoldenrod;
+}
 #cyoag-message-banner .cyoag-error-message {
   background-color: lightsalmon;
   color: darkred;
   border-color: darkred;
+}
+.cyoag-error-message #cyoag-message-banner-x {
+  color: darkred;
+}
+#cyoag-message-banner-x {
+  font-weight: bolder;
+  font-family: sans-serif;
+  text-decoration: none;
+  float: right;
+  margin-right: 1em;
 }
 
 #cyoag-modal-message-container {

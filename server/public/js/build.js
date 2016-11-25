@@ -22342,7 +22342,6 @@
 	    return;
 	  }
 	  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
-	  response.error = 'TESTING with lots of lorem ipsum maxim potubrums and stuff, including many extraneous stuffs';
 	  properThis.setState({
 	    nodeUid: response.nodeUid,
 	    parentUid: response.parentUid,
@@ -22603,7 +22602,7 @@
 	        messageContent,
 	        React.createElement(
 	          'a',
-	          { onClick: this.closeBanner, style: { 'font-weight': 'bolder', 'font-family': 'sans-serif', 'text-decoration': 'none', 'float': 'right', 'margin-right': '1em' }, href: '#' },
+	          { onClick: this.closeBanner, id: 'cyoag-message-banner-x', href: '#' },
 	          'X'
 	        )
 	      )
