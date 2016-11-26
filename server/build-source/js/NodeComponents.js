@@ -14,12 +14,12 @@ var Node = React.createClass({
     var context = this.props.context;
     var snippet = context.state.snippet;
 
-    var trailingSnippetClassName = 'cyoag-link node-' + context.state.parentUid;
+    var trailingSnippetId = 'node-' + context.state.parentUid;
 
     return(
       <div id='cyoag-node-container'>
-        <a id='cyoag-trailing-snippet' className={trailingSnippetClassName} href='#'>
-          {snippet.trailingSnippet}
+        <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-div-link' href='#'>
+          <div className='cyoag-path-item cyoag-trailing-snippet'>{snippet.trailingSnippet}</div>
           <div id='cyoag-tooltip-regress'>Back whence you came . . . ?</div>
         </a>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
@@ -33,10 +33,10 @@ var Node = React.createClass({
     var context = this.props.context;
     var parentUid = context.state.parentUid;
 
-    var trailingSnippet = document.querySelector('.node-' + parentUid);
+    var trailingSnippet = document.querySelector('#node-' + parentUid);
     var trailingSnippetTop = trailingSnippet.getBoundingClientRect().top;
     var trailingSnippetLeft = trailingSnippet.getBoundingClientRect().left;
-    var tooltip = document.querySelector('#cyoag-trailing-snippet #cyoag-tooltip-regress');
+    var tooltip = document.querySelector('#cyoag-tooltip-regress');
 
     logMgr.debug('Setting up click listener for trailing snippet');
 
@@ -46,6 +46,7 @@ var Node = React.createClass({
     trailingSnippet.addEventListener('mousemove', function(e) {
       tooltip.style.top = (e.clientY + pageYOffset) + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
       tooltip.style.left = (e.clientX + pageXOffset) + 'px';
+      logMgr.verbose('Shifted tooltip on trailing snippet.');
     }, false);
   }
 });

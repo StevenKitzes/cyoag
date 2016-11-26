@@ -17,6 +17,10 @@ div {
   padding-right: 1em;
   text-decoration: none;
 }
+.cyoag-div-link {
+  color: #0077AA;
+  text-decoration: none;
+}
 
 .inline-block {
   display: inline-block;
@@ -179,16 +183,10 @@ div {
   width: 85%;
 }
 
-#cyoag-trailing-snippet {
-  color: black;
+.cyoag-trailing-snippet {
   font-style: italic;
-  margin: 2px;
-  background-color: aliceblue;
-  border-style: solid;
-  border-width: thick;
-  border-radius: 2em;
-  border-color: white;
-  padding: 0.5em;
+  display: inline-block;
+  max-width: 62%;
 }
 #cyoag-last-path {
   font-weight: bolder;
@@ -212,7 +210,7 @@ div {
   z-index: 1000;
 }
 
-#cyoag-trailing-snippet:hover #cyoag-tooltip-regress {
+.cyoag-trailing-snippet-link:hover #cyoag-tooltip-regress {
   display: block;
 }
 
@@ -265,7 +263,7 @@ div {
   z-index: 1000;
 }
 
-.cyoag-path-item:hover .cyoag-tooltip-progress {
+.cyoag-path-item-link:hover .cyoag-tooltip-progress {
   display: block;
 }
 

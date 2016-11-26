@@ -32,7 +32,7 @@ constants.modalTypeError = 'cyoag-modal-type-error';
 
 constants.rootNodeUid = 'start';
 
-constants.rootTrailingSnippet = '... and a cold wind blows.';
+constants.rootTrailingSnippet = '... a cold wind blows.';
 constants.rootLastPath = 'The writer takes up his pen.';
 
 constants.sessionCookie = 'session_uid';

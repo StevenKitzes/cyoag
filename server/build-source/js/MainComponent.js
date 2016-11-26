@@ -30,7 +30,7 @@ var MainComponent = React.createClass({
     var debugStateDisplay = (function(){
       if(config.DEBUG) {
         return (
-          <div id="cyoag-debug-state-display">Debug mode enabled! Current app state:<br />
+          <div id="cyoag-debug-state-display"><br /><hr /><h4>Debug mode enabled! Current app state:</h4><hr />
             {JSON.stringify(context.state)}
           </div>
         );

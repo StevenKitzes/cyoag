@@ -22166,8 +22166,14 @@
 	        return React.createElement(
 	          'div',
 	          { id: 'cyoag-debug-state-display' },
-	          'Debug mode enabled! Current app state:',
 	          React.createElement('br', null),
+	          React.createElement('hr', null),
+	          React.createElement(
+	            'h4',
+	            null,
+	            'Debug mode enabled! Current app state:'
+	          ),
+	          React.createElement('hr', null),
 	          JSON.stringify(context.state)
 	        );
 	      } else {
@@ -22467,7 +22473,7 @@
 	
 	constants.rootNodeUid = 'start';
 	
-	constants.rootTrailingSnippet = '... and a cold wind blows.';
+	constants.rootTrailingSnippet = '... a cold wind blows.';
 	constants.rootLastPath = 'The writer takes up his pen.';
 	
 	constants.sessionCookie = 'session_uid';
@@ -22758,15 +22764,19 @@
 	    var context = this.props.context;
 	    var snippet = context.state.snippet;
 	
-	    var trailingSnippetClassName = 'cyoag-link node-' + context.state.parentUid;
+	    var trailingSnippetId = 'node-' + context.state.parentUid;
 	
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-node-container' },
 	      React.createElement(
 	        'a',
-	        { id: 'cyoag-trailing-snippet', className: trailingSnippetClassName, href: '#' },
-	        snippet.trailingSnippet,
+	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-div-link', href: '#' },
+	        React.createElement(
+	          'div',
+	          { className: 'cyoag-path-item cyoag-trailing-snippet' },
+	          snippet.trailingSnippet
+	        ),
 	        React.createElement(
 	          'div',
 	          { id: 'cyoag-tooltip-regress' },
@@ -22791,10 +22801,10 @@
 	    var context = this.props.context;
 	    var parentUid = context.state.parentUid;
 	
-	    var trailingSnippet = document.querySelector('.node-' + parentUid);
+	    var trailingSnippet = document.querySelector('#node-' + parentUid);
 	    var trailingSnippetTop = trailingSnippet.getBoundingClientRect().top;
 	    var trailingSnippetLeft = trailingSnippet.getBoundingClientRect().left;
-	    var tooltip = document.querySelector('#cyoag-trailing-snippet #cyoag-tooltip-regress');
+	    var tooltip = document.querySelector('#cyoag-tooltip-regress');
 	
 	    logMgr.debug('Setting up click listener for trailing snippet');
 	
@@ -22804,6 +22814,7 @@
 	    trailingSnippet.addEventListener('mousemove', function (e) {
 	      tooltip.style.top = e.clientY + pageYOffset + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
 	      tooltip.style.left = e.clientX + pageXOffset + 'px';
+	      logMgr.verbose('Shifted tooltip on trailing snippet.');
 	    }, false);
 	  }
 	});
@@ -23006,14 +23017,18 @@
 	        React.createElement(
 	          'p',
 	          { className: 'italics' },
-	          'What happens next...?'
+	          'What happens next . . . ?'
 	        ),
 	        paths.map(function (item) {
 	          var pathUid = 'node-' + item.pathUid;
 	          return React.createElement(
 	            'a',
-	            { id: pathUid, key: pathUid, className: 'cyoag-link cyoag-path-item', href: '#' },
-	            item.pathSnippet,
+	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-div-link', href: '#' },
+	            React.createElement(
+	              'div',
+	              { className: 'cyoag-path-item' },
+	              item.pathSnippet
+	            ),
 	            React.createElement(
 	              'div',
 	              { className: 'cyoag-tooltip-progress' },

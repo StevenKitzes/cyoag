@@ -20,12 +20,12 @@ var Paths = React.createClass({
     else {
       return (
         <div id='cyoag-path-list'>
-          <p className='italics'>What happens next...?</p>
+          <p className='italics'>What happens next . . . ?</p>
           {paths.map(function(item) {
             var pathUid = 'node-' + item.pathUid;
             return (
-              <a id={pathUid} key={pathUid} className='cyoag-link cyoag-path-item' href='#'>
-                {item.pathSnippet}
+              <a id={pathUid} key={pathUid} className='cyoag-path-item-link cyoag-div-link' href='#'>
+                <div className='cyoag-path-item'>{item.pathSnippet}</div>
                 <div className='cyoag-tooltip-progress'>Choose wisely . . .</div>
               </a>
             );
