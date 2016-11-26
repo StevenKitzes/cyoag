@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var config = require('./build-config');
 var constants = require('../../constants');
 var logMgr = require('./logger')('MainComponent.js');
 
@@ -26,6 +27,21 @@ var MainComponent = React.createClass({
     context.voteDown = this.voteDown;
     context.voteUp = this.voteUp;
 
+    var debugStateDisplay = (function(){
+      if(config.DEBUG) {
+        return (
+          <div id="cyoag-debug-state-display">Debug mode enabled! Current app state:<br />
+            {JSON.stringify(context.state)}
+          </div>
+        );
+      }
+      else {
+        return (
+          <div id='cyoag-debug-state-display'></div>
+        );
+      }
+    })();
+
     return (
       <div id='cyoag-react-container'>
         <HeaderComponents.Header />
@@ -35,6 +51,7 @@ var MainComponent = React.createClass({
           <MainColumnComponents.MainColumn context={context} />
         </div>
         <FooterComponents.Footer />
+        {debugStateDisplay}
         <MessagingComponents.Modal context={context} />
       </div>
     );
