@@ -55,8 +55,8 @@ var Paths = React.createClass({
         context.navigate(id);
       }, false);
       listItem.addEventListener('mousemove', function(e) {
-        tooltip.style.top = e.clientY + 'px';
-        tooltip.style.left = e.clientX + 'px';
+        tooltip.style.top = (e.clientY + pageYOffset) + 'px'; // ugly pageYOffset usage due to YOU GUESSED IT IE being short-bus
+        tooltip.style.left = (e.clientX + pageXOffset) + 'px';
       }, false);
     }
 

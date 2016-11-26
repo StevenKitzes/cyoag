@@ -52,7 +52,7 @@
 	
 	var MainComponent = __webpack_require__(/*! ./MainComponent */ 172);
 	
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('main.js');
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('main.js');
 	
 	logMgr.verbose('Kicking off initial render!');
 	
@@ -22133,8 +22133,9 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('MainComponent.js');
+	var config = __webpack_require__(/*! ./build-config */ 173);
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('MainComponent.js');
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 176);
 	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 177);
@@ -22160,6 +22161,20 @@
 	    context.voteDown = this.voteDown;
 	    context.voteUp = this.voteUp;
 	
+	    var debugStateDisplay = function () {
+	      if (config.DEBUG) {
+	        return React.createElement(
+	          'div',
+	          { id: 'cyoag-debug-state-display' },
+	          'Debug mode enabled! Current app state:',
+	          React.createElement('br', null),
+	          JSON.stringify(context.state)
+	        );
+	      } else {
+	        return React.createElement('div', { id: 'cyoag-debug-state-display' });
+	      }
+	    }();
+	
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-react-container' },
@@ -22172,6 +22187,7 @@
 	        React.createElement(MainColumnComponents.MainColumn, { context: context })
 	      ),
 	      React.createElement(FooterComponents.Footer, null),
+	      debugStateDisplay,
 	      React.createElement(MessagingComponents.Modal, { context: context })
 	    );
 	  },
@@ -22398,6 +22414,20 @@
 
 /***/ },
 /* 173 */
+/*!*****************************************!*\
+  !*** ./build-source/js/build-config.js ***!
+  \*****************************************/
+/***/ function(module, exports) {
+
+	var config = {};
+	
+	config.DEBUG = true;
+	config.VERBOSE = true;
+	
+	module.exports = config;
+
+/***/ },
+/* 174 */
 /*!**********************!*\
   !*** ./constants.js ***!
   \**********************/
@@ -22452,14 +22482,14 @@
 
 
 /***/ },
-/* 174 */
+/* 175 */
 /*!***********************************!*\
   !*** ./build-source/js/logger.js ***!
   \***********************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var DEBUG = __webpack_require__(/*! ./build-config */ 175).DEBUG;
-	var VERBOSE = __webpack_require__(/*! ./build-config */ 175).VERBOSE;
+	var DEBUG = __webpack_require__(/*! ./build-config */ 173).DEBUG;
+	var VERBOSE = __webpack_require__(/*! ./build-config */ 173).VERBOSE;
 	
 	module.exports = function (sourceName) {
 	  return {
@@ -22490,20 +22520,6 @@
 	};
 
 /***/ },
-/* 175 */
-/*!*****************************************!*\
-  !*** ./build-source/js/build-config.js ***!
-  \*****************************************/
-/***/ function(module, exports) {
-
-	var config = {};
-	
-	config.DEBUG = true;
-	config.VERBOSE = true;
-	
-	module.exports = config;
-
-/***/ },
 /* 176 */
 /*!*********************************************!*\
   !*** ./build-source/js/HeaderComponents.js ***!
@@ -22513,8 +22529,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('HeaderComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('HeaderComponents.js');
 	
 	var exports = {};
 	
@@ -22562,8 +22578,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('MessagingComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('MessagingComponents.js');
 	
 	var exports = {};
 	
@@ -22678,8 +22694,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('MainColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('MainColumnComponents.js');
 	
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 179);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 180);
@@ -22727,8 +22743,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('NodeComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('NodeComponents.js');
 	
 	var exports = {};
 	
@@ -22786,8 +22802,8 @@
 	      context.navigate(parentUid);
 	    }, false);
 	    trailingSnippet.addEventListener('mousemove', function (e) {
-	      tooltip.style.top = e.clientY + 'px';
-	      tooltip.style.left = e.clientX + 'px';
+	      tooltip.style.top = e.clientY + pageYOffset + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+	      tooltip.style.left = e.clientX + pageXOffset + 'px';
 	    }, false);
 	  }
 	});
@@ -22806,8 +22822,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('VotificationComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('VotificationComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 181);
 	
@@ -22897,7 +22913,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('SocialLoginButtonComponents.js');
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('SocialLoginButtonComponents.js');
 	
 	var exports = {};
 	
@@ -22964,8 +22980,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('PathComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23029,8 +23045,8 @@
 	        context.navigate(id);
 	      }, false);
 	      listItem.addEventListener('mousemove', function (e) {
-	        tooltip.style.top = e.clientY + 'px';
-	        tooltip.style.left = e.clientX + 'px';
+	        tooltip.style.top = e.clientY + pageYOffset + 'px'; // ugly pageYOffset usage due to YOU GUESSED IT IE being short-bus
+	        tooltip.style.left = e.clientX + pageXOffset + 'px';
 	      }, false);
 	    }
 	  }
@@ -23050,8 +23066,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('MarginColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('MarginColumnComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 181);
 	
@@ -23139,8 +23155,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 173);
-	var logMgr = __webpack_require__(/*! ./logger */ 174)('FooterComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ./logger */ 175)('FooterComponents.js');
 	
 	var exports = {};
 	

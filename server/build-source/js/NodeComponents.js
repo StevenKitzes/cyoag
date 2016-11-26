@@ -44,8 +44,8 @@ var Node = React.createClass({
       context.navigate(parentUid);
     }, false);
     trailingSnippet.addEventListener('mousemove', function(e) {
-      tooltip.style.top = e.clientY + 'px';
-      tooltip.style.left = e.clientX + 'px';
+      tooltip.style.top = (e.clientY + pageYOffset) + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+      tooltip.style.left = (e.clientX + pageXOffset) + 'px';
     }, false);
   }
 });
