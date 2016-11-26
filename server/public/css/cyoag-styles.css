@@ -38,12 +38,21 @@ div {
 #cyoag-message-banner {
   margin-bottom: 2em;
 }
+#cyoag-message-banner a {
+  border-style: solid;
+  border-width: thin;
+  border-radius: 2em;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+}
 #cyoag-message-banner p {
   border-radius: 2em;
   border-style: solid;
   border-width: medium;
-  padding-top: .5em;
-  padding-bottom: .5em;
+  padding: 0.5em;
+}
+#cyoag-message-banner .cyoag-regular-message a {
+  border-color: darkgreen;
 }
 #cyoag-message-banner .cyoag-regular-message {
   background-color: lightgreen;
@@ -53,6 +62,9 @@ div {
 .cyoag-regular-message #cyoag-message-banner-x {
   color: darkgreen;
 }
+#cyoag-message-banner .cyoag-warning-message a {
+  border-color: darkgoldenrod;
+}
 #cyoag-message-banner .cyoag-warning-message {
   background-color: lightgoldenrodyellow;
   color: darkgoldenrod;
@@ -60,6 +72,9 @@ div {
 }
 .cyoag-warning-message #cyoag-message-banner-x {
   color: darkgoldenrod;
+}
+#cyoag-message-banner .cyoag-error-message a {
+  border-color: darkred;
 }
 #cyoag-message-banner .cyoag-error-message {
   background-color: lightsalmon;

@@ -8,6 +8,10 @@ var exports = {};
 
 // Facebook login button component
 var Node = React.createClass({
+  navigate: function() {
+    logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
+    this.props.context.navigate(this.props.context.state.parentUid);
+  },
   render: function() {
     logMgr.verbose('Rendering...');
 
@@ -18,8 +22,8 @@ var Node = React.createClass({
 
     return(
       <div id='cyoag-node-container'>
-        <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-div-link' href='#'>
-          <div className='cyoag-path-item cyoag-trailing-snippet'>{snippet.trailingSnippet}</div>
+        <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-div-link' href='#' onMouseMove={this.locateTooltip}>
+          <div className='cyoag-path-item cyoag-trailing-snippet' onClick={this.navigate}>{snippet.trailingSnippet}</div>
           <div id='cyoag-tooltip-regress'>Back whence you came . . . ?</div>
         </a>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
@@ -27,27 +31,10 @@ var Node = React.createClass({
       </div>
     );
   },
-  componentDidUpdate: function() {
-    // for link created in render, set up JS listener to trigger nav XHR and tooltip listeners
-    logMgr.debug('Node components mounted, assigning listeners to trailing snippet');
-    var context = this.props.context;
-    var parentUid = context.state.parentUid;
-
-    var trailingSnippet = document.querySelector('#node-' + parentUid);
-    var trailingSnippetTop = trailingSnippet.getBoundingClientRect().top;
-    var trailingSnippetLeft = trailingSnippet.getBoundingClientRect().left;
+  locateTooltip: function(mouseEvent) {
     var tooltip = document.querySelector('#cyoag-tooltip-regress');
-
-    logMgr.debug('Setting up click listener for trailing snippet');
-
-    trailingSnippet.addEventListener('click', function(e) {
-      context.navigate(parentUid);
-    }, false);
-    trailingSnippet.addEventListener('mousemove', function(e) {
-      tooltip.style.top = (e.clientY + pageYOffset) + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
-      tooltip.style.left = (e.clientX + pageXOffset) + 'px';
-      logMgr.verbose('Shifted tooltip on trailing snippet.');
-    }, false);
+    tooltip.style.top = (mouseEvent.clientY + pageYOffset) + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+    tooltip.style.left = (mouseEvent.clientX + pageXOffset) + 'px';
   }
 });
 

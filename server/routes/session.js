@@ -21,8 +21,7 @@ router.post('/', function(req, res, next) {
 
   // If session ID is entirely missing, visitor is here for the first time!
   if (!req.cookies.session_uid || req.cookies.session_uid == '') {
-    var successMsg = 'New visitor account created for browser with no session ID.';
-    createNewUser(req, res, successMsg);
+    createNewUser(req, res);
   }
   else {
     // If session cookie existed, do simple validation
@@ -48,9 +47,9 @@ router.post('/', function(req, res, next) {
 
       var findSessionUidQuery = 'SELECT * FROM users WHERE session_uid = ' + connection.escape(session_uid) + ';'
       connection.query(findSessionUidQuery, function(err, rows) {
-        connection.release();
         if(err) {
           responder.respondError(res, 'Problem getting response from database checking session ID.');
+          connection.release();
           return;
         }
 
@@ -58,45 +57,62 @@ router.post('/', function(req, res, next) {
         // with this value to '0' and clear the current user's cookie
         if(rows.length > 1) {
           console.log('Found ' + rows.length + ' matching rows.  Removing duplicate session IDs in DB.');
-          db.getConnection(function(e, conn) {
-            if(e) {
-              responder.respondError(res, 'Error getting a connection to the database to clear matching session IDs.');
+          var clearDupesQuery = 'UPDATE users SET session_uid="0" WHERE session_uid=' + innerConnection.escape(session_uid) + ';'
+          connection.query(clearDupesQuery, function(innerErr, r) {
+            if(innerErr) {
+              responder.respondError(res, 'Error clearing matching session IDs at the database level.');
+              connection.release();
               return;
             }
 
-            var clearDupesQuery = 'UPDATE users SET session_uid="0" WHERE session_uid=' + innerConnection.escape(session_uid) + ';'
-            conn.query(clearDupesQuery, function(innerErr, r) {
-              conn.release();
-              if(innerErr) {
-                responder.respondError(res, 'Error clearing matching session IDs at the database level.');
-                return;
-              }
-
-              responder.respond(res, session_uid);
-              return;
-            });
+            responder.respond(res, session_uid);
+            connection.release();
+            return;
           });
         } // end clearing matched session_uid values
 
         // If no rows returned, no user was found with that session ID, so create and surface a new user
         else if(rows.length == 0) {
-          var successMsg = 'No user found with browser session Id.  Created new visitor account.';
-          createNewUser(req, res, successMsg);
+          createNewUser(req, res);
+          connection.release();
           return;
         }
 
         // If one row was returned...
         else if(rows.length == 1) {
+          var user_uid = rows[0]['uid'];
           if(req.body.hasOwnProperty('navigate')) {
-            responder.respondError(res, "Got successful navigation request, but navigation not yet implemented.");
+            var destination = req.body.navigate;
+            if(destination==constants.defaultParentUid) {
+              responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
+              connection.release();
+              return;
+            }
+
+            var navQuery = 'UPDATE positions SET node_uid=' +
+              connection.escape(destination) +
+              ' WHERE user_uid=' +
+              connection.escape(user_uid) +
+              ';';
+
+            connection.query(navQuery, function(err, result) {
+              if(err) {
+                responder.respondError(res, 'Error attempting to set new user position in the database: ' + err);
+                connection.release();
+                return;
+              }
+
+              responder.respond(res, session_uid);
+              connection.release();
+              return;
+            });
+          }
+          else {
+            // If no navigation requested, surface data for user at current location
+            responder.respond(res, session_uid);
+            connection.release();
             return;
           }
-
-          // If no navigation requested, surface data for user at current location
-          var uid = rows[0]['uid'];
-          var loginStatus = (uid.indexOf('fb-') > -1 || uid.indexOf('tw-') > -1) ? true : false;
-          responder.respond(res, session_uid);
-          return;
         }
       });
     });
@@ -106,13 +122,12 @@ router.post('/', function(req, res, next) {
 /* Endpoint to log a user out from a social account */
 router.get('/logout', function(req, res, next) {
   var response = {};
-  var successMsg = 'Logged out user and overwrote session ID with that of a new visitor account.';
-  createNewUser(req, res, successMsg);
+  createNewUser(req, res);
 });
 
 module.exports = router;
 
-function createNewUser(req, res, successMsg) {
+function createNewUser(req, res) {
   console.log('New visitor!  Attempting to create DB entry . . .');
   // Create new user and write it to the DB
   db.getConnection(function(err, connection) {
@@ -138,6 +153,7 @@ function createNewUser(req, res, successMsg) {
     connection.query(userInsertQuery, function(errUserQuery) {
       if(errUserQuery) {
         responder.respondError(res, 'Problem getting response from database creating new user.');
+        connection.release();
         return;
       }
 
@@ -149,11 +165,12 @@ function createNewUser(req, res, successMsg) {
       connection.query(positionInsertQuery, function(errPosQuery) {
         if(errPosQuery) {
           responder.respond(res, 'Problem getting response from database setting position of new user.');
+          connection.release();
           return;
         }
 
-        connection.release();
         responder.respond(res, newUser.session_uid);
+        connection.release();
         return;
       });
     });

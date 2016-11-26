@@ -22293,6 +22293,21 @@
 	}
 	
 	function validateResponse(properThis, response) {
+	  // don't do a full response validation if we are told to expect only an alert message
+	  if (response.messageOnly) {
+	    properThis.setState({
+	      msg: null,
+	      warning: null,
+	      error: null
+	    });
+	    properThis.setState({
+	      msg: response.msg ? response.msg : null,
+	      warning: response.warning ? response.warning : null,
+	      error: response.error ? response.error : null
+	    });
+	    return;
+	  }
+	
 	  logMgr.debug('Attempting to validate response from server . . .');
 	  if (!response) {
 	    // wow... if you don't even get a response, something is nightmarishly wrong
@@ -22621,12 +22636,12 @@
 	      React.createElement(
 	        'p',
 	        { className: className },
-	        messageContent,
 	        React.createElement(
 	          'a',
 	          { onClick: this.closeBanner, id: 'cyoag-message-banner-x', href: '#' },
 	          'X'
-	        )
+	        ),
+	        messageContent
 	      )
 	    );
 	  }
@@ -22758,6 +22773,10 @@
 	var Node = React.createClass({
 	  displayName: 'Node',
 	
+	  navigate: function () {
+	    logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
+	    this.props.context.navigate(this.props.context.state.parentUid);
+	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
@@ -22771,10 +22790,10 @@
 	      { id: 'cyoag-node-container' },
 	      React.createElement(
 	        'a',
-	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-div-link', href: '#' },
+	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-div-link', href: '#', onMouseMove: this.locateTooltip },
 	        React.createElement(
 	          'div',
-	          { className: 'cyoag-path-item cyoag-trailing-snippet' },
+	          { className: 'cyoag-path-item cyoag-trailing-snippet', onClick: this.navigate },
 	          snippet.trailingSnippet
 	        ),
 	        React.createElement(
@@ -22795,27 +22814,10 @@
 	      )
 	    );
 	  },
-	  componentDidUpdate: function () {
-	    // for link created in render, set up JS listener to trigger nav XHR and tooltip listeners
-	    logMgr.debug('Node components mounted, assigning listeners to trailing snippet');
-	    var context = this.props.context;
-	    var parentUid = context.state.parentUid;
-	
-	    var trailingSnippet = document.querySelector('#node-' + parentUid);
-	    var trailingSnippetTop = trailingSnippet.getBoundingClientRect().top;
-	    var trailingSnippetLeft = trailingSnippet.getBoundingClientRect().left;
+	  locateTooltip: function (mouseEvent) {
 	    var tooltip = document.querySelector('#cyoag-tooltip-regress');
-	
-	    logMgr.debug('Setting up click listener for trailing snippet');
-	
-	    trailingSnippet.addEventListener('click', function (e) {
-	      context.navigate(parentUid);
-	    }, false);
-	    trailingSnippet.addEventListener('mousemove', function (e) {
-	      tooltip.style.top = e.clientY + pageYOffset + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
-	      tooltip.style.left = e.clientX + pageXOffset + 'px';
-	      logMgr.verbose('Shifted tooltip on trailing snippet.');
-	    }, false);
+	    tooltip.style.top = mouseEvent.clientY + pageYOffset + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+	    tooltip.style.left = mouseEvent.clientX + pageXOffset + 'px';
 	  }
 	});
 	
@@ -23000,9 +23002,15 @@
 	var Paths = React.createClass({
 	  displayName: 'Paths',
 	
+	  navigate: function (navElementUid) {
+	    var destinationUid = navElementUid.substring(5);
+	    this.props.context.navigate(destinationUid);
+	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
-	    var paths = this.props.context.state.paths;
+	    var properThis = this;
+	    var context = this.props.context;
+	    var paths = context.state.paths;
 	
 	    if (paths.length == 0) {
 	      return React.createElement(
@@ -23016,17 +23024,17 @@
 	        { id: 'cyoag-path-list' },
 	        React.createElement(
 	          'p',
-	          { className: 'italics' },
+	          { className: 'italics', onClick: this.fuck },
 	          'What happens next . . . ?'
 	        ),
 	        paths.map(function (item) {
 	          var pathUid = 'node-' + item.pathUid;
 	          return React.createElement(
 	            'a',
-	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-div-link', href: '#' },
+	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-div-link', href: '#', onMouseMove: properThis.locateTooltip.bind(null, pathUid) },
 	            React.createElement(
 	              'div',
-	              { className: 'cyoag-path-item' },
+	              { className: 'cyoag-path-item', onClick: properThis.navigate.bind(null, pathUid) },
 	              item.pathSnippet
 	            ),
 	            React.createElement(
@@ -23039,31 +23047,10 @@
 	      );
 	    }
 	  },
-	  componentDidUpdate: function () {
-	    // for links created in render, set up JS listener to trigger nav XHR and tooltip listeners
-	    var context = this.props.context;
-	    var ids = context.state.paths.map(function (path) {
-	      return path.pathUid;
-	    });
-	
-	    logMgr.debug('Path components mounted, assigning listeners to ids: ' + ids);
-	    for (var i = 0; i < ids.length; i++) {
-	      var id = ids[i];
-	      var listItem = document.getElementById('node-' + id);
-	      var itemTop = listItem.getBoundingClientRect().top;
-	      var itemLeft = listItem.getBoundingClientRect().left;
-	      var tooltip = document.querySelector('#node-' + id + ' .cyoag-tooltip-progress');
-	
-	      logMgr.debug('Setting up click listener for node-' + id);
-	
-	      listItem.addEventListener('click', function (e) {
-	        context.navigate(id);
-	      }, false);
-	      listItem.addEventListener('mousemove', function (e) {
-	        tooltip.style.top = e.clientY + pageYOffset + 'px'; // ugly pageYOffset usage due to YOU GUESSED IT IE being short-bus
-	        tooltip.style.left = e.clientX + pageXOffset + 'px';
-	      }, false);
-	    }
+	  locateTooltip: function (hoverTargetId, mouseEvent) {
+	    var tooltip = document.querySelector('#' + hoverTargetId + ' .cyoag-tooltip-progress');
+	    tooltip.style.top = mouseEvent.clientY + pageYOffset + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+	    tooltip.style.left = mouseEvent.clientX + pageXOffset + 'px';
 	  }
 	});
 	

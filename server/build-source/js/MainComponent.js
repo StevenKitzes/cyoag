@@ -155,6 +155,21 @@ function castDownVote() {
 }
 
 function validateResponse(properThis, response) {
+  // don't do a full response validation if we are told to expect only an alert message
+  if(response.messageOnly) {
+    properThis.setState({
+      msg: null,
+      warning: null,
+      error: null
+    });
+    properThis.setState({
+      msg: response.msg ? response.msg : null,
+      warning: response.warning ? response.warning : null,
+      error: response.error ? response.error : null
+    });
+    return;
+  }
+
   logMgr.debug('Attempting to validate response from server . . .');
   if(!response) {
     // wow... if you don't even get a response, something is nightmarishly wrong

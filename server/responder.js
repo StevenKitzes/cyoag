@@ -9,6 +9,48 @@ function respondError(res, error) {
   res.send(JSON.stringify(response));
 }
 
+/*
+ *  Respond to the client with a message only, no other page content.  The 'msg'
+ *  parameter here expects a JSON object with at least one of the properties:
+ *  [msg | warning | error]
+ *  where each property accepts a string.
+ *  If more than one property is used, only the most severe level will be
+ *  propagated.
+ *  This function also accepts a simple string as for the message parameter, in
+ *  which case this will be propagated as the lowest severity of message.
+ *  Valid sample calls:
+ *     respondMsgOnly(res, {warning: 'Be careful!'});
+ *     respondMsgOnly(res, {error: 'Critical error requiring session reset!'}, true);
+ */
+function respondMsgOnly(res, msg, sessionReset) {
+  var response = {};
+
+  if(msg.error) {
+    response.error = msg.error;
+    console.log('Responding with error: ' + msg.error);
+  }
+  else if(msg.warning) {
+    response.warning = msg.warning;
+    console.log('Responding with warning: ' + msg.warning);
+  }
+  else if(msg.msg) {
+    response.msg = msg.msg;
+    console.log('Responding with message: ' + msg.msg);
+  }
+  else {
+    response.msg = msg;
+    console.log('Responding with message: ' + msg);
+  }
+
+  response.messageOnly = true;
+
+  if(sessionReset) {
+    console.log('. . . including session reset.');
+    res.clearCookie(constants.sessionCookie);
+  }
+  res.send(JSON.stringify(response));
+}
+
 function respond(res, session_uid, msg) {
   var response = {};
   response.snippet = {};
@@ -54,6 +96,7 @@ function respond(res, session_uid, msg) {
           'positions.node_uid=nodes.uid ' +
       'WHERE ' +
         'users.session_uid=' + connection.escape(session_uid) + ';'
+    console.log('Query attempted: ' + query);
     connection.query(query, function(error, rows) {
       if(error) {
         // handle any error querying for users with this user ID
@@ -61,6 +104,7 @@ function respond(res, session_uid, msg) {
         connection.release();
         return;
       }
+      console.log('Query yielded: ' + JSON.stringify(rows[0]));
 
       // if no data was found with these requirements, this is an error here
       if(rows.length < 1) {
@@ -116,7 +160,7 @@ function respond(res, session_uid, msg) {
         var query = 'SELECT uid as pathUid, path_snippet as pathSnippet, votification as pathVotification FROM nodes WHERE parent_uid=' + connection.escape(response.nodeUid) + ';';
         connection.query(query, function(error, rows) {
           if(error) {
-            respondError(res, 'ERROR: Problem getting information on paths out of node.');
+            respondError(res, 'ERROR: Problem getting information on paths out of node: ' + error);
             connection.release();
             return;
           }
@@ -190,6 +234,7 @@ function getTrailingFromSnippet(full) {
 var exports = {};
 
 exports.respond = respond;
+exports.respondMsgOnly = respondMsgOnly;
 exports.respondError = respondError;
 
 module.exports = exports;

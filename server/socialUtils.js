@@ -64,8 +64,13 @@ function registerUser(uid, session_uid, res, response) {
         connection.release();
         return;
       }
-      if(rows.length != 1) {
-        resonder.respond(res, session_uid, {warning: 'Found multiple results for current session position.'});
+      if(rows.length == 0) {
+        responder.respondError(res, 'Found no results for current session position!');
+        connection.release();
+        return;
+      }
+      if(rows.length > 1) {
+        responder.respond(res, session_uid, {warning: 'Found multiple results for current session position.'});
         connection.release();
         return;
       }

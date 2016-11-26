@@ -1,11 +1,9 @@
 CREATE TABLE IF NOT EXISTS users (
 uid VARCHAR(40) UNIQUE PRIMARY KEY,
-name VARCHAR(16) UNIQUE,
+name VARCHAR(32) UNIQUE,
 acct_type VARCHAR(16),
-salt VARCHAR(40),
-salted_pass VARCHAR(40),
 session_uid VARCHAR(40),
-email VARCHAR(50) UNIQUE
+INDEX (session_uid)
 );
 
 CREATE TABLE IF NOT EXISTS nodes (
@@ -14,20 +12,24 @@ parent_uid VARCHAR(40),
 author_uid VARCHAR(40),
 path_snippet VARCHAR(100),
 node_snippet VARCHAR(2000),
-FOREIGN KEY (author_uid) REFERENCES users(uid)
+votification INTEGER
 );
 
 CREATE TABLE IF NOT EXISTS positions (
 user_uid VARCHAR(40),
 node_uid VARCHAR(40),
-PRIMARY KEY (user_uid, node_uid),
-FOREIGN KEY (user_uid) REFERENCES users(uid) ON DELETE CASCADE,
-FOREIGN KEY (node_uid) REFERENCES nodes(uid) ON DELETE CASCADE
+PRIMARY KEY (user_uid)
 );
 
 CREATE TABLE IF NOT EXISTS votes (
 voter_uid VARCHAR(40),
 node_uid VARCHAR(40),
 sentiment TINYINT,
-PRIMARY KEY (voter_uid, node_uid)
+PRIMARY KEY (voter_uid, node_uid),
+INDEX (node_uid)
 );
+
+INSERT INTO users (uid, name, acct_type, session_uid) VALUES ('', 'Steverino', 'moderator', '0');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('start', '00000000000000-0000000000-00000000000000', '', 'Path to first node.', 'First node content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('test', 'start', '', 'Path to second node.', 'Second node content.');
+INSERT INTO positions (user_uid, node_uid) VALUES ('', 'test');
