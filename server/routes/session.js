@@ -28,10 +28,6 @@ router.post('/', function(req, res, next) {
     console.log('Session ID found, validating . . .');
 
     var session_uid = req.cookies.session_uid;
-    if(session_uid.length != 40) {
-      responder.respond(res, session_uid);
-      return;
-    }
 
     // Get a db connection from the pool
     db.getConnection(function(err, connection) {
@@ -133,6 +129,7 @@ function createNewUser(req, res) {
   db.getConnection(function(err, connection) {
     if(err) {
       responder.respondError(res, 'There was a problem getting a database connection.  New user cannot be created.');
+      connection.release();
       return;
     }
 
