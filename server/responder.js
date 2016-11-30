@@ -180,7 +180,7 @@ function respond(res, session_uid, msg) {
           if(response.nodeUid == 'start') {
             // root node gets special one-off trailing node snippet and trailing path snippet
             response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
-            res.cookie(constants.sessionCookie, session_uid);
+            res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
             res.send(JSON.stringify(response));
             connection.release();
             return;
@@ -208,7 +208,7 @@ function respond(res, session_uid, msg) {
 
               response.snippet.trailingSnippet = trailingSnippet;
 
-              res.cookie(constants.sessionCookie, session_uid);
+              res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
               res.send(JSON.stringify(response));
               connection.release();
               return;

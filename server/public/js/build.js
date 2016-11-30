@@ -22460,6 +22460,9 @@
 	constants.acctTypeRegistered = 'registered';
 	constants.acctTypeModerator = 'moderator';
 	
+	// this maxAge value acconts for 2 weeks until expiry
+	constants.cookieExpiry = {maxAge: 1209600000, httpOnly: true};
+	
 	constants.defaultNodeUid = 'default';
 	constants.defaultParentUid = '00000000000000-0000000000-00000000000000';
 	constants.defaultUserName = 'Visitor';

@@ -2,6 +2,8 @@ var db = require('./dbAccess')();
 var generateGuid = require('./build-source/js/uid-gen');
 var responder = require('./responder');
 
+var constants = require('./constants');
+
 function socialLoginById(user_uid, req, res) {
   var response = {};
 
@@ -115,7 +117,7 @@ function registerUser(uid, session_uid, res, response) {
 
           console.log('Successfully registered new registered user!  :)');
           connection.release();
-          res.cookie('session_uid', newUser.session_uid);
+          res.cookie('session_uid', newUser.session_uid, constants.cookieExpiry);
           res.redirect(302, 'http://localhost.cyoag.com:3000/');
           return;
         });
@@ -156,7 +158,7 @@ function updateUserSession(uid, res, response) {
       }
 
       console.log('Successfully updated registered user session!');
-      res.cookie('session_uid', userStatus.session_uid);
+      res.cookie('session_uid', userStatus.session_uid, constants.cookieExpiry);
       res.redirect(302, 'http://localhost.cyoag.com:3000/');
       return;
     });
