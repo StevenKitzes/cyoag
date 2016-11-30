@@ -80,10 +80,10 @@ function mountXhrHandler() {
   }
   xhr.open('POST', '/session');
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  xhr.timeout = 3000;
+  xhr.timeout = 5000;
   xhr.ontimeout = function() {
     xhr.abort();
-    alert('Server response timed out; unable to detect your login status.');
+    properThis.setState({error: 'Server response timed out; unable to detect your login status.'});
   }
   xhr.send();
 }
@@ -106,10 +106,10 @@ function logoutXhrHandler() {
   }
   xhr.open('GET', '/session/logout');
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  xhr.timeout = 3000;
+  xhr.timeout = 5000;
   xhr.ontimeout = function() {
     xhr.abort();
-    alert('Logout request took to long, server unresponsive; you are still logged in!');
+    properThis.setState({error: 'Server response timed out; unable to detect your login status.'});
   }
   xhr.send();
 }
@@ -132,10 +132,10 @@ function navigateXhrHandler(nodeUid) {
   }
   xhr.open('POST', '/session');
   xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-  xhr.timeout = 3000;
+  xhr.timeout = 5000;
   xhr.ontimeout = function() {
     xhr.abort();
-    alert('Navigation request took to long, server unresponsive; no navigation seems to have occurred!');
+    properThis.setState({error: 'Server response timed out; unable to detect your login status.'});
   }
   var xhrPayload = JSON.stringify({navigate: nodeUid});
   xhr.send(xhrPayload);
