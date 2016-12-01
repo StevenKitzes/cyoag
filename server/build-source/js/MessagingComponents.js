@@ -2,7 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var constants = require('../../constants');
-var logMgr = require('./logger')('MessagingComponents.js');
+var logMgr = require('../../utils/logger')('MessagingComponents.js');
 
 var exports = {};
 

@@ -1,5 +1,5 @@
 var db = require('./dbAccess')();
-var generateGuid = require('./build-source/js/uid-gen');
+var generateGuid = require('./utils/uid-gen');
 var responder = require('./responder');
 
 var constants = require('./constants');
@@ -128,7 +128,7 @@ function registerUser(uid, session_uid, res, response) {
 
 function updateUserSession(uid, res, response) {
   console.log('Registered user detected, updating session ID . . .');
-  // Create new user and write it to the DB
+  // Update the user with a new session and respond thusly
   db.getConnection(function(errGetConn, connectionUpdateSession) {
     if(errGetConn) {
       responder.respondError(res, 'Problem getting a database connection to update registered user session.');

@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 
 var constants = require('../constants');
 var db = require('../dbAccess')();
-var generateGuid = require('../build-source/js/uid-gen');
+var generateGuid = require('../utils/uid-gen');
 var responder = require('../responder');
 
 var app = express();

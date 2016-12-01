@@ -3,7 +3,7 @@ var ReactDOM = require('react-dom');
 
 var MainComponent = require('./MainComponent');
 
-var logMgr = require('./logger')('main.js');
+var logMgr = require('../../utils/logger')('main.js');
 
 logMgr.verbose('Kicking off initial render!');
 

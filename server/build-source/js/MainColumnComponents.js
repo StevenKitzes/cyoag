@@ -2,7 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var constants = require('../../constants');
-var logMgr = require('./logger')('MainColumnComponents.js');
+var logMgr = require('../../utils/logger')('MainColumnComponents.js');
 
 var NodeComponents = require('./NodeComponents');
 var VotificationComponents = require('./VotificationComponents');

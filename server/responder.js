@@ -1,8 +1,10 @@
 var constants = require('./constants');
 var db = require('./dbAccess')();
 
+var logMgr = require('./utils/logger')('responder.js', true);
+
 function respondError(res, error) {
-  console.log(error);
+  logMgr.error(error);
   var response = {};
   response.error = error;
   res.clearCookie(constants.sessionCookie);
@@ -27,25 +29,25 @@ function respondMsgOnly(res, msg, sessionReset) {
 
   if(msg.error) {
     response.error = msg.error;
-    console.log('Responding with error: ' + msg.error);
+    logMgr.out('Responding with error: ' + msg.error);
   }
   else if(msg.warning) {
     response.warning = msg.warning;
-    console.log('Responding with warning: ' + msg.warning);
+    logMgr.out('Responding with warning: ' + msg.warning);
   }
   else if(msg.msg) {
     response.msg = msg.msg;
-    console.log('Responding with message: ' + msg.msg);
+    logMgr.out('Responding with message: ' + msg.msg);
   }
   else {
     response.msg = msg;
-    console.log('Responding with message: ' + msg);
+    logMgr.out('Responding with message: ' + msg);
   }
 
   response.messageOnly = true;
 
   if(sessionReset) {
-    console.log('. . . including session reset.');
+    logMgr.out('. . . including session reset.');
     res.clearCookie(constants.sessionCookie);
   }
   res.send(JSON.stringify(response));
@@ -68,12 +70,12 @@ function respond(res, session_uid, msg) {
     }
   }
 
-  // if this user ID already exists, assign new session ID and redirect to main page
-  console.log('Beginning response construction.');
+  // build and send a response based on conditions
+  logMgr.out('Beginning response construction.');
   db.getConnection(function(error_getConnection, connection) {
     if(error_getConnection) {
       // handle any error getting connection from pool
-      respondError(res, 'ERROR: Problem getting a database connection.  Unable to build response. ' + error_getConnection)
+      respondError(res, 'Problem getting a database connection.  Unable to build response. ' + error_getConnection)
       connection.release();
       return;
     }
@@ -81,39 +83,42 @@ function respond(res, session_uid, msg) {
     // Let's get everything we can from a single query off the session_uid
     var query =
       'SELECT ' +
-        'users.uid as userUid, ' +                // userUid
-        'users.name as userName, ' +              // userName
-        'users.acct_type as acctType, ' +         // acctType
-        'positions.node_uid as nodeUid, ' +       // nodeUid
-        'nodes.node_snippet as nodeSnippet, ' +   // nodeSnippet
-        'nodes.path_snippet as pathSnippet, ' +   // pathSnippet
-        'nodes.parent_uid as parentUid ' +        // parentUid
-      'FROM ' +
-        'users ' +
-        'JOIN positions ON ' +
-          'users.uid=positions.user_uid ' +
-        'JOIN nodes ON ' +
-          'positions.node_uid=nodes.uid ' +
+        'users.name as userName, ' +
+        'users.acct_type as acctType, ' +
+        'positions.node_uid as nodeUid, ' +
+        'nodes.node_snippet as nodeSnippet, ' +
+        'nodes.path_snippet as pathSnippet, ' +
+        'nodes.parent_uid as parentUid, ' +
+        'votes.sentiment as sentiment ' +
+      'FROM users ' +
+        'LEFT JOIN positions ' +
+          'ON users.uid=positions.user_uid ' +
+        'LEFT JOIN nodes ' +
+          'ON positions.node_uid=nodes.uid ' +
+        'LEFT JOIN votes ' +
+          'ON nodes.uid=votes.node_uid AND users.uid=votes.user_uid ' +
       'WHERE ' +
         'users.session_uid=' + connection.escape(session_uid) + ';'
-    console.log('Query attempted: ' + query);
+    logMgr.debug('Query attempted: ' + query);
     connection.query(query, function(error, rows) {
       if(error) {
         // handle any error querying for users with this user ID
-        respondError(res, 'ERROR: Problem querying database for user status. ' + error);
+        respondError(res, 'Problem querying database for user status. ' + error);
+        logMgr.error('Database query error trying to get user, position, node, and votification data:');
+        logMgr.error(error);
         connection.release();
         return;
       }
-      console.log('Query yielded: ' + JSON.stringify(rows[0]));
+      logMgr.debug('Query yielded: ' + JSON.stringify(rows[0]));
 
       // if no data was found with these requirements, this is an error here
       if(rows.length < 1) {
-        respondError(res, 'ERROR: Problem identifying user with this session ID.');
+        respondError(res, 'No user found with this session ID; normally this should be caught by session.js.');
         connection.release();
         return;
       }
       if(rows.length > 1) {
-        respondError(res, 'ERROR: Found multiple users with this session ID.');
+        respondError(res, 'Multiple users with this session ID; this should normally be caught by session.js.');
         connection.release();
         return;
       }
@@ -125,96 +130,82 @@ function respond(res, session_uid, msg) {
       response.parentUid = row.parentUid;
       response.snippet.nodeSnippet = row.nodeSnippet;
       response.snippet.lastPath = row.pathSnippet;
+      switch(row.sentiment) {
+        case 1:
+          response.votification = constants.votificationUp;
+          break;
+        case -1:
+          response.votification = constants.votificationDown;
+          break;
+        case 0:
+        default:
+          response.votification = constants.votificationNone;
+          break;
+      }
+      logMgr.verbose('Votification status: ' + response.votification);
 
-      // Now do Votification
-      var query = 'SELECT sentiment FROM votes WHERE voter_uid=' + connection.escape(row.userUid) +
-        ' AND node_uid=' + connection.escape(row.nodeUid) + ';';
+      // now get paths out from here by finding the nodes that have this node as a parent
+      var query = 'SELECT uid as pathUid, path_snippet as pathSnippet, votification as pathVotification FROM nodes WHERE parent_uid=' + connection.escape(response.nodeUid) + ';';
       connection.query(query, function(error, rows) {
         if(error) {
-          respondError(res, 'ERROR: Problem retrieving votification information.');
+          respondError(res, 'Problem getting information on paths out of node: ' + error);
+          logMgr.error('Database query error trying to paths out from current node:');
+          logMgr.error(error);
           connection.release();
           return;
         }
 
-        // if multiple votifications for this user and this node, warn server console, and don't count it, but don't error
-        if(rows.length > 1) {
-          console.log('WARNING: Multiple votifications found; ignoring.');
-          response.votification = constants.votificationNone;
+        // for each row, with no-rows-returned being a legal state
+        response.paths = [];
+        for(var row = 0; row < rows.length; row++) {
+          var path = {
+            pathUid: rows[row].pathUid,
+            pathSnippet: rows[row].pathSnippet,
+            pathVotification: rows[row].pathVotification
+          };
+          response.paths.push(path);
         }
-        // if we got one result as expected
-        else if(rows.length == 1) {
-          var sentiment = rows[0];
-          if(sentiment) {
-            response.votification = constants.votificationUp;
-          }
-          else {
-            response.votification = constants.votificationDown;
-          }
+
+        // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
+        if(response.nodeUid == 'start') {
+          // root node gets special one-off trailing node snippet and trailing path snippet
+          response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
+          res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
+          res.send(JSON.stringify(response));
+          connection.release();
+          return;
         }
-        // or zero which would be fine
+        // if we have to do a final db call to get trailing node
         else {
-          response.votification = constants.votificationNone;
-        }
+          var query = 'SELECT node_snippet as trailingSnippet ' +
+            'FROM nodes WHERE uid=' + connection.escape(response.parentUid) + ';';
+          connection.query(query, function(error, rows) {
+            if(error) {
+              respondError(res, 'ERROR: Failed to retrieve trailing node information.');
+              logMgr.error('Database query error trying to get trailing snippet:');
+              logMgr.error(error);
+              connection.release();
+              return;
+            }
 
-        // now get paths out from here by finding the nodes that have this node as a parent
-        var query = 'SELECT uid as pathUid, path_snippet as pathSnippet, votification as pathVotification FROM nodes WHERE parent_uid=' + connection.escape(response.nodeUid) + ';';
-        connection.query(query, function(error, rows) {
-          if(error) {
-            respondError(res, 'ERROR: Problem getting information on paths out of node: ' + error);
-            connection.release();
-            return;
-          }
+            if(rows.length != 1) {
+              respondError(res, 'ERROR: Found multiple trailing nodes.  Note, this is impossible.');
+              connection.release();
+              return;
+            }
 
-          // for each row, with no-rows-returned being a legal state
-          response.paths = [];
-          for(var row = 0; row < rows.length; row++) {
-            var path = {
-              pathUid: rows[row].pathUid,
-              pathSnippet: rows[row].pathSnippet,
-              pathVotification: rows[row].pathVotification
-            };
-            response.paths.push(path);
-          }
+            var parent = rows[0];
 
-          // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
-          if(response.nodeUid == 'start') {
-            // root node gets special one-off trailing node snippet and trailing path snippet
-            response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
+            var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
+
+            response.snippet.trailingSnippet = trailingSnippet;
+
             res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
             res.send(JSON.stringify(response));
             connection.release();
             return;
-          }
-          // if we have to do a final db call to get trailing node
-          else {
-            var query = 'SELECT node_snippet as trailingSnippet ' +
-              'FROM nodes WHERE uid=' + connection.escape(response.parentUid) + ';';
-            connection.query(query, function(error, rows) {
-              if(error) {
-                respondError(res, 'ERROR: Failed to retrieve trailing node information.');
-                connection.release();
-                return;
-              }
-
-              if(rows.length != 1) {
-                respondError(res, 'ERROR: Found multiple trailing nodes.  Note, this is impossible.');
-                connection.release();
-                return;
-              }
-
-              var parent = rows[0];
-
-              var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
-
-              response.snippet.trailingSnippet = trailingSnippet;
-
-              res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
-              res.send(JSON.stringify(response));
-              connection.release();
-              return;
-            });
-          }
-        });
+          });
+        }
       });
     });
   });

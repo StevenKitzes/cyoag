@@ -2,7 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var constants = require('../../constants');
-var logMgr = require('./logger')('NodeComponents.js');
+var logMgr = require('../../utils/logger')('NodeComponents.js');
 
 var exports = {};
 

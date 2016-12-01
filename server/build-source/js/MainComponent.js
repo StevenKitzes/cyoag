@@ -1,9 +1,9 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var config = require('./build-config');
+var config = require('../../build-config');
 var constants = require('../../constants');
-var logMgr = require('./logger')('MainComponent.js');
+var logMgr = require('../../utils/logger')('MainComponent.js');
 
 var HeaderComponents = require('./HeaderComponents');
 var MessagingComponents = require('./MessagingComponents');

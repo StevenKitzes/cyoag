@@ -2,7 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var constants = require('../../constants');
-var logMgr = require('./logger')('FooterComponents.js');
+var logMgr = require('../../utils/logger')('FooterComponents.js');
 
 var exports = {};
 
