@@ -35,7 +35,7 @@ var Banner = React.createClass({
 
     return(
       <div id='cyoag-message-banner'>
-        <p className={className}><a onClick={this.closeBanner} id='cyoag-message-banner-x' href='#'>X</a>{messageContent}</p>
+        <p className={className}><a onClick={this.closeBanner} id='cyoag-message-banner-x' href='#'>x</a>{messageContent}</p>
       </div>
     );
   }

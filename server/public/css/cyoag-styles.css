@@ -89,7 +89,10 @@ div {
   font-family: sans-serif;
   text-decoration: none;
   float: right;
-  margin-right: 1em;
+  margin-top: -0.1em;
+  margin-right: 0;
+  padding-top: 0;
+  padding-bottom: 0.1em;
 }
 
 #cyoag-modal-message-container {
