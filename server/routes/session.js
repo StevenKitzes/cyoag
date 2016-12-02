@@ -103,6 +103,63 @@ router.post('/', function(req, res, next) {
               return;
             });
           }
+          else if(req.body.hasOwnProperty('votify')) {
+            var node_uid = req.body.votify;
+            var newVote = req.body.newVote;
+
+            var oldValue, newValue, voteValueDiff;
+            switch(newVote) {
+              case constants.votificationDown:
+                newValue = -1;
+                break;
+              case constants.votificationNone:
+                newValue = 0;
+                break;
+              case constants.votificationUp:
+                newValue = 1;
+                break;
+              default:
+                responder.respondError(res, 'Illegal votification value for old vote.');
+                connection.release();
+                return;
+            }
+
+            // now we will have to query the DB to learn if we must update existing votes, or create a new row
+            var query =
+              'SELECT nodes.uid, votes.sentiment AS sentiment ' +
+                'FROM nodes ' +
+                  'LEFT JOIN votes ' +
+                    'ON nodes.uid=votes.node_uid AND votes.user_uid=? AND votes.node_uid=? ' +
+                'WHERE nodes.uid=?;';
+            connection.query(query, [user_uid, node_uid, node_uid], function(error, rows) {
+              if(rows.length > 1) {
+                responder.respondError(res, 'More than one vote detected for this user at this node.');
+                connection.release();
+                return;
+              }
+              else if(rows.length == 0) {
+                responder.respondError(res, 'The node being voted on does not exist.  It may have been recently deleted.');
+                connection.release();
+                return;
+              }
+
+              var row = rows[0];
+              if(row.sentiment == null) {
+                // node existed, but no vote yet.
+                // create vote, and don't forget to update node's votification count
+              }
+              else {
+                // vote existed, so instead of creating we will need to update it,
+                // and don't forget to update the node's votification count
+                oldValue = row.sentiment;
+                voteValueDiff = newValue - oldValue;
+              }
+            });
+
+            responder.respondError(res, 'Votification implementation incomplete.');
+            connection.release();
+            return;
+          }
           else {
             // If no navigation requested, surface data for user at current location
             responder.respond(res, session_uid);
