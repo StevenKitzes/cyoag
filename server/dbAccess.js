@@ -2,6 +2,8 @@
 var mysql = require('mysql');
 var secrets = require('./secrets');
 
+var logMgr = require('./utils/logger')('dbAccess.js', true);
+
 // This is a connection pool, which will be made available to this app's routes
 var pool;
 
@@ -9,7 +11,7 @@ var pool;
 //    a reference to this module's SQL database connection pool
 function db() {
   if(pool == null || pool == undefined) {
-    console.log('Connection pool did not exist yet.  Setting it up.');
+    logMgr.out('Connection pool did not exist yet.  Setting it up.');
 
     // Create the connection pool if it didn't exist yet, using mostly defaults
     pool = mysql.createPool({

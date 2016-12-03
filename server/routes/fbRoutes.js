@@ -5,6 +5,8 @@ var express = require('express');
 var request = require('request'); // easy HTTP request library
 var router = express.Router();
 
+var logMgr = require('../utils/logger')('fbRoutes.js', true);
+
 var responder = require('../responder');
 var secrets = require('../secrets');
 var socialUtils = require('../socialUtils');
@@ -31,8 +33,8 @@ router.get('/swap', function(req, res, next) {
   // make the request to FB to swap the "code" for the access token
   request(swapUrl, function(error, response, responseBody) {
     // catch errors
-    if(error) { console.log(error); return; }
-    if(response.statusCode != 200) { console.log('Oops!  Got status code: ' + response.statusCode); return; }
+    if(error) { logMgr.error(error); return; }
+    if(response.statusCode != 200) { logMgr.warning('Oops!  Got status code: ' + response.statusCode); return; }
 
     // make a JSON object out of the response and get the token out
     var tokenObj = JSON.parse(responseBody);
@@ -43,8 +45,8 @@ router.get('/swap', function(req, res, next) {
       // another FB call, this time to get user ID from the access token
       var getUserIdUrl = 'https://graph.facebook.com/me?fields=id&access_token=' + token;
       request(getUserIdUrl, function(e, r, rb) {
-        if(e) { console.log(e); return; }
-        if(r.statusCode != 200) { console.log('Uh oh!  Got status code: ' + r.statusCode); return; }
+        if(e) { logMgr.error(e); return; }
+        if(r.statusCode != 200) { logMgr.warning('Uh oh!  Got status code: ' + r.statusCode); return; }
 
         /*
          * Get the user's social ID from the response payload.  idObj.id is
@@ -59,9 +61,7 @@ router.get('/swap', function(req, res, next) {
     }
     // token not received?!
     else {
-      var noTokenReceivedMsg = 'ERROR: no token received from Facebook.';
-      console.log(noTokenReceivedMsg);
-      responder.respondError(res, noTokenReceivedMsg);
+      responder.respondError(res, 'There was a problem retrieving account information from Facebook.');
     }
   });
 });

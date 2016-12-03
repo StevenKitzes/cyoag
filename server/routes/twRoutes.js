@@ -8,6 +8,7 @@ var router = express.Router();
 
 var secrets = require('../secrets');
 var socialUtils = require('../socialUtils');
+var logMgf = require('../utils/logger')('twRoutes.js', true);
 
 // Route to kick off a Twitter login event
 router.get('/login', function(req, res, next) {
