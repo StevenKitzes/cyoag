@@ -13,6 +13,7 @@ function db() {
 
     // Create the connection pool if it didn't exist yet, using mostly defaults
     pool = mysql.createPool({
+      multipleStatements: true,
       connectionLimit: 10,
       host: 'localhost',
       user: secrets.SQL_USER,

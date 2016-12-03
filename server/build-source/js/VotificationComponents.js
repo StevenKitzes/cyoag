@@ -55,17 +55,19 @@ var Votification = React.createClass({
     }
 
     var voteUp = function() {
+      logMgr.verbose('Client trying to upvote ' + context.state.nodeUid);
       context.votify(context.state.nodeUid, upClickResult);
     }
     var voteDown = function() {
+      logMgr.verbose('Client trying to downvote ' + context.state.nodeUid);
       context.votify(context.state.nodeUid, downClickResult);
     }
 
     return (
       <div id='cyoag-votification-container'>
         <h4>How did you like this chapter?</h4>
-        <a href='#'><img id='cyoag-upvote-button' onClick={this.voteUp} src={upImgPath} /></a>
-        <a href='#'><img id='cyoag-downvote-button' onClick={this.voteDown} src={downImgPath} /></a>
+        <a href='#'><img id='cyoag-upvote-button' onClick={voteUp} src={upImgPath} /></a>
+        <a href='#'><img id='cyoag-downvote-button' onClick={voteDown} src={downImgPath} /></a>
       </div>
     );
   }

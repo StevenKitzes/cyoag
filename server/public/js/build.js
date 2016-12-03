@@ -22312,6 +22312,10 @@
 	}
 	
 	function validateVotificationResponse(properThis, response) {
+	  if (checkMsgOnly(properThis, response)) {
+	    return;
+	  }
+	
 	  logMgr.debug('Attempting to validate votification response from server . . .');
 	  if (!response) {
 	    // wow... if you don't even get a response, something is nightmarishly wrong
@@ -22344,18 +22348,7 @@
 	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 	}
 	function validateResponse(properThis, response) {
-	  // don't do a full response validation if we are told to expect only an alert message
-	  if (response.messageOnly) {
-	    properThis.setState({
-	      msg: null,
-	      warning: null,
-	      error: null
-	    });
-	    properThis.setState({
-	      msg: response.msg ? response.msg : null,
-	      warning: response.warning ? response.warning : null,
-	      error: response.error ? response.error : null
-	    });
+	  if (checkMsgOnly(properThis, response)) {
 	    return;
 	  }
 	
@@ -22444,6 +22437,24 @@
 	  });
 	  logMgr.verbose('State was set successfully after validation!');
 	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
+	}
+	function checkMsgOnly(context, response) {
+	  // don't do a full response validation if we are told to expect only an alert message
+	  if (response.messageOnly) {
+	    logMgr.verbose('Got message-only response.');
+	    context.setState({
+	      msg: null,
+	      warning: null,
+	      error: null
+	    });
+	    context.setState({
+	      msg: response.msg ? response.msg : null,
+	      warning: response.warning ? response.warning : null,
+	      error: response.error ? response.error : null
+	    });
+	    return true;
+	  }
+	  return false;
 	}
 	
 	function getDefaultStateObject() {
@@ -22980,9 +22991,11 @@
 	    }
 	
 	    var voteUp = function () {
+	      logMgr.verbose('Client trying to upvote ' + context.state.nodeUid);
 	      context.votify(context.state.nodeUid, upClickResult);
 	    };
 	    var voteDown = function () {
+	      logMgr.verbose('Client trying to downvote ' + context.state.nodeUid);
 	      context.votify(context.state.nodeUid, downClickResult);
 	    };
 	
@@ -22997,12 +23010,12 @@
 	      React.createElement(
 	        'a',
 	        { href: '#' },
-	        React.createElement('img', { id: 'cyoag-upvote-button', onClick: this.voteUp, src: upImgPath })
+	        React.createElement('img', { id: 'cyoag-upvote-button', onClick: voteUp, src: upImgPath })
 	      ),
 	      React.createElement(
 	        'a',
 	        { href: '#' },
-	        React.createElement('img', { id: 'cyoag-downvote-button', onClick: this.voteDown, src: downImgPath })
+	        React.createElement('img', { id: 'cyoag-downvote-button', onClick: voteDown, src: downImgPath })
 	      )
 	    );
 	  }
