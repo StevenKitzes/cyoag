@@ -50,19 +50,25 @@ function socialLoginById(user_uid, req, res) {
 function registerUser(uid, session_uid, res, response) {
   console.log('New registered user!  Attempting to create based on current visitor . . .');
   // Create new user and write it to the DB
-  db.getConnection(function(errConnection, connection) {
-    if(errConnection) {
+  db.getConnection(function(err, connection) {
+    if(err) {
       responder.respondError(res, 'Problem getting a database connection for user registration.');
       return;
     }
 
-    console.log('Got database connection to register new user.');
+    logMgr.out('Got database connection to register new user.');
 
     // the first thing to do is get the position of the current session
-    var getPosQuery = 'SELECT positions.node_uid FROM positions INNER JOIN users ON users.uid=positions.user_uid WHERE users.session_uid=' + connection.escape(session_uid) + ';';
-    connection.query(getPosQuery, function(errGetPos, rows) {
-      if(errGetPos) {
-        responder.respondError(res, 'Problem getting current session position from database.');
+    var query =
+      'SELECT positions.node_uid ' +
+        'FROM positions ' +
+          'INNER JOIN users ' +
+            'ON users.uid=positions.user_uid ' +
+        'WHERE users.session_uid=?;';
+    connection.query(query, [session_uid], function(err, rows) {
+      if(err) {
+        responder.respondError(res, 'Database error getting current session position.');
+        logMgr.error(err);
         connection.release();
         return;
       }
@@ -72,7 +78,7 @@ function registerUser(uid, session_uid, res, response) {
         return;
       }
       if(rows.length > 1) {
-        responder.respond(res, session_uid, {warning: 'Found multiple results for current session position.'});
+        responder.respondError(res, 'Found multiple results for current session position.');
         connection.release();
         return;
       }
@@ -83,82 +89,65 @@ function registerUser(uid, session_uid, res, response) {
       var abbrev = uid.substring(0,3);
 
       // Create a new user to write to DB
-      var newUser = {};
-      newUser.uid = uid;
-      newUser.name = abbrev + generateGuid().substring(0,7);
-      newUser.acct_type = 'registered';
-      newUser.session_uid = generateGuid();
+      newUserUid = uid;
+      newUserName = abbrev + generateGuid().substring(0,7);
+      newUserAcctType = 'registered';
+      newUserSessionUid = generateGuid();
 
-      var userInsertQuery = 'INSERT INTO users (uid, name, acct_type, session_uid) VALUES ("' +
-        newUser.uid + '", "' +
-        newUser.name + '", "' +
-        newUser.acct_type + '", "' +
-        newUser.session_uid + '");'
-
-      console.log('Querying to register new user.');
-
-      connection.query(userInsertQuery, function(errInsert) {
-        if(errInsert) {
-          responder.respondError(res, 'Problem writing new user to database.');
+      query =
+        'START TRANSACTION; ' +
+          'INSERT INTO users (uid, name, acct_type, session_uid) VALUES (?, ?, ?, ?); ' +
+          'INSERT INTO positions (user_uid, node_uid) VALUES (?, ?);' +
+        'COMMIT;';
+      logMgr.out('Querying to register new user.');
+      logMgr.debug('Query attempt: ' + query);
+      connection.query(query, [newUserUid, newUserName, newUserAcctType, newUserSessionUid, newUserUid, position_uid], function(err) {
+        if(err) {
+          responder.respondError(res, 'Database error writing new user to database.');
+          logMgr.error(err);
           connection.release();
           return;
         }
 
-        console.log('Query to write new user to database complete, trying to set position.');
-
-        var setPosQuery = 'INSERT INTO positions (user_uid, node_uid) VALUES (' + connection.escape(newUser.uid) + ', ' + connection.escape(position_uid) + ');';
-
-        connection.query(setPosQuery, function(errSetPos) {
-          if(errSetPos) {
-            responder.respondError(res, 'Problem writing new user position to database.');
-            connection.release();
-            return;
-          }
-
-          console.log('Successfully registered new registered user!  :)');
-          connection.release();
-          res.cookie('session_uid', newUser.session_uid, constants.cookieExpiry);
-          res.redirect(302, 'http://localhost.cyoag.com:3000/');
-          return;
-        });
+        logMgr.out('Successfully registered new registered user and set initial position.');
+        connection.release();
+        res.cookie(constants.sessionCookie, newUserSessionUid, constants.cookieExpiry);
+        res.redirect(302, 'http://localhost.cyoag.com:3000/');
+        return;
       });
     });
   });
 }
 
 function updateUserSession(uid, res, response) {
-  console.log('Registered user detected, updating session ID . . .');
+  logMgr.out('Attempting to update session ID for current user . . .');
   // Update the user with a new session and respond thusly
-  db.getConnection(function(errGetConn, connectionUpdateSession) {
-    if(errGetConn) {
+  db.getConnection(function(err, connection) {
+    if(err) {
       responder.respondError(res, 'Problem getting a database connection to update registered user session.');
-      connectionUpdateSession.release();
+      connection.release();
       return;
     }
 
-    console.log('Got database connection to update registered user session.');
+    logMgr.out('Got database connection to update registered user session.');
 
     // Create a new user to write to DB
-    var userStatus = {};
-    userStatus.uid = uid;
-    userStatus.session_uid = generateGuid();
+    userUid = uid;
+    sessionUid = generateGuid();
 
-    var userInsertQuery = 'UPDATE users SET session_uid="' +
-      userStatus.session_uid + '" WHERE uid="' +
-      userStatus.uid + '";';
-
-    console.log('Querying to update registered user session ID.');
-
-    connectionUpdateSession.query(userInsertQuery, function(errInsert, rows) {
-      console.log('Registered user session update query attempt complete.');
-      connectionUpdateSession.release();
-      if(errInsert) {
-        responder.respondError(res, 'Problem writing new registered user session ID.');
+    var query = 'UPDATE users SET session_uid=? WHERE uid=?;';
+    logMgr.out('Querying to update registered user session ID.');
+    logMgr.verbose('Query attempted: ' + query);
+    connection.query(query, [sessionUid, userUid], function(err, rows) {
+      if(err) {
+        responder.respondError(res, 'Database error writing updated session ID.');
+        logMgr.error(err);
+        connection.release();
         return;
       }
 
-      console.log('Successfully updated registered user session!');
-      res.cookie('session_uid', userStatus.session_uid, constants.cookieExpiry);
+      logMgr.out('Updated registered user session.');
+      res.cookie(constants.sessionCookie, sessionUid, constants.cookieExpiry);
       res.redirect(302, 'http://localhost.cyoag.com:3000/');
       return;
     });

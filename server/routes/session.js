@@ -14,10 +14,10 @@ app.use(cookieParser());
 /* Endpoint to check if session exists, and if so, whether it is valid, and if so, what to do with it */
 router.post('/', function(req, res, next) {
   if(req.body) {
-    console.log('> > > > > req.body: ' + JSON.stringify(req.body));
+    logMgr.verbose('> > > > > req.body: ' + JSON.stringify(req.body));
   }
   else {
-    console.log('> > > > > no req body');
+    logMgr.verbose('> > > > > no req body');
   }
 
   // If session ID is entirely missing, visitor is here for the first time!
@@ -26,13 +26,13 @@ router.post('/', function(req, res, next) {
   }
   else {
     // If session cookie existed, do simple validation
-    console.log('Session ID found, validating . . .');
+    logMgr.out('Session ID found, validating . . .');
 
     var session_uid = req.cookies.session_uid;
 
     // Get a db connection from the pool
     db.getConnection(function(err, connection) {
-      console.log('Got DB connection from pool to check if any user has this session.');
+      logMgr.verbose('Got DB connection from pool to check if any user has this session.');
       // If there's an error getting DB connection to check users with this session ID
       if(err) {
         responder.respondError(res, 'There was a problem getting a database connection.  Cannot validate session ID.');
@@ -41,10 +41,10 @@ router.post('/', function(req, res, next) {
       }
 
       // Build query and callback to check for users with the current session_uid
-      console.log('Executing query to search for users with the current session_uid.');
+      logMgr.out('Executing query to search for users with the current session_uid.');
 
-      var findSessionUidQuery = 'SELECT * FROM users WHERE session_uid = ' + connection.escape(session_uid) + ';'
-      connection.query(findSessionUidQuery, function(err, rows) {
+      var query = 'SELECT * FROM users WHERE session_uid=?;'
+      connection.query(query, [session_uid], function(err, rows) {
         if(err) {
           responder.respondError(res, 'Problem getting response from database checking session ID.');
           logMgr.error(err);
@@ -55,11 +55,12 @@ router.post('/', function(req, res, next) {
         // If multiple rows were returned, clear all session_uid entries
         // with this value to '0' and clear the current user's cookie
         if(rows.length > 1) {
-          console.log('Found ' + rows.length + ' matching rows.  Removing duplicate session IDs in DB.');
-          var clearDupesQuery = 'UPDATE users SET session_uid="0" WHERE session_uid=' + innerConnection.escape(session_uid) + ';'
-          connection.query(clearDupesQuery, function(innerErr, r) {
-            if(innerErr) {
-              responder.respondError(res, 'Error clearing matching session IDs at the database level.');
+          logMgr.warning('Found ' + rows.length + ' matching rows.  Removing duplicate session IDs in DB.');
+          query = 'UPDATE users SET session_uid="0" WHERE session_uid=?;'
+          connection.query(query, [session_uid], function(err, rows) {
+            if(err) {
+              responder.respondError(res, 'Database error trying to clear duplicate session IDs.');
+              logMgr.error(err);
               connection.release();
               return;
             }
@@ -89,15 +90,10 @@ router.post('/', function(req, res, next) {
               return;
             }
 
-            var navQuery = 'UPDATE positions SET node_uid=' +
-              connection.escape(destination) +
-              ' WHERE user_uid=' +
-              connection.escape(user_uid) +
-              ';';
-
-            connection.query(navQuery, function(err, result) {
+            query = 'UPDATE positions SET node_uid=? WHERE user_uid=?;';
+            connection.query(query, [destination, user_uid], function(err, result) {
               if(err) {
-                responder.respondError(res, 'Error attempting to set new user position in the database: ' + err);
+                responder.respondError(res, 'Database error attempting to set new user position.');
                 logMgr.error(err);
                 connection.release();
                 return;
@@ -141,11 +137,9 @@ router.post('/', function(req, res, next) {
               'SELECT nodes.uid, votes.sentiment AS sentiment ' +
                 'FROM nodes ' +
                   'LEFT JOIN votes ' +
-                    'ON nodes.uid=votes.node_uid ' +
-                      'AND votes.user_uid=' + connection.escape(user_uid) +
-                      ' AND votes.node_uid=' + connection.escape(node_uid) + ' ' +
-                'WHERE nodes.uid=' + connection.escape(node_uid) + ';';
-            connection.query(query, function(error, rows) {
+                    'ON nodes.uid=votes.node_uid AND votes.user_uid=? AND votes.node_uid=? ' +
+                  'WHERE nodes.uid=?;';
+            connection.query(query, [user_uid, node_uid, node_uid], function(error, rows) {
               if(rows.length > 1) {
                 // too many rows back, indicates node duplicity
                 responder.respondError(res, 'More than one vote detected for this user at this node.');
@@ -168,12 +162,11 @@ router.post('/', function(req, res, next) {
                 // begin messy transaction code required by NPM mysql module:
                 //
                 query = 'START TRANSACTION; ' +
-                  'INSERT INTO votes (user_uid, node_uid, sentiment) VALUES (' +
-                  connection.escape(user_uid) + ', ' + connection.escape(node_uid) + ', ' + connection.escape(newValue) + '); ' +
-                  'UPDATE nodes SET votification=votification+' + newValue + ' WHERE uid=' + connection.escape(node_uid) + ';' +
+                  'INSERT INTO votes (user_uid, node_uid, sentiment) VALUES (?, ?, ?); ' +
+                  'UPDATE nodes SET votification=votification+? WHERE uid=?;' +
                   'COMMIT;'
                 logMgr.verbose('Trying vote creation query: ' + query);
-                connection.query(query, function(error, rows) {
+                connection.query(query, [user_uid, node_uid, newValue, newValue, node_uid], function(error, rows) {
                   if(error) {
                     responder.respondMsgOnly(res, {error: 'Database error creating a vote for this user on this node.'});
                     logMgr.error('Database error: ' + error);
@@ -198,12 +191,9 @@ router.post('/', function(req, res, next) {
                 oldValue = row.sentiment;
                 voteValueDiff = newValue - oldValue;
                 query = 'UPDATE votes, nodes ' +
-                  'SET votes.sentiment=' + connection.escape(newValue) + ', ' +
-                    'nodes.votification=nodes.votification+' + connection.escape(voteValueDiff) + ' ' +
-                  'WHERE votes.user_uid=' + connection.escape(user_uid) +
-                    ' AND votes.node_uid=' + connection.escape(node_uid) +
-                    ' AND nodes.uid=' + connection.escape(node_uid) + ';'
-                connection.query(query, function(error, rows) {
+                  'SET votes.sentiment=?, nodes.votification=nodes.votification+? ' +
+                  'WHERE votes.user_uid=? AND votes.node_uid=? AND nodes.uid=?;'
+                connection.query(query, [newValue, voteValueDiff, user_uid, node_uid, node_uid], function(error, rows) {
                   if(error) {
                     responder.respondError(res, 'Database error updating existing vote for this user on this node.');
                     logMgr.error('Database error: ' + error);
@@ -245,52 +235,40 @@ router.get('/logout', function(req, res, next) {
 module.exports = router;
 
 function createNewUser(req, res) {
-  console.log('New visitor!  Attempting to create DB entry . . .');
+  logMgr.out('New visitor!  Attempting to create DB entry . . .');
   // Create new user and write it to the DB
   db.getConnection(function(err, connection) {
     if(err) {
-      responder.respondError(res, 'There was a problem getting a database connection.  New user cannot be created.');
+      responder.respondError(res, 'There was a problem getting a database connection.  New user cannot be created at this time.');
+      logMgr.error(err);
       connection.release();
       return;
     }
 
-    console.log('Got DB connection to create new user.');
+    logMgr.out('Got DB connection to create new user.');
     // Create a new user to write to DB
-    var newUser = {};
-    newUser.uid = generateGuid();
-    newUser.name = 'User_' + newUser.uid.substring(0,10);
-    newUser.acct_type = constants.acctTypeVisitor;
-    newUser.session_uid = generateGuid();
+    newUserUid = generateGuid();
+    newUserName = 'User_' + newUserUid.substring(0,10);
+    newUserAcctType = constants.acctTypeVisitor;
+    newUserSessionUid = generateGuid();
 
-    var userInsertQuery = 'INSERT INTO users (uid, name, acct_type, session_uid) VALUES ("' +
-      newUser.uid + '", "' +
-      newUser.name + '", "' +
-      newUser.acct_type + '", "' +
-      newUser.session_uid + '");'
-
-    connection.query(userInsertQuery, function(errUserQuery) {
-      if(errUserQuery) {
-        responder.respondError(res, 'Problem getting response from database creating new user.');
+    var query =
+      'START TRANSACTION; ' +
+        'INSERT INTO users (uid, name, acct_type, session_uid) VALUES (?, ?, ?, ?);' +
+        'INSERT INTO positions (user_uid, node_uid) VALUES (?, ?);' +
+      'COMMIT;';
+    connection.query(query, [newUserUid, newUserName, newUserAcctType, newUserSessionUid, newUserUid, constants.rootNodeUid], function(err) {
+      if(err) {
+        responder.respondError(res, 'Database error creating new user.');
+        logMgr.error(err);
         connection.release();
         return;
       }
 
-      console.log('Query completed to create user, now setting new user position to "start" node.');
-
-      var positionInsertQuery = 'INSERT INTO positions (user_uid, node_uid) VALUES (' +
-        connection.escape(newUser.uid) + ', ' + connection.escape(constants.rootNodeUid) + ');';
-
-      connection.query(positionInsertQuery, function(errPosQuery) {
-        if(errPosQuery) {
-          responder.respond(res, 'Problem getting response from database setting position of new user.');
-          connection.release();
-          return;
-        }
-
-        responder.respond(res, newUser.session_uid);
-        connection.release();
-        return;
-      });
+      logMgr.out('Query completed to create user and set initial position.');
+      responder.respond(res, newUserSessionUid);
+      connection.release();
+      return;
     });
   });
 }

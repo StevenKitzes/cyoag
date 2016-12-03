@@ -99,13 +99,12 @@ function respond(res, session_uid, msg) {
         'LEFT JOIN votes ' +
           'ON nodes.uid=votes.node_uid AND users.uid=votes.user_uid ' +
       'WHERE ' +
-        'users.session_uid=' + connection.escape(session_uid) + ';'
-    logMgr.debug('Query attempted: ' + query);
-    connection.query(query, function(error, rows) {
+        'users.session_uid=?;'
+    logMgr.verbose('Query attempted: ' + query);
+    connection.query(query, [session_uid], function(error, rows) {
       if(error) {
         // handle any error querying for users with this session ID
-        respondError(res, 'Problem querying database for user status. ' + error);
-        logMgr.error('Database query error trying to get user, position, node, and votification data:');
+        respondError(res, 'Database error querying for user status.');
         logMgr.error(error);
         connection.release();
         return;
@@ -129,9 +128,8 @@ function respond(res, session_uid, msg) {
       // catch any problems thus far and handle them
       if(row.nodeUid == null) {
         // user was found, but couldn't determine position; create user position entry at 'start' and alert the user
-        query = 'INSERT INTO positions (user_uid, node_uid) ' +
-          'VALUES (' + connection.escape(row.userUid) + ', ' + connection.escape('start') + ');';
-        connection.query(query, function(error, rows) {
+        query = 'INSERT INTO positions (user_uid, node_uid) VALUES (?, ?);';
+        connection.query(query, [row.userUid, constants.rootNodeUid], function(error, rows) {
           if(error) {
             // handle any error resetting this user's position
             respondError(res, 'Database error prevented correction of missing user position.');
@@ -148,13 +146,11 @@ function respond(res, session_uid, msg) {
       }
       if(row.parentUid == null) {
         // user position was found, couldn't find node with that uid; reset to 'start' and alert the user
-        query = 'UPDATE positions SET node_uid=' + connection.escape('start') +
-          ' WHERE user_uid=' + connection.escape(row.userUid) + ';';
-        connection.query(query, ['start', row.userUid], function(error, rows) {
+        query = 'UPDATE positions SET node_uid=? WHERE user_uid=?;';
+        connection.query(query, [constants.rootNodeUid, row.userUid], function(error, rows) {
           if(error) {
             // handle any error resetting this user's position
             respondError(res, 'Database error prevented reset of erroneous user position.');
-            logMgr.error('Database query error trying to reset erroneous user position:');
             logMgr.error(error);
             connection.release();
             return;
@@ -187,11 +183,12 @@ function respond(res, session_uid, msg) {
       logMgr.verbose('Votification status: ' + response.votification);
 
       // now get paths out from here by finding the nodes that have this node as a parent
-      var query = 'SELECT uid as pathUid, path_snippet as pathSnippet, votification as pathVotification FROM nodes WHERE parent_uid=' + connection.escape(response.nodeUid) + ';';
-      connection.query(query, function(error, rows) {
+      query =
+        'SELECT uid as pathUid, path_snippet as pathSnippet, votification as pathVotification ' +
+          'FROM nodes WHERE parent_uid=?;';
+      connection.query(query, [response.nodeUid], function(error, rows) {
         if(error) {
-          respondError(res, 'Problem getting information on paths out of node: ' + error);
-          logMgr.error('Database query error trying to paths out from current node:');
+          respondError(res, 'Database error path information from node.');
           logMgr.error(error);
           connection.release();
           return;
@@ -209,7 +206,7 @@ function respond(res, session_uid, msg) {
         }
 
         // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
-        if(response.nodeUid == 'start') {
+        if(response.nodeUid == constants.rootNodeUid) {
           // root node gets special one-off trailing node snippet and trailing path snippet
           response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
           res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
@@ -219,27 +216,23 @@ function respond(res, session_uid, msg) {
         }
         // if we have to do a final db call to get trailing node
         else {
-          var query = 'SELECT node_snippet as trailingSnippet ' +
-            'FROM nodes WHERE uid=' + connection.escape(response.parentUid) + ';';
-          connection.query(query, function(error, rows) {
+          var query = 'SELECT node_snippet as trailingSnippet FROM nodes WHERE uid=?;';
+          connection.query(query, [response.parentUid], function(error, rows) {
             if(error) {
-              respondError(res, 'ERROR: Failed to retrieve trailing node information.');
-              logMgr.error('Database query error trying to get trailing snippet:');
+              respondError(res, 'Database error trying to retrieve information about previous chapter.');
               logMgr.error(error);
               connection.release();
               return;
             }
 
             if(rows.length != 1) {
-              respondError(res, 'ERROR: Found multiple trailing nodes.  Note, this is impossible.');
+              respondError(res, 'Found multiple parent chapters.  Note, this is impossible.  CYOAG dev is fired.');
               connection.release();
               return;
             }
 
             var parent = rows[0];
-
             var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
-
             response.snippet.trailingSnippet = trailingSnippet;
 
             res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
