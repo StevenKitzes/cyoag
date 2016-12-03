@@ -1,54 +1,57 @@
 var db = require('./dbAccess')();
 var generateGuid = require('./utils/uid-gen');
 var responder = require('./responder');
+var logMgr = require('./utils/logger')('socialUtils.js', true);
 
 var constants = require('./constants');
 
 function socialLoginById(user_uid, req, res) {
-  var response = {};
-
   // if this user ID already exists, assign new session ID and redirect to main page
-  console.log('User identified as ' + user_uid + '; checking if this user exists.');
-  db.getConnection(function(errGetConn, connectionCheckUser) {
-    if(errGetConn) {
+  logMgr.out('User identified by UID ' + user_uid + '; checking if this user exists.');
+  db.getConnection(function(err, connection) {
+    if(err) {
       // handle any error getting connection from pool
       responder.respondError(res, 'Problem getting a database connection.  Unable to check user status.');
       return;
     }
 
     // query DB to see if this user already exists
-    var checkUserQuery = 'SELECT * FROM users WHERE uid = ' + connectionCheckUser.escape(user_uid) + ';';
-    connectionCheckUser.query(checkUserQuery, function(errQuery, rows) {
-      connectionCheckUser.release();
-      if(errQuery) {
+    var query = 'SELECT * FROM users WHERE uid=?;';
+    connection.query(query, [user_uid], function(err, rows) {
+      if(err) {
         // handle any error querying for users with this user ID
-        responder.respondError(res, 'Problem querying database for user status.');
+        responder.respondError(res, 'Database error retrieving user status.');
+        logMgr.error(err);
+        connection.release();
         return;
       }
 
       // if no user was registered with this ID, create new user, write it to DB, and respond
       if(rows.length == 0) {
-        console.log('No user found with this ID, creating . . .');
-        registerUser(user_uid, req.cookies.session_uid, res, response);
+        logMgr.out('No registered user found with this ID, creating account . . .');
+        registerUser(user_uid, req.cookies.session_uid, res);
+        connection.release();
         return;
       }
 
       // if a user was found with this ID, just update the session ID, update DB, and respond
       if(rows.length == 1) {
-        console.log('User found, updating session ID . . .');
-        updateUserSession(user_uid, res, response);
+        logMgr.out('Registered user found, updating session ID . . .');
+        updateUserSession(user_uid, res);
+        connection.release();
         return;
       }
 
       // handle some mysterious uncaught Error
-      responder.respondError(res, 'Error: unexpected number of results checking user status on database.');
+      responder.respondError(res, 'Found multiple users with the same session ID.');
+      connection.release();
       return;
     });
   });
 }
 
-function registerUser(uid, session_uid, res, response) {
-  console.log('New registered user!  Attempting to create based on current visitor . . .');
+function registerUser(uid, session_uid, res) {
+  logMgr.out('New registered user!  Attempting to create based on current visitor . . .');
   // Create new user and write it to the DB
   db.getConnection(function(err, connection) {
     if(err) {
@@ -119,7 +122,7 @@ function registerUser(uid, session_uid, res, response) {
   });
 }
 
-function updateUserSession(uid, res, response) {
+function updateUserSession(uid, res) {
   logMgr.out('Attempting to update session ID for current user . . .');
   // Update the user with a new session and respond thusly
   db.getConnection(function(err, connection) {
