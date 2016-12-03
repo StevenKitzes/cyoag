@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var cookieParser = require('cookie-parser');
 
+var logMgr = require('../utils/logger')('session.js', true);
 var constants = require('../constants');
 var db = require('../dbAccess')();
 var generateGuid = require('../utils/uid-gen');
@@ -133,24 +134,45 @@ router.post('/', function(req, res, next) {
                 'WHERE nodes.uid=?;';
             connection.query(query, [user_uid, node_uid, node_uid], function(error, rows) {
               if(rows.length > 1) {
+                // too many rows back, indicates node duplicity
                 responder.respondError(res, 'More than one vote detected for this user at this node.');
                 connection.release();
                 return;
               }
               else if(rows.length == 0) {
+                // zero rows indicates node does not exist, can't vote on non-existent node
                 responder.respondError(res, 'The node being voted on does not exist.  It may have been recently deleted.');
                 connection.release();
                 return;
               }
 
               var row = rows[0];
+
               if(row.sentiment == null) {
-                // node existed, but no vote yet.
+                // node existed so row returned, but no vote on that node for this user
                 // create vote, and don't forget to update node's votification count
+                query = 'START TRANSACTION; ' +
+                  'INSERT INTO votes (user_uid, node_uid, sentiment) VALUES (?, ?, ?); ' +
+                  'UPDATE nodes SET votification=votification+' + newValue + ' WHERE uid=?;' +
+                  'COMMIT;'
+                connection.query(query, [user_uid, node_uid, newValue, node_uid], function(error, rows) {
+                  if(error) {
+                    responder.respondError(res, 'Database error creating a vote for this user on this node.');
+                    logMgr.error('Database error: ' + error);
+                    connection.release();
+                    return;
+                  }
+
+                  res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
+                  res.send(JSON.stringify({
+                    votification: newVote
+                  });
+                  connection.release();
+                  return;
+                });
               }
               else {
-                // vote existed, so instead of creating we will need to update it,
-                // and don't forget to update the node's votification count
+                // node and vote existed, so instead of creating we will need to update both
                 oldValue = row.sentiment;
                 voteValueDiff = newValue - oldValue;
               }
