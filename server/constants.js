@@ -1,8 +1,10 @@
 var constants = {}
 
-constants.acctTypeVisitor = 'visitor';
-constants.acctTypeRegistered = 'registered';
+constants.acctTypeBanned = 'banned';
+constants.acctTypeDeleted = 'deleted';
 constants.acctTypeModerator = 'moderator';
+constants.acctTypeRegistered = 'registered';
+constants.acctTypeVisitor = 'visitor';
 
 // this maxAge value acconts for 2 weeks until expiry
 constants.cookieExpiry = {maxAge: 1209600000, httpOnly: true};
