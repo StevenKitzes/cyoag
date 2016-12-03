@@ -129,8 +129,9 @@ function respond(res, session_uid, msg) {
       // catch any problems thus far and handle them
       if(row.nodeUid == null) {
         // user was found, but couldn't determine position; create user position entry at 'start' and alert the user
-        query = 'INSERT INTO positions (user_uid, node_uid) VALUES (?, ?);';
-        connection.query(query, [row.userUid, 'start'], function(error, rows) {
+        query = 'INSERT INTO positions (user_uid, node_uid) ' +
+          'VALUES (' + connection.escape(row.userUid) + ', ' + connection.escape('start') + ');';
+        connection.query(query, function(error, rows) {
           if(error) {
             // handle any error resetting this user's position
             respondError(res, 'Database error prevented correction of missing user position.');
@@ -147,7 +148,8 @@ function respond(res, session_uid, msg) {
       }
       if(row.parentUid == null) {
         // user position was found, couldn't find node with that uid; reset to 'start' and alert the user
-        query = 'UPDATE positions SET node_uid=? WHERE user_uid=?';
+        query = 'UPDATE positions SET node_uid=' + connection.escape('start') +
+          ' WHERE user_uid=' + connection.escape(row.userUid) + ';';
         connection.query(query, ['start', row.userUid], function(error, rows) {
           if(error) {
             // handle any error resetting this user's position

@@ -24,8 +24,7 @@ var MainComponent = React.createClass({
     context.state = this.state;
     context.logoutRequest = this.logoutRequest;
     context.navigate = this.navigate;
-    context.voteDown = this.voteDown;
-    context.voteUp = this.voteUp;
+    context.votify = this.votify;
 
     var debugStateDisplay = (function(){
       if(config.DEBUG) {
@@ -56,8 +55,7 @@ var MainComponent = React.createClass({
       </div>
     );
   },
-  voteDown: castDownVote,
-  voteUp: castUpVote
+  votify: votify
 });
 
 module.exports = MainComponent;
@@ -115,6 +113,10 @@ function logoutXhrHandler() {
 }
 
 function navigateXhrHandler(nodeUid) {
+  if(nodeUid == null) {
+    logMgr.error('Missing node ID in navigation attempt.');
+    return;
+  }
   logMgr.debug('User attempting to navigate story nodes . . .');
   var xhr = new XMLHttpRequest();
   // xmlHttp.onreadystatechange = () => {...}
@@ -141,32 +143,79 @@ function navigateXhrHandler(nodeUid) {
   xhr.send(xhrPayload);
 }
 
-function castUpVote() {
-  logMgr.debug('Setting votification UP');
-  this.setState({
-    votification: constants.votificationUp
-  });
-}
-function castDownVote() {
-  logMgr.debug('Setting votification DOWN');
-  this.setState({
-    votification: constants.votificationDown
-  });
+function votify(nodeUid, newVote) {
+  if(nodeUid == null || newVote == null) {
+    logMgr.error('Relevant parameters missing in votification call.');
+    return;
+  }
+  logMgr.debug('User attempting to votify a story node . . .');
+  var xhr = new XMLHttpRequest();
+  // xmlHttp.onreadystatechange = () => {...}
+  var properThis = this;
+  xhr.onreadystatechange = function() {
+    if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
+      logMgr.debug('Status 200 (or 304)!');
+      logMgr.verbose('Votification response payload: ' + xhr.responseText);
+      var response = JSON.parse(xhr.responseText);
+      validateVotificationResponse(properThis, response);
+    }
+    else {
+      logMgr.debug('Votification attempt yielded HTTP response status: ' + xhr.status);
+    }
+  }
+  xhr.open('POST', '/session');
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xhr.timeout = 5000;
+  xhr.ontimeout = function() {
+    xhr.abort();
+    properThis.setState({error: 'Server response timed out; unable to detect result of votification attempt.'});
+  }
+  var xhrPayload = JSON.stringify({votify: nodeUid, newVote: newVote});
+  xhr.send(xhrPayload);
 }
 
+function validateVotificationResponse(properThis, response) {
+  if(checkMsgOnly(properThis, response)) {
+    return;
+  }
+
+  logMgr.debug('Attempting to validate votification response from server . . .');
+  if(!response) {
+    // wow... if you don't even get a response, something is nightmarishly wrong
+    var errorMessage = 'Got no valid response object from server whatsoever.';
+    logMgr.error(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
+    return;
+  }
+  if(response.error) {
+    // set an error state based on the returned error
+    logMgr.error(response.error);
+    properThis.setState(getErrorStateObject(response.error));
+    return;
+  }
+  if(
+    !response.hasOwnProperty('votification') ||
+    (response.votification != constants.votificationNone &&
+     response.votification != constants.votificationUp &&
+     response.votification != constants.votificationDown)) {
+    // can't determine votification status; set err, display err content
+    var errorMessage = 'Could not retrieve new votification status from the server.';
+    logMgr.error(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
+    return;
+  }
+  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
+  properThis.setState({
+    votification: response.votification,
+    msg: response.msg ? response.msg : null,
+    warning: response.warning ? response.warning : null,
+    error: response.error ? response.error : null
+  });
+  logMgr.verbose('State was set successfully after validation!');
+  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
+}
 function validateResponse(properThis, response) {
-  // don't do a full response validation if we are told to expect only an alert message
-  if(response.messageOnly) {
-    properThis.setState({
-      msg: null,
-      warning: null,
-      error: null
-    });
-    properThis.setState({
-      msg: response.msg ? response.msg : null,
-      warning: response.warning ? response.warning : null,
-      error: response.error ? response.error : null
-    });
+  if(checkMsgOnly(properThis, response)) {
     return;
   }
 
@@ -262,6 +311,24 @@ function validateResponse(properThis, response) {
   });
   logMgr.verbose('State was set successfully after validation!');
   logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
+}
+function checkMsgOnly(context, response) {
+  // don't do a full response validation if we are told to expect only an alert message
+  if(response.messageOnly) {
+    logMgr.verbose('Got message-only response.');
+    context.setState({
+      msg: null,
+      warning: null,
+      error: null
+    });
+    context.setState({
+      msg: response.msg ? response.msg : null,
+      warning: response.warning ? response.warning : null,
+      error: response.error ? response.error : null
+    });
+    return true;
+  }
+  return false;
 }
 
 function getDefaultStateObject() {

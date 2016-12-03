@@ -31,27 +31,43 @@ var Votification = React.createClass({
     logMgr.verbose('Rendering...');
     var context = this.props.context;
     var upImgPath, downImgPath;
+    var upClickResult, downClickResult;
 
     switch(context.state.votification) {
       case 'up':
         upImgPath = 'images/upLit.png';
         downImgPath = 'images/down.png';
+        upClickResult = constants.votificationNone;
+        downClickResult = constants.votificationDown;
         break;
       case 'down':
         upImgPath = 'images/up.png';
         downImgPath = 'images/downLit.png';
+        upClickResult = constants.votificationUp;
+        downClickResult = constants.votificationNone;
         break;
       default:
         upImgPath = 'images/up.png';
         downImgPath = 'images/down.png';
+        upClickResult = constants.votificationUp;
+        downClickResult = constants.votificationDown;
         break;
+    }
+
+    var voteUp = function() {
+      logMgr.verbose('Client trying to upvote ' + context.state.nodeUid);
+      context.votify(context.state.nodeUid, upClickResult);
+    }
+    var voteDown = function() {
+      logMgr.verbose('Client trying to downvote ' + context.state.nodeUid);
+      context.votify(context.state.nodeUid, downClickResult);
     }
 
     return (
       <div id='cyoag-votification-container'>
         <h4>How did you like this chapter?</h4>
-        <a href='#'><img id='cyoag-upvote-button' onClick={context.voteUp} src={upImgPath} /></a>
-        <a href='#'><img id='cyoag-downvote-button' onClick={context.voteDown} src={downImgPath} /></a>
+        <a href='#'><img id='cyoag-upvote-button' onClick={voteUp} src={upImgPath} /></a>
+        <a href='#'><img id='cyoag-downvote-button' onClick={voteDown} src={downImgPath} /></a>
       </div>
     );
   }

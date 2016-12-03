@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var cookieParser = require('cookie-parser');
 
+var logMgr = require('../utils/logger')('session.js', true);
 var constants = require('../constants');
 var db = require('../dbAccess')();
 var generateGuid = require('../utils/uid-gen');
@@ -35,6 +36,7 @@ router.post('/', function(req, res, next) {
       // If there's an error getting DB connection to check users with this session ID
       if(err) {
         responder.respondError(res, 'There was a problem getting a database connection.  Cannot validate session ID.');
+        logMgr.error(err);
         return;
       }
 
@@ -45,6 +47,7 @@ router.post('/', function(req, res, next) {
       connection.query(findSessionUidQuery, function(err, rows) {
         if(err) {
           responder.respondError(res, 'Problem getting response from database checking session ID.');
+          logMgr.error(err);
           connection.release();
           return;
         }
@@ -76,7 +79,8 @@ router.post('/', function(req, res, next) {
 
         // If one row was returned...
         else if(rows.length == 1) {
-          var user_uid = rows[0]['uid'];
+          var userRow = rows[0];
+          var user_uid = userRow['uid'];
           if(req.body.hasOwnProperty('navigate')) {
             var destination = req.body.navigate;
             if(destination==constants.defaultParentUid) {
@@ -94,6 +98,7 @@ router.post('/', function(req, res, next) {
             connection.query(navQuery, function(err, result) {
               if(err) {
                 responder.respondError(res, 'Error attempting to set new user position in the database: ' + err);
+                logMgr.error(err);
                 connection.release();
                 return;
               }
@@ -101,6 +106,121 @@ router.post('/', function(req, res, next) {
               responder.respond(res, session_uid);
               connection.release();
               return;
+            });
+          }
+          else if(req.body.hasOwnProperty('votify')) {
+            // start with extra validation that this user is allowed to votify!
+            if(userRow['acct_type'] == constants.acctTypeVisitor) {
+              responder.respondMsgOnly(res, {warning: 'Unregistered visitors may not participate in votification!'});
+              connection.release();
+              return;
+            }
+
+            var node_uid = req.body.votify;
+            var newVote = req.body.newVote;
+
+            var oldValue, newValue, voteValueDiff;
+            switch(newVote) {
+              case constants.votificationDown:
+                newValue = -1;
+                break;
+              case constants.votificationNone:
+                newValue = 0;
+                break;
+              case constants.votificationUp:
+                newValue = 1;
+                break;
+              default:
+                responder.respondError(res, 'Illegal votification value for old vote.');
+                connection.release();
+                return;
+            }
+
+            // now we will have to query the DB to learn if we must update existing votes, or create a new row
+            var query =
+              'SELECT nodes.uid, votes.sentiment AS sentiment ' +
+                'FROM nodes ' +
+                  'LEFT JOIN votes ' +
+                    'ON nodes.uid=votes.node_uid ' +
+                      'AND votes.user_uid=' + connection.escape(user_uid) +
+                      ' AND votes.node_uid=' + connection.escape(node_uid) + ' ' +
+                'WHERE nodes.uid=' + connection.escape(node_uid) + ';';
+            connection.query(query, function(error, rows) {
+              if(rows.length > 1) {
+                // too many rows back, indicates node duplicity
+                responder.respondError(res, 'More than one vote detected for this user at this node.');
+                connection.release();
+                return;
+              }
+              else if(rows.length == 0) {
+                // zero rows indicates node does not exist, can't vote on non-existent node
+                responder.respondError(res, 'The node being voted on does not exist.  It may have been recently deleted.');
+                connection.release();
+                return;
+              }
+
+              var row = rows[0];
+
+              if(row.sentiment == null) {
+                // node existed so row returned, but no vote on that node for this user
+                // create vote, and don't forget to update node's votification count
+
+                // begin messy transaction code required by NPM mysql module:
+                //
+                query = 'START TRANSACTION; ' +
+                  'INSERT INTO votes (user_uid, node_uid, sentiment) VALUES (' +
+                  connection.escape(user_uid) + ', ' + connection.escape(node_uid) + ', ' + connection.escape(newValue) + '); ' +
+                  'UPDATE nodes SET votification=votification+' + newValue + ' WHERE uid=' + connection.escape(node_uid) + ';' +
+                  'COMMIT;'
+                logMgr.verbose('Trying vote creation query: ' + query);
+                connection.query(query, function(error, rows) {
+                  if(error) {
+                    responder.respondMsgOnly(res, {error: 'Database error creating a vote for this user on this node.'});
+                    logMgr.error('Database error: ' + error);
+                    connection.release();
+                    return;
+                  }
+
+                  res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
+                  res.send(
+                    JSON.stringify({
+                      votification: newVote
+                    })
+                  );
+                  connection.release();
+                  return;
+                });
+                //
+                // end messy transaction code required by NPM mysql module:
+              }
+              else {
+                // node and vote existed, so instead of creating we will need to update both
+                oldValue = row.sentiment;
+                voteValueDiff = newValue - oldValue;
+                query = 'UPDATE votes, nodes ' +
+                  'SET votes.sentiment=' + connection.escape(newValue) + ', ' +
+                    'nodes.votification=nodes.votification+' + connection.escape(voteValueDiff) + ' ' +
+                  'WHERE votes.user_uid=' + connection.escape(user_uid) +
+                    ' AND votes.node_uid=' + connection.escape(node_uid) +
+                    ' AND nodes.uid=' + connection.escape(node_uid) + ';'
+                connection.query(query, function(error, rows) {
+                  if(error) {
+                    responder.respondError(res, 'Database error updating existing vote for this user on this node.');
+                    logMgr.error('Database error: ' + error);
+                    connection.release();
+                    return;
+                  }
+
+                  res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
+                  res.send(
+                    JSON.stringify({
+                      votification: newVote
+                    })
+                  );
+                  connection.release();
+                  return;
+                });
+              }
             });
           }
           else {
@@ -114,6 +234,7 @@ router.post('/', function(req, res, next) {
     });
   }
 });
+// whew
 
 /* Endpoint to log a user out from a social account */
 router.get('/logout', function(req, res, next) {
