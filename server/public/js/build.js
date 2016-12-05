@@ -22312,7 +22312,7 @@
 	}
 	
 	function validateVotificationResponse(properThis, response) {
-	  if (checkMsgOnly(properThis, response)) {
+	  if (validateMessageResponse(properThis, response)) {
 	    return;
 	  }
 	
@@ -22348,7 +22348,7 @@
 	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 	}
 	function validateResponse(properThis, response) {
-	  if (checkMsgOnly(properThis, response)) {
+	  if (validateMessageResponse(properThis, response)) {
 	    return;
 	  }
 	
@@ -22422,6 +22422,20 @@
 	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
+	  if (!response.hasOwnProperty('inputBlocking')) {
+	    // no verification of current node's authorship, set error state and display error content
+	    var errorMessage = 'Could not retrieve input permissions from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.inputBlocking.hasOwnProperty('top') || !response.inputBlocking.hasOwnProperty('side')) {
+	    // path authorship information missing, set error state and display error content
+	    var errorMessage = 'Path authorship details were missing in response from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
 	  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
 	  properThis.setState({
 	    nodeUid: response.nodeUid,
@@ -22431,6 +22445,7 @@
 	    votification: response.votification,
 	    snippet: response.snippet,
 	    paths: response.paths,
+	    inputBlocking: response.inputBlocking,
 	    msg: response.msg ? response.msg : null,
 	    warning: response.warning ? response.warning : null,
 	    error: response.error ? response.error : null
@@ -22438,7 +22453,7 @@
 	  logMgr.verbose('State was set successfully after validation!');
 	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 	}
-	function checkMsgOnly(context, response) {
+	function validateMessageResponse(context, response) {
 	  // don't do a full response validation if we are told to expect only an alert message
 	  if (response.messageOnly) {
 	    logMgr.verbose('Got message-only response.');
@@ -22470,6 +22485,7 @@
 	      nodeSnippet: constants.defaultNodeSnippet
 	    },
 	    paths: [],
+	    inputBlocking: constants.inputBlockingHide,
 	    msg: null,
 	    warning: null,
 	    error: null
@@ -22489,6 +22505,7 @@
 	      nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage
 	    },
 	    paths: [],
+	    inputBlocking: constants.inputBlockingHide,
 	    msg: null,
 	    warning: null,
 	    error: errorMessage
@@ -22545,6 +22562,8 @@
 	constants.errorLastPath = 'The developer makes a horrible mistake.';
 	constants.errorNodeSnippet = 'It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, ' +
 	  'you might ask ... ?  Well, let me tell you!';
+	
+	constants.inputBlockingHide = 'hide';
 	
 	constants.messageRegularClass = 'cyoag-regular-message';
 	constants.messageWarningClass = 'cyoag-warning-message';
@@ -22817,6 +22836,7 @@
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 179);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 180);
 	var PathComponents = __webpack_require__(/*! ./PathComponents */ 182);
+	var InputComponents = __webpack_require__(/*! ./InputComponents */ 185);
 	
 	var exports = {};
 	
@@ -22836,12 +22856,22 @@
 	      votificationComponent = React.createElement(VotificationComponents.BegLogin, { context: context });
 	    }
 	
+	    var inputComponent;
+	    if (context.state.acctType == constants.acctTypeVisitor || context.state.inputBlocking == constants.inputBlockingHide) {
+	      inputComponent = React.createElement(InputComponents.Hidden, null);
+	    } else if (context.state.inputBlocking.top || context.state.inputBlocking.side) {
+	      inputComponent = React.createElement(InputComponents.Blocked, { blocking: context.state.inputBlocking });
+	    } else {
+	      inputComponent = React.createElement(InputComponents.Input, null);
+	    }
+	
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-main-column' },
 	      React.createElement(NodeComponents.Node, { context: context }),
 	      votificationComponent,
-	      React.createElement(PathComponents.Paths, { context: context })
+	      React.createElement(PathComponents.Paths, { context: context }),
+	      inputComponent
 	    );
 	  }
 	});
@@ -23110,7 +23140,7 @@
 	
 	var exports = {};
 	
-	// Facebook login button component
+	// Dynamically generated paths if available component
 	var Paths = React.createClass({
 	  displayName: 'Paths',
 	
@@ -23128,7 +23158,7 @@
 	      return React.createElement(
 	        'div',
 	        { id: 'cyoag-path-list' },
-	        'No paths yet lead from this chapter.  Create your own...?'
+	        'No paths yet lead from this chapter.'
 	      );
 	    } else {
 	      return React.createElement(
@@ -23299,6 +23329,126 @@
 	});
 	
 	exports.Footer = Footer;
+	
+	module.exports = exports;
+
+/***/ },
+/* 185 */
+/*!********************************************!*\
+  !*** ./build-source/js/InputComponents.js ***!
+  \********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('PathComponents.js');
+	
+	var exports = {};
+	
+	// Display an empty div when prompted
+	var Hidden = React.createClass({
+	  displayName: 'Hidden',
+	
+	  render: function () {
+	    return React.createElement('div', { id: 'cyoag-input-container' });
+	  }
+	});
+	
+	// Display an appropriate message when the user is forbidden by rules from input
+	var Blocked = React.createClass({
+	  displayName: 'Blocked',
+	
+	  render: function () {
+	    if (this.props.blocking.top && this.props.blocking.side) {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-input-container' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-input-blocked-message' },
+	          '(You may not add paths to your own chapters, or chapters that you have already added paths to!)'
+	        )
+	      );
+	    } else if (this.props.blocking.top) {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-input-container' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-input-blocked-message' },
+	          '(You may not add paths to your own chapters!)'
+	        )
+	      );
+	    } else {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-input-container' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-input-blocked-message' },
+	          '(You may not add multiple paths to the same chapter!)'
+	        )
+	      );
+	    }
+	  }
+	});
+	
+	// Display input fields and simple directions so users know how to contribute
+	var Input = React.createClass({
+	  displayName: 'Input',
+	
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-input-container' },
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-input-cta' },
+	        React.createElement(
+	          'em',
+	          null,
+	          'Want to add your own content following this chapter?'
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-input-path-container' },
+	        'Enter the path teaser text that will entice people to choose your new chapter:',
+	        React.createElement('br', null),
+	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', placeholder: 'Path snippet' }),
+	        React.createElement('br', null),
+	        React.createElement(
+	          'div',
+	          { className: 'cyoag-resize-input-hint' },
+	          'Drag to resize! ^'
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-input-body-container' },
+	        'Enter the body of your new chapter:',
+	        React.createElement('br', null),
+	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', placeholder: 'Chapter content' }),
+	        React.createElement(
+	          'div',
+	          { className: 'cyoag-resize-input-hint' },
+	          'Drag to resize! ^'
+	        )
+	      ),
+	      React.createElement(
+	        'button',
+	        { id: 'cyoag-input-submit' },
+	        'Submit'
+	      )
+	    );
+	  }
+	});
+	
+	exports.Hidden = Hidden;
+	exports.Blocked = Blocked;
+	exports.Input = Input;
 	
 	module.exports = exports;
 

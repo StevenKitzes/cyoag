@@ -6,7 +6,7 @@ var logMgr = require('../../utils/logger')('PathComponents.js');
 
 var exports = {};
 
-// Facebook login button component
+// Dynamically generated paths if available component
 var Paths = React.createClass({
   navigate: function(navElementUid) {
     var destinationUid = navElementUid.substring(5);
@@ -20,7 +20,7 @@ var Paths = React.createClass({
 
     if(paths.length == 0) {
       return (
-        <div id='cyoag-path-list'>No paths yet lead from this chapter.  Create your own...?</div>
+        <div id='cyoag-path-list'>No paths yet lead from this chapter.</div>
       );
     }
     else {

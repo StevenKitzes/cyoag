@@ -285,6 +285,46 @@ div {
   display: block;
 }
 
+#cyoag-input-container {
+  background-color: white;
+  border-style: solid;
+  border-width: medium;
+  border-radius: 2em;
+  border-color: blue;
+  margin: 1em auto;
+  padding: 0.01em 1em 1em 1em; /* 0.01em top is because this element interacts weird with <p> */
+  width: 75%;
+}
+#cyoag-input-container textarea {
+  border-radius: 1em;
+  padding-top: 0.1em;
+  padding-right: 0.5em;
+  padding-left: 0.5em;
+  resize: vertical;
+}
+#cyoag-input-container textarea:focus {
+  outline: none !important;
+}
+
+#cyoag-input-path {
+  min-height: 2em;
+  max-height: 4em;
+  width: 85%;
+}
+#cyoag-input-body {
+  min-height: 3em;
+  max-height: 20em;
+  width: 85%;
+}
+
+.cyoag-resize-input-hint {
+  color: #BBBBBB;
+  font-size: 0.8em;
+  margin: 0 auto;
+  text-align: right;
+  width: 85%;
+}
+
 #cyoag-footer-container {
   clear: both;
 }

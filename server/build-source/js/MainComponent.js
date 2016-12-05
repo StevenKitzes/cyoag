@@ -175,7 +175,7 @@ function votify(nodeUid, newVote) {
 }
 
 function validateVotificationResponse(properThis, response) {
-  if(checkMsgOnly(properThis, response)) {
+  if(validateMessageResponse(properThis, response)) {
     return;
   }
 
@@ -215,7 +215,7 @@ function validateVotificationResponse(properThis, response) {
   logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 }
 function validateResponse(properThis, response) {
-  if(checkMsgOnly(properThis, response)) {
+  if(validateMessageResponse(properThis, response)) {
     return;
   }
 
@@ -296,6 +296,22 @@ function validateResponse(properThis, response) {
     properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
+  if(!response.hasOwnProperty('inputBlocking')) {
+    // no verification of current node's authorship, set error state and display error content
+    var errorMessage = 'Could not retrieve input permissions from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
+    return;
+  }
+  if(
+    !response.inputBlocking.hasOwnProperty('top') ||
+    !response.inputBlocking.hasOwnProperty('side')) {
+    // path authorship information missing, set error state and display error content
+    var errorMessage = 'Path authorship details were missing in response from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
+    return;
+  }
   logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
   properThis.setState({
     nodeUid: response.nodeUid,
@@ -305,6 +321,7 @@ function validateResponse(properThis, response) {
     votification: response.votification,
     snippet: response.snippet,
     paths: response.paths,
+    inputBlocking: response.inputBlocking,
     msg: response.msg ? response.msg : null,
     warning: response.warning ? response.warning : null,
     error: response.error ? response.error : null
@@ -312,7 +329,7 @@ function validateResponse(properThis, response) {
   logMgr.verbose('State was set successfully after validation!');
   logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 }
-function checkMsgOnly(context, response) {
+function validateMessageResponse(context, response) {
   // don't do a full response validation if we are told to expect only an alert message
   if(response.messageOnly) {
     logMgr.verbose('Got message-only response.');
@@ -344,6 +361,7 @@ function getDefaultStateObject() {
       nodeSnippet: constants.defaultNodeSnippet
     },
     paths: [],
+    inputBlocking: constants.inputBlockingHide,
     msg: null,
     warning: null,
     error: null
@@ -363,6 +381,7 @@ function getErrorStateObject(errorMessage) {
       nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage
     },
     paths: [],
+    inputBlocking: constants.inputBlockingHide,
     msg: null,
     warning: null,
     error: errorMessage

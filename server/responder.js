@@ -56,6 +56,9 @@ function respondMsgOnly(res, msg, sessionReset) {
 function respond(res, session_uid, msg) {
   var response = {};
   response.snippet = {};
+  response.inputBlocking = {};
+  response.inputBlocking.top = false; // "top block" i.e. blocked by parent
+  response.inputBlocking.side = false; // "side block" i.e. blocked by sibling
 
   // handle any messaging
   if(msg) {
@@ -90,6 +93,7 @@ function respond(res, session_uid, msg) {
         'nodes.node_snippet as nodeSnippet, ' +
         'nodes.path_snippet as pathSnippet, ' +
         'nodes.parent_uid as parentUid, ' +
+        'nodes.author_uid as authorUid, ' +
         'votes.sentiment as sentiment ' +
       'FROM users ' +
         'LEFT JOIN positions ' +
@@ -139,7 +143,7 @@ function respond(res, session_uid, msg) {
             return;
           }
 
-          respond(res, session_uid, {warning: 'User position was lost due to an error!  I apologize.  You are being returned to the start of the story.'});
+          respond(res, session_uid, {warning: 'User position was lost due to an error.  You are being returned to the start of the story.'});
           connection.release();
         });
         return;
@@ -180,11 +184,11 @@ function respond(res, session_uid, msg) {
           response.votification = constants.votificationNone;
           break;
       }
-      logMgr.verbose('Votification status: ' + response.votification);
+      response.inputBlocking.top = (row.userUid == row.authorUid) ? true : false;
 
       // now get paths out from here by finding the nodes that have this node as a parent
       query =
-        'SELECT uid as pathUid, path_snippet as pathSnippet, votification as pathVotification ' +
+        'SELECT uid as pathUid, author_uid as authorUid, path_snippet as pathSnippet, votification as pathVotification ' +
           'FROM nodes WHERE parent_uid=?;';
       connection.query(query, [response.nodeUid], function(error, rows) {
         if(error) {
@@ -196,13 +200,14 @@ function respond(res, session_uid, msg) {
 
         // for each row, with no-rows-returned being a legal state
         response.paths = [];
-        for(var row = 0; row < rows.length; row++) {
+        for(var i = 0; i < rows.length; i++) {
           var path = {
-            pathUid: rows[row].pathUid,
-            pathSnippet: rows[row].pathSnippet,
-            pathVotification: rows[row].pathVotification
+            pathUid: rows[i].pathUid,
+            pathSnippet: rows[i].pathSnippet,
+            pathVotification: rows[i].pathVotification
           };
           response.paths.push(path);
+          response.inputBlocking.side = (row.userUid == rows[i].authorUid) ? true : false;
         }
 
         // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)

@@ -7,6 +7,7 @@ var logMgr = require('../../utils/logger')('MainColumnComponents.js');
 var NodeComponents = require('./NodeComponents');
 var VotificationComponents = require('./VotificationComponents');
 var PathComponents = require('./PathComponents');
+var InputComponents = require('./InputComponents');
 
 var exports = {};
 
@@ -25,11 +26,23 @@ var MainColumn = React.createClass({
       votificationComponent = <VotificationComponents.BegLogin context={context} />;
     }
 
+    var inputComponent;
+    if(context.state.acctType == constants.acctTypeVisitor || context.state.inputBlocking == constants.inputBlockingHide) {
+      inputComponent = <InputComponents.Hidden />
+    }
+    else if(context.state.inputBlocking.top || context.state.inputBlocking.side) {
+      inputComponent = <InputComponents.Blocked blocking={context.state.inputBlocking} />
+    }
+    else {
+      inputComponent = <InputComponents.Input />
+    }
+
     return(
       <div id='cyoag-main-column'>
         <NodeComponents.Node context={context} />
         {votificationComponent}
         <PathComponents.Paths context={context} />
+        {inputComponent}
       </div>
     );
   }
