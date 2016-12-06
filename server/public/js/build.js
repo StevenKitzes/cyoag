@@ -23081,7 +23081,7 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { className: 'cyoag-fb-login inline-block' },
+	      { className: 'cyoag-fb-login cyoag-inline-block' },
 	      React.createElement(
 	        'a',
 	        { className: 'cyoag-link', href: '/fb/login' },
@@ -23098,7 +23098,7 @@
 	  render: function () {
 	    return React.createElement(
 	      'div',
-	      { className: 'cyoag-tw-button inline-block' },
+	      { className: 'cyoag-tw-button cyoag-inline-block' },
 	      React.createElement(
 	        'a',
 	        { className: 'cyoag-link', href: '/tw/login' },
@@ -23222,7 +23222,7 @@
 	  displayName: 'Hidden',
 	
 	  render: function () {
-	    return React.createElement('div', { id: 'cyoag-input-container' });
+	    return React.createElement('div', { id: 'cyoag-input-container', className: 'cyoag-hidden' });
 	  }
 	});
 	

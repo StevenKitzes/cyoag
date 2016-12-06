@@ -197,13 +197,14 @@ function respond(res, session_uid, msg) {
 
         // for each row, with no-rows-returned being a legal state
         response.paths = [];
-        for(var row = 0; row < rows.length; row++) {
+        for(var i = 0; i < rows.length; i++) {
           var path = {
-            pathUid: rows[row].pathUid,
-            pathSnippet: rows[row].pathSnippet,
-            pathVotification: rows[row].pathVotification
+            pathUid: rows[i].pathUid,
+            pathSnippet: rows[i].pathSnippet,
+            pathVotification: rows[i].pathVotification
           };
           response.paths.push(path);
+          response.inputBlocking.side = (row.userUid == rows[i].authorUid) ? true : false;
         }
 
         // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
@@ -253,6 +254,9 @@ function visitorResponse(res, node_uid, msg) {
   logMgr.verbose('Beginning visitor response . . .');
   var response = {};
   response.snippet = {};
+  response.inputBlocking = {};
+  response.inputBlocking.top = false; // "top block" i.e. blocked by parent
+  response.inputBlocking.side = false; // "side block" i.e. blocked by sibling
 
   // handle any messaging
   if(msg) {
@@ -332,14 +336,13 @@ function visitorResponse(res, node_uid, msg) {
             pathVotification: rows[i].pathVotification
           };
           response.paths.push(path);
-          response.inputBlocking.side = (row.userUid == rows[i].authorUid) ? true : false;
         }
 
         // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
         if(response.nodeUid == constants.rootNodeUid) {
           // root node gets special one-off trailing node snippet and trailing path snippet
           response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
-          
+
           res.clearCookie(constants.cookieSession);
           res.cookie(constants.cookieNode, node_uid, constants.cookieExpiry);
           res.send(JSON.stringify(response));

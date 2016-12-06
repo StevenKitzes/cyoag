@@ -21,8 +21,11 @@ div {
   color: #0077AA;
   text-decoration: none;
 }
+.cyoag-hidden {
+  display: none;
+}
 
-.inline-block {
+.cyoag-inline-block {
   display: inline-block;
 }
 

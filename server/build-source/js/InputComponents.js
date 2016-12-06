@@ -10,7 +10,7 @@ var exports = {};
 var Hidden = React.createClass({
   render: function() {
     return (
-      <div id='cyoag-input-container'></div>
+      <div id='cyoag-input-container' className='cyoag-hidden'></div>
     );
   }
 });

@@ -12,21 +12,20 @@ parent_uid VARCHAR(40),
 author_uid VARCHAR(40),
 path_snippet VARCHAR(100),
 node_snippet VARCHAR(2000),
-votification INTEGER
+votification INTEGER,
+INDEX (parent_uid)
 );
 
 CREATE TABLE IF NOT EXISTS positions (
-user_uid VARCHAR(40),
-node_uid VARCHAR(40),
-PRIMARY KEY (user_uid)
+user_uid VARCHAR(40) UNIQUE PRIMARY KEY,
+node_uid VARCHAR(40)
 );
 
 CREATE TABLE IF NOT EXISTS votes (
 voter_uid VARCHAR(40),
 node_uid VARCHAR(40),
 sentiment TINYINT,
-PRIMARY KEY (voter_uid, node_uid),
-INDEX (node_uid)
+PRIMARY KEY (voter_uid, node_uid)
 );
 
 INSERT INTO users (uid, name, acct_type, session_uid) VALUES ('', 'Steverino', 'moderator', '0');
