@@ -45,10 +45,12 @@ var MarginLogin = React.createClass({
 // Margin logout button set component
 var MarginLogout = React.createClass({
   render: function() {
+    var htmlUserName = this.props.userName;
+    htmlUserName = htmlUserName.replace('-', '\u2011');
     return (
       <div id='cyoag-margin-login-container'>
         <h4>Logged in!</h4>
-        <p>Welcome, {this.props.userName}!</p>
+        <p>Welcome, {htmlUserName}!</p>
         <SocialLoginButtonComponents.LogoutButton logoutRequest={this.props.logoutRequest} />
       </div>
     );

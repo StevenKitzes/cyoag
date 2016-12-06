@@ -22544,6 +22544,8 @@
 	
 	// this maxAge value acconts for 2 weeks until expiry
 	constants.cookieExpiry = {maxAge: 1209600000, httpOnly: true};
+	constants.cookieNode = 'node_uid';
+	constants.cookieSession = 'session_uid';
 	
 	constants.defaultNodeUid = 'default';
 	constants.defaultParentUid = '00000000000000-0000000000-00000000000000';
@@ -22578,9 +22580,9 @@
 	constants.rootTrailingSnippet = '... a cold wind blows.';
 	constants.rootLastPath = 'The writer takes up his pen.';
 	
-	constants.sessionCookie = 'session_uid';
-	
 	constants.trailingSnippetLength = 200;
+	
+	constants.visitorName = 'Illustrious Visitor';
 	
 	constants.votificationNone = 'none';
 	constants.votificationUp = 'up';
@@ -23380,6 +23382,8 @@
 	  displayName: 'MarginLogout',
 	
 	  render: function () {
+	    var htmlUserName = this.props.userName;
+	    htmlUserName = htmlUserName.replace('-', '\u2011');
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-margin-login-container' },
@@ -23392,7 +23396,7 @@
 	        'p',
 	        null,
 	        'Welcome, ',
-	        this.props.userName,
+	        htmlUserName,
 	        '!'
 	      ),
 	      React.createElement(SocialLoginButtonComponents.LogoutButton, { logoutRequest: this.props.logoutRequest })

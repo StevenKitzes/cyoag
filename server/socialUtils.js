@@ -11,7 +11,7 @@ function socialLoginById(user_uid, req, res) {
   db.getConnection(function(err, connection) {
     if(err) {
       // handle any error getting connection from pool
-      responder.respondError(res, 'Problem getting a database connection.  Unable to check user status.');
+      responder.respondError(res, 'Problem getting a database connection.  Unable to check user status at this time.');
       return;
     }
 
@@ -29,7 +29,7 @@ function socialLoginById(user_uid, req, res) {
       // if no user was registered with this ID, create new user, write it to DB, and respond
       if(rows.length == 0) {
         logMgr.out('No registered user found with this ID, creating account . . .');
-        registerUser(user_uid, req.cookies.session_uid, res);
+        registerUser(user_uid, (req.cookies.node_uid ? req.cookies.node_uid : constants.rootNodeUid), res);
         connection.release();
         return;
       }
@@ -43,15 +43,15 @@ function socialLoginById(user_uid, req, res) {
       }
 
       // handle some mysterious uncaught Error
-      responder.respondError(res, 'Found multiple users with the same session ID.');
+      responder.respondError(res, 'Found multiple users with the same user ID.  Aborting operation.');
       connection.release();
       return;
     });
   });
 }
 
-function registerUser(uid, session_uid, res) {
-  logMgr.out('New registered user!  Attempting to create based on current visitor . . .');
+function registerUser(uid, node_uid, res) {
+  logMgr.out('New registered user!  Attempting to create based on current visitor position . . .');
   // Create new user and write it to the DB
   db.getConnection(function(err, connection) {
     if(err) {
@@ -61,64 +61,38 @@ function registerUser(uid, session_uid, res) {
 
     logMgr.out('Got database connection to register new user.');
 
-    // the first thing to do is get the position of the current session
-    var query =
-      'SELECT positions.node_uid ' +
-        'FROM positions ' +
-          'INNER JOIN users ' +
-            'ON users.uid=positions.user_uid ' +
-        'WHERE users.session_uid=?;';
-    connection.query(query, [session_uid], function(err, rows) {
+    // figure out what type of social account this is going to be
+    var abbrev = uid.substring(0,3);
+
+    // Create a new user to write to DB
+    newUserUid = uid;
+    newUserName = abbrev + generateGuid().substring(0,13);
+    newUserAcctType = 'registered';
+    newUserSessionUid = generateGuid();
+
+    query =
+      'START TRANSACTION; ' +
+        'INSERT INTO users (uid, name, acct_type, session_uid) VALUES (?, ?, ?, ?); ' +
+        'INSERT INTO positions (user_uid, node_uid) VALUES (?, ?);' +
+      'COMMIT;';
+    logMgr.out('Querying to register new user.');
+    logMgr.debug('Query attempt: ' + query);
+    connection.query(query, [newUserUid, newUserName, newUserAcctType, newUserSessionUid, newUserUid, node_uid], function(err) {
       if(err) {
-        responder.respondError(res, 'Database error getting current session position.');
+        responder.respondError(res, 'Database error writing new user to database.');
         logMgr.error(err);
         connection.release();
         return;
       }
-      if(rows.length == 0) {
-        responder.respondError(res, 'Found no results for current session position!');
-        connection.release();
-        return;
-      }
-      if(rows.length > 1) {
-        responder.respondError(res, 'Found multiple results for current session position.');
-        connection.release();
-        return;
-      }
 
-      var position_uid = rows[0]['node_uid'];
-
-      // figure out what type of social account this is going to be
-      var abbrev = uid.substring(0,3);
-
-      // Create a new user to write to DB
-      newUserUid = uid;
-      newUserName = abbrev + generateGuid().substring(0,7);
-      newUserAcctType = 'registered';
-      newUserSessionUid = generateGuid();
-
-      query =
-        'START TRANSACTION; ' +
-          'INSERT INTO users (uid, name, acct_type, session_uid) VALUES (?, ?, ?, ?); ' +
-          'INSERT INTO positions (user_uid, node_uid) VALUES (?, ?);' +
-        'COMMIT;';
-      logMgr.out('Querying to register new user.');
-      logMgr.debug('Query attempt: ' + query);
-      connection.query(query, [newUserUid, newUserName, newUserAcctType, newUserSessionUid, newUserUid, position_uid], function(err) {
-        if(err) {
-          responder.respondError(res, 'Database error writing new user to database.');
-          logMgr.error(err);
-          connection.release();
-          return;
-        }
-
-        logMgr.out('Successfully registered new registered user and set initial position.');
-        connection.release();
-        res.cookie(constants.sessionCookie, newUserSessionUid, constants.cookieExpiry);
-        res.redirect(302, 'http://localhost.cyoag.com:3000/');
-        return;
-      });
+      logMgr.out('Successfully registered new registered user and set initial position.');
+      connection.release();
+      res.clearCookie(constants.cookieNode);
+      res.cookie(constants.cookieSession, newUserSessionUid, constants.cookieExpiry);
+      res.redirect(302, 'http://localhost.cyoag.com:3000/');
+      return;
     });
+
   });
 }
 
@@ -150,7 +124,8 @@ function updateUserSession(uid, res) {
       }
 
       logMgr.out('Updated registered user session.');
-      res.cookie(constants.sessionCookie, sessionUid, constants.cookieExpiry);
+      res.clearCookie(constants.cookieNode);
+      res.cookie(constants.cookieSession, sessionUid, constants.cookieExpiry);
       res.redirect(302, 'http://localhost.cyoag.com:3000/');
       return;
     });
