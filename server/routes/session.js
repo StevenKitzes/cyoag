@@ -20,14 +20,49 @@ router.post('/', function(req, res, next) {
     logMgr.verbose('> > > > > no req body');
   }
 
-  // If session ID is entirely missing, visitor is here for the first time!
-  if (!req.cookies.session_uid || req.cookies.session_uid == '') {
-    createNewUser(req, res);
+  if(req.cookies) {
+    logMgr.verbose('> > > > > req.cookies: ' + JSON.stringify(req.cookies));
   }
   else {
-    // If session cookie existed, do simple validation
-    logMgr.out('Session ID found, validating . . .');
+    logMgr.verbose('> > > > > no req cookies');
+  }
 
+  // If we don't see a session ID or a node ID in the cookie, a new visitor is here for the first time!
+  if(!req.cookies.session_uid && !req.cookies.node_uid) {
+    logMgr.debug('No cookies found.');
+    responder.visitorResponse(res, constants.rootNodeUid);
+    return;
+  }
+  // should not have both cookie types together
+  if(req.cookies.session_uid && req.cookies.node_uid) {
+    logMgr.debug('Both cookies found!  Uh oh!');
+    responder.visitorResponse(res, constants.rootNodeUid, {warning: 'Detected traces of registered and unregistered accounts together. Resetting.'});
+    return;
+  }
+  // presence of node_uid cookie indicates visitor
+  if(req.cookies.node_uid) {
+    logMgr.debug('Position cookie found.  Visitor detected.');
+    // if request body includes navigation details, visitor is requesting to navigate
+    if(req.body.hasOwnProperty('navigate')) {
+      logMgr.debug('Visitor requested navigation.');
+      var destination = req.body.navigate;
+      if(destination == constants.defaultParentUid) {
+        responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
+        return;
+      }
+
+      responder.visitorResponse(res, destination);
+      return;
+    }
+    // if navigation not requested, show the user the node at their current position
+    else {
+      logMgr.debug('Surfacing node at current visitor location.');
+      responder.visitorResponse(res, req.cookies.node_uid);
+    }
+  }
+  // If session cookie existed
+  if(req.cookies.session_uid) {
+    logMgr.out('Session ID found . . .');
     var session_uid = req.cookies.session_uid;
 
     // Get a db connection from the pool
@@ -41,9 +76,8 @@ router.post('/', function(req, res, next) {
       }
 
       // Build query and callback to check for users with the current session_uid
-      logMgr.out('Executing query to search for users with the current session_uid.');
-
       var query = 'SELECT * FROM users WHERE session_uid=?;'
+      logMgr.out('Executing query to search for users with the current session_uid.');
       connection.query(query, [session_uid], function(err, rows) {
         if(err) {
           responder.respondError(res, 'Problem getting response from database checking session ID.');
@@ -71,9 +105,9 @@ router.post('/', function(req, res, next) {
           });
         } // end clearing matched session_uid values
 
-        // If no rows returned, no user was found with that session ID, so create and surface a new user
+        // If no rows returned, no user was found with that session ID, so surface a visitor with appropriate message
         else if(rows.length == 0) {
-          createNewUser(req, res);
+          responder.visitorResponse(res, constants.rootNodeUid, {warning: 'Got an expired session ID.  You can try logging in again, or continue using the site as a visitor.'});
           connection.release();
           return;
         }
@@ -105,13 +139,6 @@ router.post('/', function(req, res, next) {
             });
           }
           else if(req.body.hasOwnProperty('votify')) {
-            // start with extra validation that this user is allowed to votify!
-            if(userRow['acct_type'] == constants.acctTypeVisitor) {
-              responder.respondMsgOnly(res, {warning: 'Unregistered visitors may not participate in votification!'});
-              connection.release();
-              return;
-            }
-
             var node_uid = req.body.votify;
             var newVote = req.body.newVote;
 
@@ -174,7 +201,8 @@ router.post('/', function(req, res, next) {
                     return;
                   }
 
-                  res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
+                  res.clearCookie(constants.cookieNode);
+                  res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
                   res.send(
                     JSON.stringify({
                       votification: newVote
@@ -201,7 +229,8 @@ router.post('/', function(req, res, next) {
                     return;
                   }
 
-                  res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
+                  res.clearCookie(constants.cookieNode);
+                  res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
                   res.send(
                     JSON.stringify({
                       votification: newVote
@@ -228,47 +257,7 @@ router.post('/', function(req, res, next) {
 
 /* Endpoint to log a user out from a social account */
 router.get('/logout', function(req, res, next) {
-  var response = {};
-  createNewUser(req, res);
+  responder.visitorResponse(res, constants.rootNodeUid);
 });
 
 module.exports = router;
-
-function createNewUser(req, res) {
-  logMgr.out('New visitor!  Attempting to create DB entry . . .');
-  // Create new user and write it to the DB
-  db.getConnection(function(err, connection) {
-    if(err) {
-      responder.respondError(res, 'There was a problem getting a database connection.  New user cannot be created at this time.');
-      logMgr.error(err);
-      connection.release();
-      return;
-    }
-
-    logMgr.out('Got DB connection to create new user.');
-    // Create a new user to write to DB
-    newUserUid = generateGuid();
-    newUserName = 'User_' + newUserUid.substring(0,10);
-    newUserAcctType = constants.acctTypeVisitor;
-    newUserSessionUid = generateGuid();
-
-    var query =
-      'START TRANSACTION; ' +
-        'INSERT INTO users (uid, name, acct_type, session_uid) VALUES (?, ?, ?, ?);' +
-        'INSERT INTO positions (user_uid, node_uid) VALUES (?, ?);' +
-      'COMMIT;';
-    connection.query(query, [newUserUid, newUserName, newUserAcctType, newUserSessionUid, newUserUid, constants.rootNodeUid], function(err) {
-      if(err) {
-        responder.respondError(res, 'Database error creating new user.');
-        logMgr.error(err);
-        connection.release();
-        return;
-      }
-
-      logMgr.out('Query completed to create user and set initial position.');
-      responder.respond(res, newUserSessionUid);
-      connection.release();
-      return;
-    });
-  });
-}

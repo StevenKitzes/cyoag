@@ -7,7 +7,8 @@ function respondError(res, error) {
   logMgr.error(error);
   var response = {};
   response.error = error;
-  res.clearCookie(constants.sessionCookie);
+  res.clearCookie(constants.cookieSession);
+  res.clearCookie(constants.cookieNode);
   res.send(JSON.stringify(response));
 }
 
@@ -22,9 +23,9 @@ function respondError(res, error) {
  *  which case this will be propagated as the lowest severity of message.
  *  Valid sample calls:
  *     respondMsgOnly(res, {warning: 'Be careful!'});
- *     respondMsgOnly(res, {error: 'Critical error requiring session reset!'}, true);
+ *     respondMsgOnly(res, {error: 'Critical error requiring session reset!'});
  */
-function respondMsgOnly(res, msg, sessionReset) {
+function respondMsgOnly(res, msg) {
   var response = {};
 
   if(msg.error) {
@@ -46,10 +47,6 @@ function respondMsgOnly(res, msg, sessionReset) {
 
   response.messageOnly = true;
 
-  if(sessionReset) {
-    logMgr.out('. . . including session reset.');
-    res.clearCookie(constants.sessionCookie);
-  }
   res.send(JSON.stringify(response));
 }
 
@@ -72,8 +69,8 @@ function respond(res, session_uid, msg) {
 
   // build and send a response based on conditions
   logMgr.out('Beginning response construction.');
-  db.getConnection(function(error_getConnection, connection) {
-    if(error_getConnection) {
+  db.getConnection(function(err, connection) {
+    if(err) {
       // handle any error getting connection from pool
       respondError(res, 'Problem getting a database connection.  Unable to build response. ' + error_getConnection)
       connection.release();
@@ -188,7 +185,7 @@ function respond(res, session_uid, msg) {
           'FROM nodes WHERE parent_uid=?;';
       connection.query(query, [response.nodeUid], function(error, rows) {
         if(error) {
-          respondError(res, 'Database error path information from node.');
+          respondError(res, 'Database error retrieving path information from node.');
           logMgr.error(error);
           connection.release();
           return;
@@ -209,7 +206,8 @@ function respond(res, session_uid, msg) {
         if(response.nodeUid == constants.rootNodeUid) {
           // root node gets special one-off trailing node snippet and trailing path snippet
           response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
-          res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
+          res.clearCookie(constants.cookieNode);
+          res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
           res.send(JSON.stringify(response));
           connection.release();
           return;
@@ -235,7 +233,137 @@ function respond(res, session_uid, msg) {
             var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
             response.snippet.trailingSnippet = trailingSnippet;
 
-            res.cookie(constants.sessionCookie, session_uid, constants.cookieExpiry);
+            res.clearCookie(constants.cookieNode);
+            res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
+            res.send(JSON.stringify(response));
+            connection.release();
+            return;
+          });
+        }
+      });
+    });
+  });
+}
+
+function visitorResponse(res, node_uid, msg) {
+  logMgr.verbose('Beginning visitor response . . .');
+  var response = {};
+  response.snippet = {};
+
+  // handle any messaging
+  if(msg) {
+    if(msg.msg) {
+      response.msg = msg.msg;
+    }
+    if(msg.warning) {
+      response.warning = msg.warning;
+    }
+    else {
+      response.msg = msg;
+    }
+  }
+
+  // build and send a response based on conditions
+  logMgr.out('Beginning response construction.');
+  db.getConnection(function(err, connection) {
+    if(err) {
+      // handle any error getting connection from pool
+      respondError(res, 'Problem getting a database connection.  Unable to build response.')
+      connection.release();
+      return;
+    }
+
+    // Let's get everything we can from a single query off the node_uid
+    var query = 'SELECT node_snippet, path_snippet, parent_uid FROM nodes WHERE uid=?;';
+    connection.query(query, [node_uid], function(error, rows) {
+      if(error) {
+        // handle any error querying for users with this session ID
+        respondError(res, 'Database error querying for chapter information.');
+        logMgr.error(error);
+        connection.release();
+        return;
+      }
+      logMgr.debug('Query yielded: ' + JSON.stringify(rows[0]));
+
+      // if no data was found with these requirements, this is an error here
+      if(rows.length < 1) {
+        respondError(res, 'No chapter information found for this chapter!');
+        connection.release();
+        return;
+      }
+      if(rows.length > 1) {
+        respondError(res, 'Multiple chapters found with the same ID!');
+        connection.release();
+        return;
+      }
+
+      var row = rows[0];
+
+      response.userName = constants.visitorName;
+      response.acctType = constants.acctTypeVisitor;
+      response.nodeUid = node_uid;
+      response.parentUid = row.parent_uid;
+      response.snippet.nodeSnippet = row.node_snippet;
+      response.snippet.lastPath = row.path_snippet;
+      response.votification = constants.votificationNone;
+
+      // now get paths out from here by finding the nodes that have this node as a parent
+      query =
+        'SELECT uid as pathUid, path_snippet as pathSnippet, votification as pathVotification ' +
+          'FROM nodes WHERE parent_uid=?;';
+      connection.query(query, [response.nodeUid], function(error, rows) {
+        if(error) {
+          respondError(res, 'Database error retrieving path information from node.');
+          logMgr.error(error);
+          connection.release();
+          return;
+        }
+
+        // for each row, with no-rows-returned being a legal state
+        response.paths = [];
+        for(var row = 0; row < rows.length; row++) {
+          var path = {
+            pathUid: rows[row].pathUid,
+            pathSnippet: rows[row].pathSnippet,
+            pathVotification: rows[row].pathVotification
+          };
+          response.paths.push(path);
+        }
+
+        // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
+        if(response.nodeUid == constants.rootNodeUid) {
+          // root node gets special one-off trailing node snippet and trailing path snippet
+          response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
+          
+          res.clearCookie(constants.cookieSession);
+          res.cookie(constants.cookieNode, node_uid, constants.cookieExpiry);
+          res.send(JSON.stringify(response));
+          connection.release();
+          return;
+        }
+        // if we have to do a final db call to get trailing node
+        else {
+          var query = 'SELECT node_snippet as trailingSnippet FROM nodes WHERE uid=?;';
+          connection.query(query, [response.parentUid], function(error, rows) {
+            if(error) {
+              respondError(res, 'Database error trying to retrieve information about previous chapter.');
+              logMgr.error(error);
+              connection.release();
+              return;
+            }
+
+            if(rows.length != 1) {
+              respondError(res, 'Found multiple parent chapters.  Note, this is impossible.  CYOAG dev is fired.');
+              connection.release();
+              return;
+            }
+
+            var parent = rows[0];
+            var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
+            response.snippet.trailingSnippet = trailingSnippet;
+
+            res.clearCookie(constants.cookieSession);
+            res.cookie(constants.cookieNode, node_uid, constants.cookieExpiry);
             res.send(JSON.stringify(response));
             connection.release();
             return;
@@ -262,5 +390,6 @@ var exports = {};
 exports.respond = respond;
 exports.respondMsgOnly = respondMsgOnly;
 exports.respondError = respondError;
+exports.visitorResponse = visitorResponse;
 
 module.exports = exports;
