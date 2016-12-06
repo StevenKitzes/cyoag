@@ -51,7 +51,6 @@ var Input = React.createClass({
         <div id='cyoag-input-path-container'>
           Enter the path teaser text that will entice people to choose your new chapter:<br />
           <textarea id='cyoag-input-path' type='text' placeholder='Path snippet'></textarea><br />
-          <div className='cyoag-resize-input-hint'>Drag to resize! ^</div>
         </div>
         <div id='cyoag-input-body-container'>
           Enter the body of your new chapter:<br />

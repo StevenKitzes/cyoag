@@ -300,20 +300,23 @@ div {
   padding-top: 0.1em;
   padding-right: 0.5em;
   padding-left: 0.5em;
-  resize: vertical;
 }
 #cyoag-input-container textarea:focus {
   outline: none !important;
 }
 
+#cyoag-input-body-container {
+  margin-top: 0.5em;
+}
+
 #cyoag-input-path {
-  min-height: 2em;
-  max-height: 4em;
+  height: 2em;
+  resize: none;
   width: 85%;
 }
 #cyoag-input-body {
-  min-height: 3em;
-  max-height: 20em;
+  height: 10em;
+  resize: vertical;
   width: 85%;
 }
 
