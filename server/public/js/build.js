@@ -22314,13 +22314,9 @@
 	}
 	
 	function nameChange(newName) {
-	  var realThis = this;
-	  realThis.setState({ warning: null });
-	  setTimeout(function () {
-	    realThis.setState({
-	      warning: 'Name change not yet implemented but will use "' + newName + '"'
-	    });
-	  }, 2000);
+	  this.setState({
+	    warning: 'Name change not yet implemented but will use "' + newName + '"'
+	  });
 	}
 	
 	function validateVotificationResponse(properThis, response) {
@@ -22720,20 +22716,34 @@
 	
 	  closeBanner: function (e) {
 	    e.preventDefault();
-	    document.getElementById('cyoag-message-banner').style.display = 'none';
+	    var bannerObj = document.getElementById('cyoag-message-banner');
+	    if (bannerObj) {
+	      bannerObj.style.display = 'none';
+	    }
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
 	    var state = this.props.context.state;
 	    var className, messageContent;
+	    var bannerObj = document.getElementById('cyoag-message-banner');
+	
 	    if (state.error) {
+	      if (bannerObj) {
+	        bannerObj.style.display = 'block';
+	      }
 	      className = constants.messageErrorClass;
 	      messageContent = state.error;
 	    } else if (state.warning) {
+	      if (bannerObj) {
+	        bannerObj.style.display = 'block';
+	      }
 	      className = constants.messageWarningClass;
 	      messageContent = state.warning;
 	    } else if (state.msg) {
+	      if (bannerObj) {
+	        bannerObj.style.display = 'block';
+	      }
 	      className = constants.messageRegularClass;
 	      messageContent = state.msg;
 	    } else {
@@ -22763,21 +22773,34 @@
 	
 	  closeModal: function (e) {
 	    e.preventDefault();
-	    document.getElementById('cyoag-modal-message-container').style.display = 'none';
+	    var modalObj = document.getElementById('cyoag-modal-message-container');
+	    if (modalObj) {
+	      modalObj.style.display = 'none';
+	    }
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
 	    var state = this.props.context.state;
 	    var modalType, messageContent;
+	    var modalObj = document.getElementById('cyoag-modal-message-container');
 	
 	    if (state.error) {
+	      if (modalObj) {
+	        modalObj.style.display = 'block';
+	      }
 	      modalType = constants.modalTypeError;
 	      messageContent = state.error;
 	    } else if (state.warning) {
+	      if (modalObj) {
+	        modalObj.style.display = 'block';
+	      }
 	      modalType = constants.modalTypeWarning;
 	      messageContent = state.warning;
 	    } else if (state.msg) {
+	      if (modalObj) {
+	        modalObj.style.display = 'block';
+	      }
 	      modalType = constants.modalTypeMessage;
 	      messageContent = state.msg;
 	    } else {

@@ -177,13 +177,9 @@ function votify(nodeUid, newVote) {
 }
 
 function nameChange(newName) {
-  var realThis = this;
-  realThis.setState({warning: null});
-  setTimeout(function() {
-    realThis.setState({
-      warning: 'Name change not yet implemented but will use "' + newName + '"'
-    });
-  }, 2000);
+  this.setState({
+    warning: 'Name change not yet implemented but will use "' + newName + '"'
+  });
 }
 
 function validateVotificationResponse(properThis, response) {
