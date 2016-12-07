@@ -7,6 +7,11 @@ div {
   text-align: center;
 }
 
+button {
+  border-radius: 2em;
+  border-style: outset;
+}
+
 .italics {
   font-style: italic;
 }
@@ -193,6 +198,15 @@ div {
   margin-right: auto;
   margin-bottom: 0.5em;
   margin-left: auto;
+}
+
+#cyoag-name-input {
+  margin-right: 0.5em;
+  width: 8em;
+}
+
+#cyoag-logout-button {
+  margin-top: 1em;
 }
 
 #cyoag-node-container {

@@ -16,6 +16,7 @@ var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   getInitialState: getDefaultStateObject,
   logoutRequest: logoutXhrHandler,
+  nameChange: nameChange,
   navigate: navigateXhrHandler,
   render: function() {
     logMgr.verbose('Rendering...');
@@ -23,6 +24,7 @@ var MainComponent = React.createClass({
     var context = {};
     context.state = this.state;
     context.logoutRequest = this.logoutRequest;
+    context.nameChange = this.nameChange;
     context.navigate = this.navigate;
     context.votify = this.votify;
 
@@ -172,6 +174,16 @@ function votify(nodeUid, newVote) {
   }
   var xhrPayload = JSON.stringify({votify: nodeUid, newVote: newVote});
   xhr.send(xhrPayload);
+}
+
+function nameChange(newName) {
+  var realThis = this;
+  realThis.setState({warning: null});
+  setTimeout(function() {
+    realThis.setState({
+      warning: 'Name change not yet implemented but will use "' + newName + '"'
+    });
+  }, 2000);
 }
 
 function validateVotificationResponse(properThis, response) {

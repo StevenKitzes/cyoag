@@ -22150,6 +22150,7 @@
 	  componentDidMount: mountXhrHandler,
 	  getInitialState: getDefaultStateObject,
 	  logoutRequest: logoutXhrHandler,
+	  nameChange: nameChange,
 	  navigate: navigateXhrHandler,
 	  render: function () {
 	    logMgr.verbose('Rendering...');
@@ -22157,6 +22158,7 @@
 	    var context = {};
 	    context.state = this.state;
 	    context.logoutRequest = this.logoutRequest;
+	    context.nameChange = this.nameChange;
 	    context.navigate = this.navigate;
 	    context.votify = this.votify;
 	
@@ -22309,6 +22311,16 @@
 	  };
 	  var xhrPayload = JSON.stringify({ votify: nodeUid, newVote: newVote });
 	  xhr.send(xhrPayload);
+	}
+	
+	function nameChange(newName) {
+	  var realThis = this;
+	  realThis.setState({ warning: null });
+	  setTimeout(function () {
+	    realThis.setState({
+	      warning: 'Name change not yet implemented but will use "' + newName + '"'
+	    });
+	  }, 2000);
 	}
 	
 	function validateVotificationResponse(properThis, response) {
@@ -23085,7 +23097,7 @@
 	  render: function () {
 	    return React.createElement(
 	      'button',
-	      { onClick: this.props.logoutRequest },
+	      { id: 'cyoag-logout-button', onClick: this.props.logoutRequest },
 	      'Log Out'
 	    );
 	  }
@@ -23199,7 +23211,7 @@
 	    var loginComponent;
 	
 	    if (context.state.acctType != constants.acctTypeVisitor) {
-	      loginComponent = React.createElement(MarginLogout, { userName: context.state.userName, logoutRequest: context.logoutRequest });
+	      loginComponent = React.createElement(MarginLogout, { context: context, logoutRequest: context.logoutRequest });
 	    } else {
 	      loginComponent = React.createElement(MarginLogin, null);
 	    }
@@ -23237,8 +23249,9 @@
 	  displayName: 'MarginLogout',
 	
 	  render: function () {
-	    var htmlUserName = this.props.userName;
-	    htmlUserName = htmlUserName.replace('-', '\u2011');
+	    var context = this.props.context;
+	    var htmlUserName = context.state.userName;
+	    htmlUserName = htmlUserName.replace('-', '\u2011'); // replace hyphen with unicode non-breaking dash
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-margin-login-container' },
@@ -23254,8 +23267,64 @@
 	        htmlUserName,
 	        '!'
 	      ),
+	      React.createElement(NameChangeComponent, { context: context }),
 	      React.createElement(SocialLoginButtonComponents.LogoutButton, { logoutRequest: this.props.logoutRequest })
 	    );
+	  }
+	});
+	
+	// Component to provide UI for and control user name changes
+	var NameChangeComponent = React.createClass({
+	  displayName: 'NameChangeComponent',
+	
+	  getInitialState: function () {
+	    return {
+	      nameChange: 'beg'
+	    };
+	  },
+	  render: function () {
+	    var context = this.props.context;
+	
+	    if (this.state.nameChange == 'beg') {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-name-change-ui' },
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-swap-name-change-button', onClick: this.swap },
+	          'Customize Your Name'
+	        )
+	      );
+	    } else if (this.state.nameChange == 'ui') {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-name-change-ui' },
+	        React.createElement('input', { id: 'cyoag-name-input', type: 'text', placeholder: 'New name' }),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-submit-name-change-button', onClick: this.submit },
+	          'Submit'
+	        )
+	      );
+	    }
+	
+	    return { nameChangeUi };
+	  },
+	  submit: function () {
+	    var newName = document.getElementById('cyoag-name-input').value;
+	    this.props.context.nameChange(newName);
+	    this.swap();
+	  },
+	  swap: function () {
+	    if (this.state.nameChange == 'beg') {
+	      this.setState({
+	        nameChange: 'ui'
+	      });
+	    } else if (this.state.nameChange == 'ui') {
+	      this.setState({
+	        nameChange: 'beg'
+	      });
+	    }
 	  }
 	});
 	
