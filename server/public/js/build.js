@@ -22150,6 +22150,13 @@
 	  componentDidMount: mountXhrHandler,
 	  getInitialState: getDefaultStateObject,
 	  logoutRequest: logoutXhrHandler,
+	  message: function (msg) {
+	    this.setState({
+	      msg: msg.msg ? msg.msg : null,
+	      warning: msg.warning ? msg.warning : null,
+	      error: msg.error ? msg.error : null
+	    });
+	  },
 	  nameChange: nameChange,
 	  navigate: navigateXhrHandler,
 	  render: function () {
@@ -22158,6 +22165,7 @@
 	    var context = {};
 	    context.state = this.state;
 	    context.logoutRequest = this.logoutRequest;
+	    context.message = this.message;
 	    context.nameChange = this.nameChange;
 	    context.navigate = this.navigate;
 	    context.votify = this.votify;
@@ -22314,9 +22322,29 @@
 	}
 	
 	function nameChange(newName) {
-	  this.setState({
-	    warning: 'Name change not yet implemented but will use "' + newName + '"'
-	  });
+	  logMgr.debug('User attempting to update their name . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Name change response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response);
+	    } else {
+	      logMgr.debug('Name change attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({ error: 'Server response timed out; unable to detect result of name change attempt.' });
+	  };
+	  var xhrPayload = JSON.stringify({ newName: newName });
+	  xhr.send(xhrPayload);
 	}
 	
 	function validateVotificationResponse(properThis, response) {
@@ -23300,6 +23328,12 @@
 	var NameChangeComponent = React.createClass({
 	  displayName: 'NameChangeComponent',
 	
+	  componentDidUpdate: function () {
+	    var input = document.getElementById('cyoag-name-input');
+	    if (input) {
+	      input.focus();
+	    }
+	  },
 	  getInitialState: function () {
 	    return {
 	      nameChange: 'beg'
@@ -23322,7 +23356,7 @@
 	      return React.createElement(
 	        'div',
 	        { id: 'cyoag-name-change-ui' },
-	        React.createElement('input', { id: 'cyoag-name-input', type: 'text', placeholder: 'New name' }),
+	        React.createElement('input', { id: 'cyoag-name-input', onKeyUp: this.validate, type: 'text', placeholder: 'New name' }),
 	        React.createElement(
 	          'button',
 	          { id: 'cyoag-submit-name-change-button', onClick: this.submit },
@@ -23331,10 +23365,17 @@
 	      );
 	    }
 	
-	    return { nameChangeUi };
+	    return React.createElement('div', { id: 'cyoag-name-change-ui' });
 	  },
 	  submit: function () {
+	    this.validate();
 	    var newName = document.getElementById('cyoag-name-input').value;
+	    if (newName.length < 3) {
+	      this.props.context.message({
+	        warning: 'Your custom name must have at least 3 characters in it.'
+	      });
+	      return;
+	    }
 	    this.props.context.nameChange(newName);
 	    this.swap();
 	  },
@@ -23347,6 +23388,12 @@
 	      this.setState({
 	        nameChange: 'beg'
 	      });
+	    }
+	  },
+	  validate: function () {
+	    var newName = document.getElementById('cyoag-name-input').value;
+	    if (newName.length > 16 || newName.match(/-{2,}/) || newName.match(/[^a-zA-Z0-9-]/)) {
+	      document.getElementById('cyoag-name-input').value = newName.substring(0, 16).replace(/-{2,}/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
 	    }
 	  }
 	});
