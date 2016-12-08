@@ -1,6 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
 uid VARCHAR(40) UNIQUE PRIMARY KEY,
-name VARCHAR(32) UNIQUE,
+name VARCHAR(16) UNIQUE,
 acct_type VARCHAR(16),
 session_uid VARCHAR(40),
 INDEX (session_uid)
@@ -11,7 +11,7 @@ uid VARCHAR(40) UNIQUE PRIMARY KEY,
 parent_uid VARCHAR(40),
 author_uid VARCHAR(40),
 path_snippet VARCHAR(100),
-node_snippet VARCHAR(2000),
+node_snippet VARCHAR(5000),
 votification INTEGER,
 INDEX (parent_uid)
 );

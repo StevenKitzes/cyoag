@@ -26,7 +26,7 @@ var Paths = React.createClass({
     else {
       return (
         <div id='cyoag-path-list'>
-          <p className='italics' onClick={this.fuck}>What happens next . . . ?</p>
+          <p className='italics sans-serif'>What happens next . . . ?</p>
           {paths.map(function(item) {
             var pathUid = 'node-' + item.pathUid;
             return (

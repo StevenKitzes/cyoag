@@ -50,11 +50,11 @@ var Input = React.createClass({
         <p id='cyoag-input-cta'><em>Want to add your own content following this chapter?</em></p>
         <div id='cyoag-input-path-container'>
           Enter the path teaser text that will entice people to choose your new chapter:<br />
-          <textarea id='cyoag-input-path' type='text' placeholder='Path snippet'></textarea><br />
+          <textarea id='cyoag-input-path' type='text' placeholder='Path snippet - minimum 4 characters, maximum 100 characters.'></textarea><br />
         </div>
         <div id='cyoag-input-body-container'>
           Enter the body of your new chapter:<br />
-          <textarea id='cyoag-input-body' type='text' placeholder='Chapter content'></textarea>
+          <textarea id='cyoag-input-body' type='text' placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
           <div className='cyoag-resize-input-hint'>Drag to resize! ^</div>
         </div>
         <button id='cyoag-input-submit'>Submit</button>

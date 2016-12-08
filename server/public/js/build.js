@@ -23002,6 +23002,12 @@
 	        'p',
 	        { id: 'cyoag-node-snippet' },
 	        snippet.nodeSnippet
+	      ),
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-author-attribution', className: 'cyoag-note' },
+	        'Contribution by user ',
+	        context.state.userName
 	      )
 	    );
 	  },
@@ -23231,7 +23237,7 @@
 	        { id: 'cyoag-path-list' },
 	        React.createElement(
 	          'p',
-	          { className: 'italics', onClick: this.fuck },
+	          { className: 'italics sans-serif' },
 	          'What happens next . . . ?'
 	        ),
 	        paths.map(function (item) {
@@ -23350,7 +23356,7 @@
 	        { id: 'cyoag-input-path-container' },
 	        'Enter the path teaser text that will entice people to choose your new chapter:',
 	        React.createElement('br', null),
-	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', placeholder: 'Path snippet' }),
+	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', placeholder: 'Path snippet - minimum 4 characters, maximum 100 characters.' }),
 	        React.createElement('br', null)
 	      ),
 	      React.createElement(
@@ -23358,7 +23364,7 @@
 	        { id: 'cyoag-input-body-container' },
 	        'Enter the body of your new chapter:',
 	        React.createElement('br', null),
-	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', placeholder: 'Chapter content' }),
+	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', placeholder: 'Chapter content - minimum 1000 characters, maximum 5000 characters.' }),
 	        React.createElement(
 	          'div',
 	          { className: 'cyoag-resize-input-hint' },

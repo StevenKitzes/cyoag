@@ -15,6 +15,9 @@ button {
 .italics {
   font-style: italic;
 }
+.sans-serif {
+  font-family: sans-serif;
+}
 
 .cyoag-link {
   color: #0077AA;
@@ -28,6 +31,12 @@ button {
 }
 .cyoag-hidden {
   display: none;
+}
+.cyoag-note {
+  color: #BBBBBB;
+  font-family: sans-serif;
+  font-size: 0.8em;
+  font-style: italic;
 }
 
 .cyoag-inline-block {
