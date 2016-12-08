@@ -16,6 +16,14 @@ var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   getInitialState: getDefaultStateObject,
   logoutRequest: logoutXhrHandler,
+  message: function(msg) {
+    this.setState({
+      msg: msg.msg ? msg.msg : null,
+      warning: msg.warning ? msg.warning : null,
+      error: msg.error ? msg.error : null
+    });
+  },
+  nameChange: nameChange,
   navigate: navigateXhrHandler,
   render: function() {
     logMgr.verbose('Rendering...');
@@ -23,6 +31,8 @@ var MainComponent = React.createClass({
     var context = {};
     context.state = this.state;
     context.logoutRequest = this.logoutRequest;
+    context.message = this.message;
+    context.nameChange = this.nameChange;
     context.navigate = this.navigate;
     context.votify = this.votify;
 
@@ -171,6 +181,33 @@ function votify(nodeUid, newVote) {
     properThis.setState({error: 'Server response timed out; unable to detect result of votification attempt.'});
   }
   var xhrPayload = JSON.stringify({votify: nodeUid, newVote: newVote});
+  xhr.send(xhrPayload);
+}
+
+function nameChange(newName) {
+  logMgr.debug('User attempting to update their name . . .');
+  var xhr = new XMLHttpRequest();
+  // xmlHttp.onreadystatechange = () => {...}
+  var properThis = this;
+  xhr.onreadystatechange = function() {
+    if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
+      logMgr.debug('Status 200 (or 304)!');
+      logMgr.verbose('Name change response payload: ' + xhr.responseText);
+      var response = JSON.parse(xhr.responseText);
+      validateResponse(properThis, response);
+    }
+    else {
+      logMgr.debug('Name change attempt yielded HTTP response status: ' + xhr.status);
+    }
+  }
+  xhr.open('POST', '/session');
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xhr.timeout = 5000;
+  xhr.ontimeout = function() {
+    xhr.abort();
+    properThis.setState({error: 'Server response timed out; unable to detect result of name change attempt.'});
+  }
+  var xhrPayload = JSON.stringify({newName: newName});
   xhr.send(xhrPayload);
 }
 
