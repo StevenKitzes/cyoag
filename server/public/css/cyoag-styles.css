@@ -309,7 +309,6 @@ button {
   border-radius: 2em;
   border-color: blue;
   margin: 1em auto;
-  padding: 0.01em 1em 1em 1em; /* 0.01em top is because this element interacts weird with <p> */
   width: 75%;
 }
 #cyoag-input-container textarea {
@@ -343,6 +342,10 @@ button {
   margin: 0 auto;
   text-align: right;
   width: 85%;
+}
+
+#cyoag-input-submit {
+  margin-bottom: 1em;
 }
 
 #cyoag-footer-container {
