@@ -20,6 +20,10 @@ constants.defaultNodeSnippet = 'You have come to CYOAG, a unique Create Your Own
   'the results of collaborative efforts by writers from all across the world to write one story of many paths and branches, together! ' +
   '(The CYOAG experience is still loading.)';
 
+constants.displayNameBanned = '[-banned-]';
+constants.displayNameDeleted = '[-deleted-]';
+constants.displayNameUnknown = '[-unknown-]';
+
 constants.emptyString = '';
 
 constants.errorNodeUid = 'error';

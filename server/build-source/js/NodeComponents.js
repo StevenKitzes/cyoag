@@ -28,7 +28,7 @@ var Node = React.createClass({
         </a>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
         <p id='cyoag-node-snippet'>{snippet.nodeSnippet}</p>
-        <p id='cyoag-author-attribution' className='cyoag-note'>Contribution by user {context.state.userName}</p>
+        <p id='cyoag-author-attribution' className='cyoag-note'>Contribution by user {context.state.snippet.authorName}</p>
       </div>
     );
   },

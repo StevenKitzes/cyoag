@@ -22451,7 +22451,7 @@
 	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
-	  if (!response.snippet.hasOwnProperty('trailingSnippet') || !response.snippet.hasOwnProperty('lastPath') || !response.snippet.hasOwnProperty('nodeSnippet')) {
+	  if (!response.snippet.hasOwnProperty('trailingSnippet') || !response.snippet.hasOwnProperty('lastPath') || !response.snippet.hasOwnProperty('nodeSnippet') || !response.snippet.hasOwnProperty('authorName')) {
 	    // snippet information missing, set error state and display error content
 	    var errorMessage = 'Some snippet details were missing in response from server.';
 	    logMgr.out(errorMessage);
@@ -22518,7 +22518,8 @@
 	    snippet: {
 	      trailingSnippet: constants.defaultTrailingSnippet,
 	      lastPath: constants.defaultLastPath,
-	      nodeSnippet: constants.defaultNodeSnippet
+	      nodeSnippet: constants.defaultNodeSnippet,
+	      authorName: constants.displayNameUnknown
 	    },
 	    paths: [],
 	    inputBlocking: constants.inputBlockingHide,
@@ -22538,7 +22539,8 @@
 	    snippet: {
 	      trailingSnippet: constants.errorTrailingSnippet,
 	      lastPath: constants.errorLastPath,
-	      nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage
+	      nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage,
+	      authorName: constants.displayNameUnknown
 	    },
 	    paths: [],
 	    inputBlocking: constants.inputBlockingHide,
@@ -22591,6 +22593,10 @@
 	constants.defaultNodeSnippet = 'You have come to CYOAG, a unique Create Your Own Adventure Game experience!  Here you will enjoy ' +
 	  'the results of collaborative efforts by writers from all across the world to write one story of many paths and branches, together! ' +
 	  '(The CYOAG experience is still loading.)';
+	
+	constants.displayNameBanned = '[-banned-]';
+	constants.displayNameDeleted = '[-deleted-]';
+	constants.displayNameUnknown = '[-unknown-]';
 	
 	constants.emptyString = '';
 	
@@ -23007,7 +23013,7 @@
 	        'p',
 	        { id: 'cyoag-author-attribution', className: 'cyoag-note' },
 	        'Contribution by user ',
-	        context.state.userName
+	        context.state.snippet.authorName
 	      )
 	    );
 	  },

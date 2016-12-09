@@ -326,7 +326,8 @@ function validateResponse(properThis, response) {
   if(
     !response.snippet.hasOwnProperty('trailingSnippet') ||
     !response.snippet.hasOwnProperty('lastPath') ||
-    !response.snippet.hasOwnProperty('nodeSnippet')) {
+    !response.snippet.hasOwnProperty('nodeSnippet') ||
+    !response.snippet.hasOwnProperty('authorName')) {
     // snippet information missing, set error state and display error content
     var errorMessage = 'Some snippet details were missing in response from server.';
     logMgr.out(errorMessage);
@@ -395,7 +396,8 @@ function getDefaultStateObject() {
     snippet: {
       trailingSnippet: constants.defaultTrailingSnippet,
       lastPath: constants.defaultLastPath,
-      nodeSnippet: constants.defaultNodeSnippet
+      nodeSnippet: constants.defaultNodeSnippet,
+      authorName: constants.displayNameUnknown
     },
     paths: [],
     inputBlocking: constants.inputBlockingHide,
@@ -415,7 +417,8 @@ function getErrorStateObject(errorMessage) {
     snippet: {
       trailingSnippet: constants.errorTrailingSnippet,
       lastPath: constants.errorLastPath,
-      nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage
+      nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage,
+      authorName: constants.displayNameUnknown
     },
     paths: [],
     inputBlocking: constants.inputBlockingHide,

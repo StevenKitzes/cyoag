@@ -91,7 +91,9 @@ function respond(res, session_uid, msg) {
         'nodes.path_snippet as pathSnippet, ' +
         'nodes.parent_uid as parentUid, ' +
         'nodes.author_uid as authorUid, ' +
-        'votes.sentiment as sentiment ' +
+        'votes.sentiment as sentiment, ' +
+        'authors.name as authorName, ' +
+        'authors.acct_type as authorAcctType ' +
       'FROM users ' +
         'LEFT JOIN positions ' +
           'ON users.uid=positions.user_uid ' +
@@ -99,8 +101,10 @@ function respond(res, session_uid, msg) {
           'ON positions.node_uid=nodes.uid ' +
         'LEFT JOIN votes ' +
           'ON nodes.uid=votes.node_uid AND users.uid=votes.user_uid ' +
+        'LEFT JOIN users as authors ' +
+          'ON nodes.author_uid=authors.uid ' +
       'WHERE ' +
-        'users.session_uid=?;'
+        'users.session_uid=?; ';
     logMgr.verbose('Query attempted: ' + query);
     connection.query(query, [session_uid], function(error, rows) {
       if(error) {
@@ -169,6 +173,20 @@ function respond(res, session_uid, msg) {
       response.parentUid = row.parentUid;
       response.snippet.nodeSnippet = row.nodeSnippet;
       response.snippet.lastPath = row.pathSnippet;
+      switch(row.authorAcctType) {
+        case null:
+          response.snippet.authorName = constants.displayNameUnknown;
+          break;
+        case constants.acctTypeBanned:
+          repsonse.snippet.authorName = constants.displayNameBanned;
+          break;
+        case constants.acctTypeDeleted:
+          response.snippet.authorName = constants.displayNameDeleted;
+          break;
+        default:
+          response.snippet.authorName = row.authorName;
+          break;
+      }
       switch(row.sentiment) {
         case 1:
           response.votification = constants.votificationUp;
