@@ -73,6 +73,7 @@ router.post('/', function(req, res, next) {
       if(err) {
         responder.respondError(res, 'There was a problem getting a database connection.  Cannot validate session ID.');
         logMgr.error(err);
+        connection.release();
         return;
       }
 
@@ -181,6 +182,12 @@ router.post('/', function(req, res, next) {
               connection.release();
               return;
             });
+          }
+          else if(req.body.hasOwnProperty('newNodePath')) {
+            responder.respondMsgOnly(res, {warning: 'Node submission not yet implemented on backend, but FYI got path ' + req.body.newNodePath +
+              ' and body ' + req.body.newNodeBody + '.'});
+            connection.release();
+            return;
           }
           else if(req.body.hasOwnProperty('votify')) {
             var node_uid = req.body.votify;

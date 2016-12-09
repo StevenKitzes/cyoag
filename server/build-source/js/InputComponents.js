@@ -57,9 +57,47 @@ var Input = React.createClass({
           <textarea id='cyoag-input-body' type='text' placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
           <div className='cyoag-resize-input-hint'>Drag to resize! ^</div>
         </div>
-        <button id='cyoag-input-submit'>Submit</button>
+        <button id='cyoag-save-draft-submit'>Save Draft</button><button id='cyoag-input-submit' onClick={this.submit}>Submit</button>
       </div>
     );
+  },
+  submit: function() {
+    var inputPath = document.getElementById('cyoag-input-path').value;
+    var inputBody = document.getElementById('cyoag-input-body').value;
+    var warningMsg;
+    var message = this.props.context.message;
+
+    if(inputPath.length < 4) {
+      warningMsg = 'Your path teaser must be at least 4 characters long';
+    }
+    else if(inputPath.length > 100) {
+      warningMsg = 'Your path teaser may not exceed 100 characters';
+    }
+
+    if(inputBody.length < 1000) {
+      if(warningMsg) {
+        warningMsg = warningMsg + ' and your chapter content must be at least 1,000 characters long';
+      }
+      else {
+        warningMsg = 'Your chapter content must be at least 1,000 characters long';
+      }
+    }
+    else if(inputBody.length > 5000) {
+      if(warningMsg) {
+        warningMsg = warningMsg + ' and your chapter content may not exceed 5,000 characters';
+      }
+      else {
+        warningMsg = 'Your chapter content may not exceed 5,000 characters';
+      }
+    }
+
+    if(warningMsg) {
+      warningMsg = warningMsg + '.';
+      this.props.context.message({warning: warningMsg});
+      return;
+    }
+
+    this.props.context.inputSubmit(inputPath, inputBody);
   }
 });
 

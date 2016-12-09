@@ -133,7 +133,7 @@ button {
   padding-right: 2.5em;
   padding-bottom: 1.5em;
   padding-left: 2.5em;
-  position: absolute;
+  position: fixed;
   max-width: 33%;
   overflow: auto;
   top: 50%;
@@ -354,6 +354,7 @@ button {
 }
 
 #cyoag-input-submit {
+  margin-left: 1em;
   margin-bottom: 1em;
 }
 

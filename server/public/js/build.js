@@ -22149,6 +22149,7 @@
 	
 	  componentDidMount: mountXhrHandler,
 	  getInitialState: getDefaultStateObject,
+	  inputSubmit: inputSubmit,
 	  logoutRequest: logoutXhrHandler,
 	  message: function (msg) {
 	    this.setState({
@@ -22164,6 +22165,7 @@
 	
 	    var context = {};
 	    context.state = this.state;
+	    context.inputSubmit = this.inputSubmit;
 	    context.logoutRequest = this.logoutRequest;
 	    context.message = this.message;
 	    context.nameChange = this.nameChange;
@@ -22344,6 +22346,32 @@
 	    properThis.setState({ error: 'Server response timed out; unable to detect result of name change attempt.' });
 	  };
 	  var xhrPayload = JSON.stringify({ newName: newName });
+	  xhr.send(xhrPayload);
+	}
+	
+	function inputSubmit(path, body) {
+	  logMgr.debug('User attempting to submit new node . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Node submission response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response);
+	    } else {
+	      logMgr.debug('Node submission attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({ error: 'Server response timed out; unable to detect result of node submission attempt.' });
+	  };
+	  var xhrPayload = JSON.stringify({ newNodePath: path, newNodeBody: body });
 	  xhr.send(xhrPayload);
 	}
 	
@@ -22933,7 +22961,7 @@
 	    } else if (context.state.inputBlocking.top || context.state.inputBlocking.side) {
 	      inputComponent = React.createElement(InputComponents.Blocked, { blocking: context.state.inputBlocking });
 	    } else {
-	      inputComponent = React.createElement(InputComponents.Input, null);
+	      inputComponent = React.createElement(InputComponents.Input, { context: context });
 	    }
 	
 	    return React.createElement(
@@ -23379,10 +23407,49 @@
 	      ),
 	      React.createElement(
 	        'button',
-	        { id: 'cyoag-input-submit' },
+	        { id: 'cyoag-save-draft-submit' },
+	        'Save Draft'
+	      ),
+	      React.createElement(
+	        'button',
+	        { id: 'cyoag-input-submit', onClick: this.submit },
 	        'Submit'
 	      )
 	    );
+	  },
+	  submit: function () {
+	    var inputPath = document.getElementById('cyoag-input-path').value;
+	    var inputBody = document.getElementById('cyoag-input-body').value;
+	    var warningMsg;
+	    var message = this.props.context.message;
+	
+	    if (inputPath.length < 4) {
+	      warningMsg = 'Your path teaser must be at least 4 characters long';
+	    } else if (inputPath.length > 100) {
+	      warningMsg = 'Your path teaser may not exceed 100 characters';
+	    }
+	
+	    if (inputBody.length < 1000) {
+	      if (warningMsg) {
+	        warningMsg = warningMsg + ' and your chapter content must be at least 1,000 characters long';
+	      } else {
+	        warningMsg = 'Your chapter content must be at least 1,000 characters long';
+	      }
+	    } else if (inputBody.length > 5000) {
+	      if (warningMsg) {
+	        warningMsg = warningMsg + ' and your chapter content may not exceed 5,000 characters';
+	      } else {
+	        warningMsg = 'Your chapter content may not exceed 5,000 characters';
+	      }
+	    }
+	
+	    if (warningMsg) {
+	      warningMsg = warningMsg + '.';
+	      this.props.context.message({ warning: warningMsg });
+	      return;
+	    }
+	
+	    this.props.context.inputSubmit(inputPath, inputBody);
 	  }
 	});
 	

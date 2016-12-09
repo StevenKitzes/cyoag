@@ -34,7 +34,7 @@ var MainColumn = React.createClass({
       inputComponent = <InputComponents.Blocked blocking={context.state.inputBlocking} />
     }
     else {
-      inputComponent = <InputComponents.Input />
+      inputComponent = <InputComponents.Input context={context} />
     }
 
     return(

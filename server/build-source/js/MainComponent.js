@@ -15,6 +15,7 @@ var FooterComponents = require('./FooterComponents');
 var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   getInitialState: getDefaultStateObject,
+  inputSubmit: inputSubmit,
   logoutRequest: logoutXhrHandler,
   message: function(msg) {
     this.setState({
@@ -30,6 +31,7 @@ var MainComponent = React.createClass({
 
     var context = {};
     context.state = this.state;
+    context.inputSubmit = this.inputSubmit;
     context.logoutRequest = this.logoutRequest;
     context.message = this.message;
     context.nameChange = this.nameChange;
@@ -208,6 +210,33 @@ function nameChange(newName) {
     properThis.setState({error: 'Server response timed out; unable to detect result of name change attempt.'});
   }
   var xhrPayload = JSON.stringify({newName: newName});
+  xhr.send(xhrPayload);
+}
+
+function inputSubmit(path, body) {
+  logMgr.debug('User attempting to submit new node . . .');
+  var xhr = new XMLHttpRequest();
+  // xmlHttp.onreadystatechange = () => {...}
+  var properThis = this;
+  xhr.onreadystatechange = function() {
+    if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
+      logMgr.debug('Status 200 (or 304)!');
+      logMgr.verbose('Node submission response payload: ' + xhr.responseText);
+      var response = JSON.parse(xhr.responseText);
+      validateResponse(properThis, response);
+    }
+    else {
+      logMgr.debug('Node submission attempt yielded HTTP response status: ' + xhr.status);
+    }
+  }
+  xhr.open('POST', '/session');
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xhr.timeout = 5000;
+  xhr.ontimeout = function() {
+    xhr.abort();
+    properThis.setState({error: 'Server response timed out; unable to detect result of node submission attempt.'});
+  }
+  var xhrPayload = JSON.stringify({newNodePath: path, newNodeBody: body});
   xhr.send(xhrPayload);
 }
 
