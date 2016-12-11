@@ -78,7 +78,7 @@ router.post('/', function(req, res, next) {
       }
 
       // Build query and callback to check for users with the current session_uid
-      var query = 'SELECT * FROM users WHERE session_uid=?;'
+      var query = 'SELECT * FROM users LEFT JOIN positions ON users.uid=positions.user_uid WHERE session_uid=?;'
       logMgr.out('Executing query to search for users with the current session_uid.');
       connection.query(query, [session_uid], function(err, rows) {
         if(err) {
@@ -118,6 +118,7 @@ router.post('/', function(req, res, next) {
         else if(rows.length == 1) {
           var userRow = rows[0];
           var user_uid = userRow['uid'];
+          var user_position = userRow['node_uid'];
           if(req.body.hasOwnProperty('navigate')) {
             var destination = req.body.navigate;
             if(destination==constants.defaultParentUid) {
@@ -191,7 +192,7 @@ router.post('/', function(req, res, next) {
           }
           else if(req.body.hasOwnProperty('draftPath')) {
             responder.respondMsgOnly(res, {warning: 'Draft salvation not yet implemented on backend, but FYI got path ' + req.body.draftPath +
-              ' and body ' + req.body.draftBody + '.'});
+              ' and body ' + req.body.draftBody + ' to be added with parent node ' + user_position + '.'});
             connection.release();
             return;
           }
