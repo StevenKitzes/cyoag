@@ -57,9 +57,21 @@ var Input = React.createClass({
           <textarea id='cyoag-input-body' type='text' placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
           <div className='cyoag-resize-input-hint'>Drag to resize! ^</div>
         </div>
-        <button id='cyoag-save-draft-submit'>Save Draft</button><button id='cyoag-input-submit' onClick={this.submit}>Submit</button>
+        <button id='cyoag-save-draft-submit' onClick={this.saveDraft}>Save Draft</button>
+        <button id='cyoag-input-submit' onClick={this.submit}>Submit</button>
       </div>
     );
+  },
+  saveDraft: function() {
+    var inputPath = document.getElementById('cyoag-input-path').value || '';
+    var inputBody = document.getElementById('cyoag-input-body').value || '';
+
+    if(inputBody.length > 5000) {
+      this.props.context.message({warning: "Sorry, drafts of over 5,000 characters are not permitted."});
+      return;
+    }
+
+    this.props.context.saveDraft(inputPath, inputBody);
   },
   submit: function() {
     var inputPath = document.getElementById('cyoag-input-path').value;

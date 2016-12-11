@@ -52,7 +52,7 @@
 	
 	var MainComponent = __webpack_require__(/*! ./MainComponent */ 172);
 	
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('main.js');
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('main.js');
 	
 	logMgr.verbose('Kicking off initial render!');
 	
@@ -22133,9 +22133,9 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var config = __webpack_require__(/*! ../../build-config */ 173);
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('MainComponent.js');
+	var config = __webpack_require__(/*! ../../build-config */ 174);
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('MainComponent.js');
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 176);
 	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 177);
@@ -22170,6 +22170,7 @@
 	    context.message = this.message;
 	    context.nameChange = this.nameChange;
 	    context.navigate = this.navigate;
+	    context.saveDraft = this.saveDraft;
 	    context.votify = this.votify;
 	
 	    var debugStateDisplay = function () {
@@ -22208,6 +22209,7 @@
 	      React.createElement(MessagingComponents.Modal, { context: context })
 	    );
 	  },
+	  saveDraft: saveDraft,
 	  votify: votify
 	});
 	
@@ -22372,6 +22374,32 @@
 	    properThis.setState({ error: 'Server response timed out; unable to detect result of node submission attempt.' });
 	  };
 	  var xhrPayload = JSON.stringify({ newNodePath: path, newNodeBody: body });
+	  xhr.send(xhrPayload);
+	}
+	
+	function saveDraft(path, body) {
+	  logMgr.debug('User attempting to save draft . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Draft salvation response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response);
+	    } else {
+	      logMgr.debug('Draft salvation attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({ error: 'Server response timed out; unable to verify that your draft was saved.' });
+	  };
+	  var xhrPayload = JSON.stringify({ draftPath: path, draftBody: body });
 	  xhr.send(xhrPayload);
 	}
 	
@@ -22581,6 +22609,72 @@
 /***/ },
 /* 173 */
 /*!*************************!*\
+  !*** ./utils/logger.js ***!
+  \*************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var DEBUG = __webpack_require__(/*! ../build-config */ 174).DEBUG;
+	var VERBOSE = __webpack_require__(/*! ../build-config */ 174).VERBOSE;
+	
+	module.exports = function(sourceName, withTimestamp) {
+	  return {
+	    logSource: sourceName ? sourceName : 'Unknown source',
+	    withTimestamp: withTimestamp,
+	
+	    out: function(msg) {
+	      var output = msg + ' (' + this.logSource + ')';
+	      logWithTimestamp(output, this.withTimestamp);
+	    },
+	
+	    debug: function(msg) {
+	      if(DEBUG) {
+	        var output = "DEBUG: " + msg + ' (' + this.logSource + ')';
+	        logWithTimestamp(output, this.withTimestamp);
+	      }
+	    },
+	
+	    warn: function(warning) {
+	      var output = "! ! ! WARNING ! ! ! : " + warning + ' (' + this.logSource + ')';
+	      logWithTimestamp(output, this.withTimestamp);
+	    },
+	
+	    error: function(error) {
+	      var output = 'X X X ERROR X X X : ' + error + ' (' + this.logSource + ')';
+	      logWithTimestamp(output, this.withTimestamp);
+	    },
+	
+	    verbose: function(msg) {
+	      if(DEBUG && VERBOSE) {
+	        var output = "VERBOSE: " + msg + ' (' + this.logSource + ')';
+	        logWithTimestamp(output, this.withTimestamp);
+	      }
+	    }
+	  };
+	};
+	
+	function logWithTimestamp(msg, withTimestamp) {
+	  if(!withTimestamp) {
+	    console.log(msg);
+	    return;
+	  }
+	
+	  var date = new Date();
+	
+	  var
+	    year = date.getFullYear(),
+	    month = date.getMonth() + 1,
+	    day = date.getDate(),
+	    hour = date.getHours(),
+	    minute = date.getMinutes(),
+	    second = date.getSeconds();
+	
+	  console.log('[' + year + '.' + month + '.' + day + '.' + hour + '.' + minute + '.' + second + '] ' + msg);
+	}
+
+
+/***/ },
+/* 174 */
+/*!*************************!*\
   !*** ./build-config.js ***!
   \*************************/
 /***/ function(module, exports) {
@@ -22594,7 +22688,7 @@
 
 
 /***/ },
-/* 174 */
+/* 175 */
 /*!**********************!*\
   !*** ./constants.js ***!
   \**********************/
@@ -22662,72 +22756,6 @@
 
 
 /***/ },
-/* 175 */
-/*!*************************!*\
-  !*** ./utils/logger.js ***!
-  \*************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var DEBUG = __webpack_require__(/*! ../build-config */ 173).DEBUG;
-	var VERBOSE = __webpack_require__(/*! ../build-config */ 173).VERBOSE;
-	
-	module.exports = function(sourceName, withTimestamp) {
-	  return {
-	    logSource: sourceName ? sourceName : 'Unknown source',
-	    withTimestamp: withTimestamp,
-	
-	    out: function(msg) {
-	      var output = msg + ' (' + this.logSource + ')';
-	      logWithTimestamp(output, this.withTimestamp);
-	    },
-	
-	    debug: function(msg) {
-	      if(DEBUG) {
-	        var output = "DEBUG: " + msg + ' (' + this.logSource + ')';
-	        logWithTimestamp(output, this.withTimestamp);
-	      }
-	    },
-	
-	    warn: function(warning) {
-	      var output = "! ! ! WARNING ! ! ! : " + warning + ' (' + this.logSource + ')';
-	      logWithTimestamp(output, this.withTimestamp);
-	    },
-	
-	    error: function(error) {
-	      var output = 'X X X ERROR X X X : ' + error + ' (' + this.logSource + ')';
-	      logWithTimestamp(output, this.withTimestamp);
-	    },
-	
-	    verbose: function(msg) {
-	      if(DEBUG && VERBOSE) {
-	        var output = "VERBOSE: " + msg + ' (' + this.logSource + ')';
-	        logWithTimestamp(output, this.withTimestamp);
-	      }
-	    }
-	  };
-	};
-	
-	function logWithTimestamp(msg, withTimestamp) {
-	  if(!withTimestamp) {
-	    console.log(msg);
-	    return;
-	  }
-	
-	  var date = new Date();
-	
-	  var
-	    year = date.getFullYear(),
-	    month = date.getMonth() + 1,
-	    day = date.getDate(),
-	    hour = date.getHours(),
-	    minute = date.getMinutes(),
-	    second = date.getSeconds();
-	
-	  console.log('[' + year + '.' + month + '.' + day + '.' + hour + '.' + minute + '.' + second + '] ' + msg);
-	}
-
-
-/***/ },
 /* 176 */
 /*!*********************************************!*\
   !*** ./build-source/js/HeaderComponents.js ***!
@@ -22737,8 +22765,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('HeaderComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('HeaderComponents.js');
 	
 	var exports = {};
 	
@@ -22786,8 +22814,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('MessagingComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('MessagingComponents.js');
 	
 	var exports = {};
 	
@@ -22929,8 +22957,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('MainColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('MainColumnComponents.js');
 	
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 179);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 180);
@@ -22989,8 +23017,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('NodeComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('NodeComponents.js');
 	
 	var exports = {};
 	
@@ -23066,8 +23094,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('VotificationComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('VotificationComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 181);
 	
@@ -23173,7 +23201,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('SocialLoginButtonComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('SocialLoginButtonComponents.js');
 	
 	var exports = {};
 	
@@ -23240,8 +23268,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('PathComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23315,8 +23343,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('PathComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23407,7 +23435,7 @@
 	      ),
 	      React.createElement(
 	        'button',
-	        { id: 'cyoag-save-draft-submit' },
+	        { id: 'cyoag-save-draft-submit', onClick: this.saveDraft },
 	        'Save Draft'
 	      ),
 	      React.createElement(
@@ -23416,6 +23444,17 @@
 	        'Submit'
 	      )
 	    );
+	  },
+	  saveDraft: function () {
+	    var inputPath = document.getElementById('cyoag-input-path').value || '';
+	    var inputBody = document.getElementById('cyoag-input-body').value || '';
+	
+	    if (inputBody.length > 5000) {
+	      this.props.context.message({ warning: "Sorry, drafts of over 5,000 characters are not permitted." });
+	      return;
+	    }
+	
+	    this.props.context.saveDraft(inputPath, inputBody);
 	  },
 	  submit: function () {
 	    var inputPath = document.getElementById('cyoag-input-path').value;
@@ -23469,8 +23508,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('MarginColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('MarginColumnComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 181);
 	
@@ -23636,8 +23675,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 175)('FooterComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/logger */ 173)('FooterComponents.js');
 	
 	var exports = {};
 	

@@ -189,6 +189,12 @@ router.post('/', function(req, res, next) {
             connection.release();
             return;
           }
+          else if(req.body.hasOwnProperty('draftPath')) {
+            responder.respondMsgOnly(res, {warning: 'Draft salvation not yet implemented on backend, but FYI got path ' + req.body.draftPath +
+              ' and body ' + req.body.draftBody + '.'});
+            connection.release();
+            return;
+          }
           else if(req.body.hasOwnProperty('votify')) {
             var node_uid = req.body.votify;
             var newVote = req.body.newVote;
