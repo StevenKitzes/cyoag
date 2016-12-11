@@ -185,8 +185,55 @@ router.post('/', function(req, res, next) {
             });
           }
           else if(req.body.hasOwnProperty('newNodePath')) {
-            responder.respondMsgOnly(res, {warning: 'Node submission not yet implemented on backend, but FYI got path ' + req.body.newNodePath +
-              ' and body ' + req.body.newNodeBody + '.'});
+            var inputPath = req.body.newNodePath;
+            var inputBody = req.body.newNodeBody;
+            var warningMsg;
+
+            if(!user_position) {
+              responder.respondError(res, 'Unable to establish link between existing chapter and new chapter.');
+              connection.release();
+              return;
+            }
+
+            if(!inputPath || !inputBody) {
+              responder.respondError(res, 'Crucial data was missing from the chapter authoring request.');
+              connection.release();
+              return;
+            }
+
+            if(inputPath.length < 4) {
+              warningMsg = 'Your path teaser must be at least 4 characters long';
+            }
+            else if(inputPath.length > 100) {
+              warningMsg = 'Your path teaser may not exceed 100 characters';
+            }
+
+            if(inputBody.length < 1000) {
+              if(warningMsg) {
+                warningMsg = warningMsg + ' and your chapter content must be at least 1,000 characters long';
+              }
+              else {
+                warningMsg = 'Your chapter content must be at least 1,000 characters long';
+              }
+            }
+            else if(inputBody.length > 5000) {
+              if(warningMsg) {
+                warningMsg = warningMsg + ' and your chapter content may not exceed 5,000 characters';
+              }
+              else {
+                warningMsg = 'Your chapter content may not exceed 5,000 characters';
+              }
+            }
+
+            if(warningMsg) {
+              warningMsg = warningMsg + '.';
+              responder.respondMsgOnly(res, {warning: warningMsg});
+              connection.release();
+              return;
+            }
+
+            // insert new chapter!!
+
             connection.release();
             return;
           }
