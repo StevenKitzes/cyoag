@@ -1,0 +1,12 @@
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level1-1', 'start', '', 'Level 1 choice 1', 'Level 1 choice 1 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level1-2', 'start', '', 'Level 1 choice 2', 'Level 1 choice 2 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level1-3', 'start', '', 'Level 1 choice 3', 'Level 1 choice 3 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level1-4', 'start', '', 'Level 1 choice 4', 'Level 1 choice 4 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level2-1', 'level1-1', '', 'Level 2 choice 1', 'Level 2 choice 1 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level2-2', 'level1-1', '', 'Level 2 choice 2', 'Level 2 choice 2 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level2-3', 'level1-2', '', 'Level 2 choice 3', 'Level 2 choice 3 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level2-4', 'level1-2', '', 'Level 2 choice 4', 'Level 2 choice 4 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level2-5', 'level1-3', '', 'Level 2 choice 5', 'Level 2 choice 1 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level2-6', 'level1-3', '', 'Level 2 choice 6', 'Level 2 choice 2 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level2-7', 'level1-4', '', 'Level 2 choice 7', 'Level 2 choice 3 content.');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('level2-8', 'level1-4', '', 'Level 2 choice 8', 'Level 2 choice 4 content.');

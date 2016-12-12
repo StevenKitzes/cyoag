@@ -300,7 +300,16 @@ function visitorResponse(res, node_uid, msg) {
     }
 
     // Let's get everything we can from a single query off the node_uid
-    var query = 'SELECT node_snippet, path_snippet, parent_uid FROM nodes WHERE uid=?;';
+    var query =
+      'SELECT ' +
+        'nodes.node_snippet, ' +
+        'nodes.path_snippet, ' +
+        'nodes.parent_uid, ' +
+        'users.name AS authorName, ' +
+        'users.acct_type AS authorAcctType ' +
+      'FROM nodes ' +
+      'LEFT JOIN users ON nodes.author_uid=users.uid ' +
+      'WHERE nodes.uid=?;';
     connection.query(query, [node_uid], function(error, rows) {
       if(error) {
         // handle any error querying for users with this session ID
@@ -331,6 +340,20 @@ function visitorResponse(res, node_uid, msg) {
       response.parentUid = row.parent_uid;
       response.snippet.nodeSnippet = row.node_snippet;
       response.snippet.lastPath = row.path_snippet;
+      switch(row.authorAcctType) {
+        case null:
+          response.snippet.authorName = constants.displayNameUnknown;
+          break;
+        case constants.acctTypeBanned:
+          repsonse.snippet.authorName = constants.displayNameBanned;
+          break;
+        case constants.acctTypeDeleted:
+          response.snippet.authorName = constants.displayNameDeleted;
+          break;
+        default:
+          response.snippet.authorName = row.authorName;
+          break;
+      }
       response.votification = constants.votificationNone;
 
       // now get paths out from here by finding the nodes that have this node as a parent
