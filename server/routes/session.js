@@ -232,8 +232,27 @@ router.post('/', function(req, res, next) {
               return;
             }
 
+            // validate parent still exists
             // insert new chapter!!
+            query =
+              'START TRANSACTION; ' +
+                'INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet, votification) ' +
+                  'SELECT ?, positions.node_uid, positions.user_uid, ?, ?, ? ' +
+                  'FROM positions ' +
+                  'WHERE positions.user_uid=?;' +
+                'UPDATE positions SET node_uid=? WHERE user_uid=?; ' +
+              'COMMIT;';
+            var newNodeUid = generateGuid();
+            connection.query(query, [newNodeUid, inputPath, inputBody, 0, user_uid, newNodeUid, user_uid], function(err, rows) {
+              if(err) {
+                responder.respondError(res, 'Database error saving new chapter information.');
+                logMgr.error(err);
+                connection.release();
+                return;
+              }
+            });
 
+            responder.respond(res, session_uid);
             connection.release();
             return;
           }
@@ -290,9 +309,6 @@ router.post('/', function(req, res, next) {
               if(row.sentiment == null) {
                 // node existed so row returned, but no vote on that node for this user
                 // create vote, and don't forget to update node's votification count
-
-                // begin messy transaction code required by NPM mysql module:
-                //
                 query = 'START TRANSACTION; ' +
                   'INSERT INTO votes (user_uid, node_uid, sentiment) VALUES (?, ?, ?); ' +
                   'UPDATE nodes SET votification=votification+? WHERE uid=?;' +

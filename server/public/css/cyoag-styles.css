@@ -36,7 +36,16 @@ button {
   color: #BBBBBB;
   font-family: sans-serif;
   font-size: 0.8em;
-  font-style: italic;
+}
+.cyoag-note-green {
+  color: darkgreen;
+  font-family: sans-serif;
+  font-size: 0.8em;
+}
+.cyoag-note-red {
+  color: darkred;
+  font-family: sans-serif;
+  font-size: 0.8em;
 }
 
 .cyoag-inline-block {
@@ -345,12 +354,25 @@ button {
   width: 85%;
 }
 
-.cyoag-resize-input-hint {
-  color: #BBBBBB;
-  font-size: 0.8em;
-  margin: 0 auto;
-  text-align: right;
+#cyoag-path-char-hint {
+  margin: -0.2em auto 0 auto;
+  text-align: left;
   width: 85%;
+}
+#cyoag-input-body-hints-container {
+  margin-top: -0.2em;
+}
+#cyoag-body-char-hint {
+  display: inline-block;
+  margin: -0.5em auto 0 auto;
+  text-align: left;
+  width: 42%;
+}
+.cyoag-resize-input-hint {
+  display: inline-block;
+  margin: -0.5em auto 0 auto;
+  text-align: right;
+  width: 42%;
 }
 
 #cyoag-input-submit {

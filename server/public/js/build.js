@@ -23400,6 +23400,12 @@
 	var Input = React.createClass({
 	  displayName: 'Input',
 	
+	  getInitialState: function () {
+	    return {
+	      pathCharCount: 0,
+	      bodyCharCount: 0
+	    };
+	  },
 	  render: function () {
 	    return React.createElement(
 	      'div',
@@ -23416,21 +23422,34 @@
 	      React.createElement(
 	        'div',
 	        { id: 'cyoag-input-path-container' },
-	        'Enter the path teaser text that will entice people to choose your new chapter:',
+	        'Enter the path teaser for your new chapter:',
 	        React.createElement('br', null),
-	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', placeholder: 'Path snippet - minimum 4 characters, maximum 100 characters.' }),
-	        React.createElement('br', null)
+	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', onKeyUp: this.updatePathCharCount, placeholder: 'Path snippet - minimum 4 characters, maximum 100 characters.' }),
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-path-char-hint' },
+	          React.createElement(PathHint, { count: this.state.pathCharCount })
+	        )
 	      ),
 	      React.createElement(
 	        'div',
 	        { id: 'cyoag-input-body-container' },
 	        'Enter the body of your new chapter:',
 	        React.createElement('br', null),
-	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', placeholder: 'Chapter content - minimum 1000 characters, maximum 5000 characters.' }),
+	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', onKeyUp: this.updateBodyCharCount, placeholder: 'Chapter content - minimum 1000 characters, maximum 5000 characters.' }),
 	        React.createElement(
 	          'div',
-	          { className: 'cyoag-resize-input-hint' },
-	          'Drag to resize! ^'
+	          { id: 'cyoag-input-body-hints-container' },
+	          React.createElement(
+	            'div',
+	            { id: 'cyoag-body-char-hint' },
+	            React.createElement(BodyHint, { count: this.state.bodyCharCount })
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'cyoag-resize-input-hint cyoag-note' },
+	            'Drag to resize! ^'
+	          )
 	        )
 	      ),
 	      React.createElement(
@@ -23489,6 +23508,82 @@
 	    }
 	
 	    this.props.context.inputSubmit(inputPath, inputBody);
+	  },
+	  updateBodyCharCount: function () {
+	    this.setState({
+	      bodyCharCount: document.getElementById('cyoag-input-body').value.length
+	    });
+	  },
+	  updatePathCharCount: function () {
+	    this.setState({
+	      pathCharCount: document.getElementById('cyoag-input-path').value.length
+	    });
+	  }
+	});
+	
+	var PathHint = React.createClass({
+	  displayName: 'PathHint',
+	
+	  render: function () {
+	    var count = this.props.count;
+	
+	    if (count < 4) {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-red' },
+	        'Too few characters: ',
+	        count
+	      );
+	    }
+	
+	    if (count > 100) {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-red' },
+	        'Too many characters: ',
+	        count
+	      );
+	    } else {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-green' },
+	        'Characters: ',
+	        count
+	      );
+	    }
+	  }
+	});
+	
+	var BodyHint = React.createClass({
+	  displayName: 'BodyHint',
+	
+	  render: function () {
+	    var count = this.props.count;
+	
+	    if (count < 1000) {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-red' },
+	        'Too few characters: ',
+	        count
+	      );
+	    }
+	
+	    if (count > 5000) {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-red' },
+	        'Too many characters: ',
+	        count
+	      );
+	    } else {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-green' },
+	        'Characters: ',
+	        count
+	      );
+	    }
 	  }
 	});
 	

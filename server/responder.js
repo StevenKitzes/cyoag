@@ -222,7 +222,9 @@ function respond(res, session_uid, msg) {
             pathVotification: rows[i].pathVotification
           };
           response.paths.push(path);
-          response.inputBlocking.side = (row.userUid == rows[i].authorUid) ? true : false;
+          if(row.userUid == rows[i].authorUid) {
+            response.inputBlocking.side = true;
+          }
         }
 
         // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)

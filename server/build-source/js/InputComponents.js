@@ -44,18 +44,27 @@ var Blocked = React.createClass({
 
 // Display input fields and simple directions so users know how to contribute
 var Input = React.createClass({
+  getInitialState: function() {
+    return {
+      pathCharCount: 0,
+      bodyCharCount: 0
+    };
+  },
   render: function() {
     return (
       <div id='cyoag-input-container'>
         <p id='cyoag-input-cta'><em>Want to add your own content following this chapter?</em></p>
         <div id='cyoag-input-path-container'>
-          Enter the path teaser text that will entice people to choose your new chapter:<br />
-          <textarea id='cyoag-input-path' type='text' placeholder='Path snippet - minimum 4 characters, maximum 100 characters.'></textarea><br />
+          Enter the path teaser for your new chapter:<br />
+          <textarea id='cyoag-input-path' type='text' onKeyUp={this.updatePathCharCount} placeholder='Path snippet - minimum 4 characters, maximum 100 characters.'></textarea>
+          <div id='cyoag-path-char-hint'><PathHint count={this.state.pathCharCount} /></div>
         </div>
         <div id='cyoag-input-body-container'>
           Enter the body of your new chapter:<br />
-          <textarea id='cyoag-input-body' type='text' placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
-          <div className='cyoag-resize-input-hint'>Drag to resize! ^</div>
+          <textarea id='cyoag-input-body' type='text' onKeyUp={this.updateBodyCharCount} placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
+          <div id='cyoag-input-body-hints-container'>
+            <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
+          </div>
         </div>
         <button id='cyoag-save-draft-submit' onClick={this.saveDraft}>Save Draft</button>
         <button id='cyoag-input-submit' onClick={this.submit}>Submit</button>
@@ -110,6 +119,64 @@ var Input = React.createClass({
     }
 
     this.props.context.inputSubmit(inputPath, inputBody);
+  },
+  updateBodyCharCount: function() {
+    this.setState({
+      bodyCharCount: document.getElementById('cyoag-input-body').value.length
+    });
+  },
+  updatePathCharCount: function() {
+    this.setState({
+      pathCharCount: document.getElementById('cyoag-input-path').value.length
+    });
+  }
+});
+
+var PathHint = React.createClass({
+  render: function() {
+    var count = this.props.count;
+
+    if(count < 4) {
+      return (
+        <span className='cyoag-note-red'>Too few characters: {count}</span>
+      );
+    }
+
+    if(count > 100) {
+      return (
+        <span className='cyoag-note-red'>Too many characters: {count}</span>
+      );
+    }
+
+    else {
+      return (
+        <span className='cyoag-note-green'>Characters: {count}</span>
+      );
+    }
+  }
+});
+
+var BodyHint = React.createClass({
+  render: function() {
+    var count = this.props.count;
+
+    if(count < 1000) {
+      return (
+        <span className='cyoag-note-red'>Too few characters: {count}</span>
+      );
+    }
+
+    if(count > 5000) {
+      return (
+        <span className='cyoag-note-red'>Too many characters: {count}</span>
+      );
+    }
+
+    else {
+      return (
+        <span className='cyoag-note-green'>Characters: {count}</span>
+      );
+    }
   }
 });
 
