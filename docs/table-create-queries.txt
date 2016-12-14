@@ -23,7 +23,7 @@ node_uid VARCHAR(40)
 );
 
 CREATE TABLE IF NOT EXISTS votes (
-voter_uid VARCHAR(40),
+user_uid VARCHAR(40),
 node_uid VARCHAR(40),
 sentiment TINYINT,
 PRIMARY KEY (voter_uid, node_uid)
