@@ -26,7 +26,7 @@ CREATE TABLE IF NOT EXISTS votes (
 user_uid VARCHAR(40),
 node_uid VARCHAR(40),
 sentiment TINYINT,
-PRIMARY KEY (voter_uid, node_uid)
+PRIMARY KEY (user_uid, node_uid)
 );
 
 INSERT INTO users (uid, name, acct_type, session_uid) VALUES ('', 'Steverino', 'moderator', '0');
