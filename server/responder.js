@@ -76,7 +76,6 @@ function respond(res, session_uid, msg) {
     if(err) {
       // handle any error getting connection from pool
       respondError(res, 'Problem getting a database connection.  Unable to build response. ' + error_getConnection)
-      connection.release();
       return;
     }
 
@@ -297,7 +296,6 @@ function visitorResponse(res, node_uid, msg) {
     if(err) {
       // handle any error getting connection from pool
       respondError(res, 'Problem getting a database connection.  Unable to build response.')
-      connection.release();
       return;
     }
 

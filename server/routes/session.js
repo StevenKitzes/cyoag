@@ -73,7 +73,6 @@ router.post('/', function(req, res, next) {
       if(err) {
         responder.respondError(res, 'There was a problem getting a database connection.  Cannot validate session ID.');
         logMgr.error(err);
-        connection.release();
         return;
       }
 

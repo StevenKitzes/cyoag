@@ -2,3 +2,4 @@ server/node_modules
 resources
 *.log
 server/secrets.js
+server/digital-ocean
