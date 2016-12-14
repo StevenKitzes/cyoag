@@ -26,6 +26,9 @@ constants.displayNameUnknown = '[-unknown-]';
 
 constants.emptyString = '';
 
+constants.envLocal = 'local';
+constants.envProd = 'prod';
+
 constants.errorNodeUid = 'error';
 constants.errorUserName = 'Visitor';
 constants.errorTrailingSnippet = '... and it had been a long night, and the CYOAG development team was really tired.';
@@ -43,10 +46,16 @@ constants.modalTypeMessage = 'cyoag-modal-type-message';
 constants.modalTypeWarning = 'cyoag-modal-type-warning';
 constants.modalTypeError = 'cyoag-modal-type-error';
 
+constants.portLocal = 3000;
+constants.portProd = 80;
+
 constants.rootNodeUid = 'start';
 
 constants.rootTrailingSnippet = '... a cold wind blows.';
 constants.rootLastPath = 'The writer takes up his pen.';
+
+constants.hostDomainLocal = 'http://localhost.cyoag.com:3000/';
+constants.hostDomainProd = 'http://cyoag.com/';
 
 constants.trailingSnippetLength = 200;
 

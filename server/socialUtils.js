@@ -3,6 +3,7 @@ var generateGuid = require('./utils/uid-gen');
 var responder = require('./responder');
 var logMgr = require('./utils/logger')('socialUtils.js', true);
 
+var config = require('./build-config');
 var constants = require('./constants');
 
 function socialLoginById(user_uid, req, res) {
@@ -89,7 +90,7 @@ function registerUser(uid, node_uid, res) {
       connection.release();
       res.clearCookie(constants.cookieNode);
       res.cookie(constants.cookieSession, newUserSessionUid, constants.cookieExpiry);
-      res.redirect(302, 'http://localhost.cyoag.com:3000/');
+      res.redirect(302, config.hostDomain);
       return;
     });
 
@@ -126,7 +127,7 @@ function updateUserSession(uid, res) {
       logMgr.out('Updated registered user session.');
       res.clearCookie(constants.cookieNode);
       res.cookie(constants.cookieSession, sessionUid, constants.cookieExpiry);
-      res.redirect(302, 'http://localhost.cyoag.com:3000/');
+      res.redirect(302, config.hostDomain);
       return;
     });
   });

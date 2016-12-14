@@ -9,6 +9,7 @@ var router = express.Router();
 var secrets = require('../secrets');
 var socialUtils = require('../socialUtils');
 var logMgf = require('../utils/logger')('twRoutes.js', true);
+var config = require('../build-config');
 
 // Route to kick off a Twitter login event
 router.get('/login', function(req, res, next) {
@@ -27,7 +28,7 @@ router.get('/login', function(req, res, next) {
 
   // This 'oauth' object defines our authentication header and callback location
   var oauth = {
-    callback: 'http://localhost.cyoag.com:3000/tw/swap/',
+    callback: config.hostDomain + 'tw/swap/',
     consumer_key: secrets.TW_KEY,
     consumer_secret: secrets.TW_SECRET
   };

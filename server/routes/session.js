@@ -249,11 +249,11 @@ router.post('/', function(req, res, next) {
                 connection.release();
                 return;
               }
-            });
 
-            responder.respond(res, session_uid);
-            connection.release();
-            return;
+              responder.respond(res, session_uid);
+              connection.release();
+              return;
+            });
           }
           else if(req.body.hasOwnProperty('draftPath')) {
             responder.respondMsgOnly(res, {warning: 'Draft salvation not yet implemented on backend, but FYI got path ' + req.body.draftPath +

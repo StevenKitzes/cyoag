@@ -5,6 +5,9 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
+var buildConfig = require('./build-config');
+var constants = require('./constants');
+
 var index = require('./routes/index');
 var fbRoutes = require('./routes/fbRoutes');
 var twRoutes = require('./routes/twRoutes');
@@ -15,6 +18,21 @@ var app = express();
 
 // view engine setup
 app.set('view engine', null);
+
+// set incoming port
+var port;
+switch(buildConfig.env) {
+  case constants.envProd:
+    port = constants.portProd;
+    break;
+  case constants.envLocal:
+    port = constants.portLocal;
+    break;
+  default:
+    port = 3000;
+    break;
+}
+app.set('port', process.env.PORT || port);
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -54,5 +72,7 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.send('ERROR: ' + err.message);
 });
+
+app.listen(80);
 
 module.exports = app;

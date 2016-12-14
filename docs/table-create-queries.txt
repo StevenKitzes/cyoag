@@ -13,7 +13,8 @@ author_uid VARCHAR(40),
 path_snippet VARCHAR(100),
 node_snippet VARCHAR(5000),
 votification INTEGER,
-INDEX (parent_uid)
+INDEX (parent_uid),
+INDEX (author_uid)
 );
 
 CREATE TABLE IF NOT EXISTS positions (
@@ -29,6 +30,5 @@ PRIMARY KEY (voter_uid, node_uid)
 );
 
 INSERT INTO users (uid, name, acct_type, session_uid) VALUES ('', 'Steverino', 'moderator', '0');
-INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('start', '00000000000000-0000000000-00000000000000', '', 'Path to first node.', 'First node content.');
-INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet) VALUES ('test', 'start', '', 'Path to second node.', 'Second node content.');
-INSERT INTO positions (user_uid, node_uid) VALUES ('', 'test');
+INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet, votification) VALUES ('start', '00000000000000-0000000000-00000000000000', '', 'Path to first node.', 'First node content.', 0);
+INSERT INTO positions (user_uid, node_uid) VALUES ('', 'start');

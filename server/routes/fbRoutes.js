@@ -6,6 +6,7 @@ var request = require('request'); // easy HTTP request library
 var router = express.Router();
 
 var logMgr = require('../utils/logger')('fbRoutes.js', true);
+var config = require('../build-config');
 
 var responder = require('../responder');
 var secrets = require('../secrets');
@@ -15,7 +16,9 @@ var socialUtils = require('../socialUtils');
 router.get('/login', function(req, res, next) {
   var fbLoginUrl = 'https://www.facebook.com/v2.8/dialog/oauth?client_id=' +
     secrets.FB_APP_ID +
-    '&redirect_uri=http://localhost.cyoag.com:3000/fb/swap&response_type=code';
+    '&redirect_uri=' +
+    config.hostDomain +
+    'fb/swap&response_type=code';
   res.redirect(302, fbLoginUrl);
 });
 
@@ -25,7 +28,9 @@ router.get('/swap', function(req, res, next) {
   //  parse it out here, then build URL to swap "code" for user's access token
   var swapUrl = 'https://graph.facebook.com/v2.8/oauth/access_token?client_id=' +
     secrets.FB_APP_ID +
-    '&redirect_uri=http://localhost.cyoag.com:3000/fb/swap&client_secret=' +
+    '&redirect_uri=' +
+    config.hostDomain +
+    'fb/swap&client_secret=' +
     secrets.FB_APP_SECRET +
     '&code=' +
     req.query.code;
