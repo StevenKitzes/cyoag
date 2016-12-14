@@ -344,11 +344,13 @@ button {
 }
 
 #cyoag-input-path {
+  font-size: 1em;
   height: 2em;
   resize: none;
   width: 85%;
 }
 #cyoag-input-body {
+  font-size: 1em;
   height: 10em;
   resize: vertical;
   width: 85%;
