@@ -21,11 +21,13 @@ var options = null;
 var server;
 
 if(buildConfig.env == constants.envProd) {
+  logger.out('Trying to read in certificate information . . .');
   options = {
     key: fs.readFileSync(buildConfig.httpsPrivKeyLocation),
     cert: fs.readFileSync(buildConfig.httpsFullChainLocation),
     ca: fs.readFileSync(buildConfig.httpsChainLocation)
   }
+  logger.out('Certificate information loaded');
 
   /**
   * Get port from environment and store in Express.
