@@ -22,6 +22,9 @@ var server;
 
 if(buildConfig.env == constants.envProd) {
   logger.out('Trying to read in certificate information . . .');
+  logger.out('Attempting to read from paths:');
+  logger.out(buildConfig.httpsPrivKeyLocation + ' ' + buildConfig.httpsFullChainLocation + ' ' + buildConfig.httpsChainLocation);
+  logger.out(JSON.stringify(buildConfig));
   options = {
     key: fs.readFileSync(buildConfig.httpsPrivKeyLocation),
     cert: fs.readFileSync(buildConfig.httpsFullChainLocation),
