@@ -12,3 +12,27 @@ $ sudo apt-get install letsencrypt
 
 To use the certbot:
 $ letsencrypt certonly --webroot -w /home/cyoag/server/public -d cyoag.com -d www.cyoag.com
+
+The Let's Encrypt script output will tell you where it has placed the new key/cert files you need to reference in creating your ExpressJS server.
+
+===
+PM2
+===
+
+PM2 is a process manager that can be used to manage NodeJS instances.  It allows for automated startup and restarting of NodeJS applications as daemon processes.
+
+Command to run using an 'npm start script':
+pm2 start npm --name [your app name] -- [npm start script name, e.g. start]
+
+================================
+Helpful Links In Case You Forget
+================================
+
+ExpressJS best security practices:
+https://expressjs.com/en/advanced/best-practice-security.html
+
+CertBot guide for getting Let's Encrypt SSL certificates:
+https://certbot.eff.org/#ubuntuxenial-other
+
+How to work with SSL/HTTPS/TSL in ExpressJS:
+https://www.sitepoint.com/how-to-use-ssltls-with-node-js/
