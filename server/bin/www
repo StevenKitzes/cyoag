@@ -23,7 +23,7 @@ var server;
 if(buildConfig.env == constants.envProd) {
   options = {
     key: fs.readFileSync(buildConfig.httpsPrivKeyLocation),
-    cert: fs.readFileSync(buildConfig.httpsFullChainLocation)
+    cert: fs.readFileSync(buildConfig.httpsFullChainLocation),
     ca: fs.readFileSync(buildConfig.httpsChainLocation)
   }
 
