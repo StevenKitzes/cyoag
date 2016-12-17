@@ -4,30 +4,83 @@
  * Module dependencies.
  */
 
+var fs = require('fs');
 var app = require('../cyoag');
 var debug = require('debug')('server:server');
 var http = require('http');
+var https = require('https');
 
-/**
- * Get port from environment and store in Express.
- */
+var logger = require('../utils/logger')('www', true);
 
-var port = normalizePort(process.env.PORT || '3000');
-app.set('port', port);
+var constants = require('../constants');
+var buildConfig = require('../build-config');
+var secrets = require('../secrets');
 
-/**
- * Create HTTP server.
- */
+// grab cert and private key for HTTPS authentication
+var options = null;
+var server;
 
-var server = http.createServer(app);
+if(buildConfig.env == constants.envProd) {
+  options = {
+    key: fs.readFileSync(buildConfig.httpsCertKeyLocation),
+    cert: fs.readFileSync(buildConfig.httpsCertLocation)
+  }
 
-/**
- * When DB is ready, listen on provided port, on all network interfaces.
- */
+  /**
+  * Get port from environment and store in Express.
+  */
+  app.set('port', process.env.PORT || 443);
 
-server.listen(port);
-server.on('error', onError);
-server.on('listening', onListening);
+  /**
+   * Create HTTPS server.
+   */
+  server = https.createServer(options, app);
+
+  /**
+   * When DB is ready, listen on provided port, on all network interfaces.
+   */
+  logger.out('Attempting to start main server listener in Production environment.');
+  server.listen(443);
+  server.on('error', onError);
+  server.on('listening', onListening);
+  logger.out('Main server started in Production environment.');
+
+  /**
+   * On Prod only, set up an additional micro HTTP listener to simply redirect
+   * all requests to HTTPS
+   */
+
+  var httpRedirect = require('express')();
+
+  httpRedirect.get('*', function(req,res) {
+    logger.out('Got HTTP GET request to url: ' + req.url.substring(1) + ' . . . attempting redirect');
+    res.redirect(buildConfig.hostDomain + req.url.substring(1));
+  });
+
+  logger.out('Attempting to start micro server to redirect HTTP to HTTPS . . .');
+  http.createServer(httpRedirect).listen(buildConfig.httpPort);
+  logger.out('Micro HTTP to HTTPS redirect server init successful.');
+}
+else if(buildConfig.env == constants.envLocal) {
+  /**
+  * Get port from environment and store in Express.
+  */
+  app.set('port', process.env.PORT || 3000);
+
+  /**
+   * Create HTTP server.
+   */
+  server = require('http').createServer(app);
+
+  /**
+   * When DB is ready, listen on provided port, on all network interfaces.
+   */
+  logger.out('Attempting to start main server listener in Local environment.');
+  server.listen(3000);
+  server.on('error', onError);
+  server.on('listening', onListening);
+  logger.out('Main server started in Local environment.');
+}
 
 /**
  * Normalize a port into a number, string, or false.

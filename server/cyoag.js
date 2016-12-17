@@ -1,9 +1,11 @@
+var http = require('http');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
-var logger = require('morgan');
+var logger = require('./utils/logger')('cyoag.js', true);
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var helmet = require('helmet');
 
 var buildConfig = require('./build-config');
 var constants = require('./constants');
@@ -19,24 +21,11 @@ var app = express();
 // view engine setup
 app.set('view engine', null);
 
-// set incoming port
-var port;
-switch(buildConfig.env) {
-  case constants.envProd:
-    port = constants.portProd;
-    break;
-  case constants.envLocal:
-    port = constants.portLocal;
-    break;
-  default:
-    port = 3000;
-    break;
-}
-app.set('port', process.env.PORT || port);
+// NOTE: port is set in ../cyoag/bin/www
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+app.use(helmet());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -72,7 +61,5 @@ app.use(function(err, req, res, next) {
   res.status(err.status || 500);
   res.send('ERROR: ' + err.message);
 });
-
-app.listen(80);
 
 module.exports = app;

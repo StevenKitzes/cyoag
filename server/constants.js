@@ -36,6 +36,9 @@ constants.errorLastPath = 'The developer makes a horrible mistake.';
 constants.errorNodeSnippet = 'It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, ' +
   'you might ask ... ?  Well, let me tell you!';
 
+constants.hostDomainLocal = 'https://localhost.cyoag.com/';
+constants.hostDomainProd = 'https://cyoag.com/';
+  
 constants.inputBlockingHide = 'hide';
 
 constants.messageRegularClass = 'cyoag-regular-message';
@@ -48,14 +51,12 @@ constants.modalTypeError = 'cyoag-modal-type-error';
 
 constants.portLocal = 3000;
 constants.portProd = 80;
+constants.portHttps = 443;
 
 constants.rootNodeUid = 'start';
 
 constants.rootTrailingSnippet = '... a cold wind blows.';
 constants.rootLastPath = 'The writer takes up his pen.';
-
-constants.hostDomainLocal = 'http://localhost.cyoag.com:3000/';
-constants.hostDomainProd = 'http://cyoag.com/';
 
 constants.trailingSnippetLength = 200;
 

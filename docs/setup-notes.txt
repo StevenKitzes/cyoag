@@ -1,0 +1,14 @@
+Setup and Installation Notes:
+=============================
+
+Regarding HTTPS setup:
+To set up the CYOAG server, you will want to have HTTPS enabled since the NodeJS
+project expects it.
+
+First you need Let's Encrypt for free certificate authority access
+
+To get the certbot:
+$ sudo apt-get install letsencrypt
+
+To use the certbot:
+$ letsencrypt certonly --webroot -w /home/cyoag/server/public -d cyoag.com -d www.cyoag.com
