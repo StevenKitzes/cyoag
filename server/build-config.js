@@ -6,7 +6,7 @@ var config = {};
 config.DEBUG = true;
 config.VERBOSE = true;
 
-config.env = constants.envProd;
+config.env = constants.envLocal;
 
 switch(config.env) {
   case constants.envLocal:

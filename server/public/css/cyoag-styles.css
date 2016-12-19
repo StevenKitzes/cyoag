@@ -4,6 +4,10 @@ body {
   text-align: center;
 }
 
+a {
+    outline: none !important;
+}
+
 div {
   text-align: center;
 }
@@ -235,6 +239,15 @@ button {
   margin-right: auto;
   margin-left: auto;
   width: 85%;
+}
+
+.cyoag-snippet-paragraph {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.cyoag-snippet-paragraph + .cyoag-snippet-paragraph {
+  margin-top: 0.5em;
+  margin-bottom: 0;
 }
 
 .cyoag-trailing-snippet {

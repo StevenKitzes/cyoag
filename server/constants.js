@@ -36,9 +36,9 @@ constants.errorLastPath = 'The developer makes a horrible mistake.';
 constants.errorNodeSnippet = 'It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, ' +
   'you might ask ... ?  Well, let me tell you!';
 
-constants.hostDomainLocal = 'https://localhost.cyoag.com/';
+constants.hostDomainLocal = 'http://localhost.cyoag.com:3000/';
 constants.hostDomainProd = 'https://cyoag.com/';
-  
+
 constants.inputBlockingHide = 'hide';
 
 constants.messageRegularClass = 'cyoag-regular-message';

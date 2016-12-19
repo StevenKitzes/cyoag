@@ -23,11 +23,13 @@ var Node = React.createClass({
     return(
       <div id='cyoag-node-container'>
         <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-div-link' href='#' onMouseMove={this.locateTooltip}>
-          <div className='cyoag-path-item cyoag-trailing-snippet' onClick={this.navigate}>{snippet.trailingSnippet}</div>
+          <div className='cyoag-path-item cyoag-trailing-snippet' onClick={this.navigate}>
+            {snippet.trailingSnippet.split("\n").map(function(i) {return <p className='cyoag-snippet-paragraph'>{i}</p>;})}
+          </div>
           <div id='cyoag-tooltip-regress'>Back whence you came . . . ?</div>
         </a>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
-        <p id='cyoag-node-snippet'>{snippet.nodeSnippet}</p>
+        <p id='cyoag-node-snippet'>{snippet.nodeSnippet.split("\n").map(function(i) {return <p className='cyoag-snippet-paragraph'>{i}</p>;})}</p>
         <p id='cyoag-author-attribution' className='cyoag-note'>Contribution by user {context.state.snippet.authorName}</p>
       </div>
     );
