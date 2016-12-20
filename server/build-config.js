@@ -22,6 +22,8 @@ switch(config.env) {
     config.httpsPrivKeyLocation = secrets.httpsPrivKeyLocation;
     config.httpsFullChainLocation = secrets.httpsFullChainLocation;
     config.httpsChainLocation = secrets.httpsChainLocation;
+    // override in Production
+    config.DEBUG = false;
     break;
   default:
     config.hostDomain = constants.hostDomainLocal;
