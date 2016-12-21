@@ -5,6 +5,7 @@ var express = require('express');
 var qs = require('querystring');  // help build and parse URL query strings
 var request = require('request'); // easy HTTP request library
 var router = express.Router();
+var responder = require('../responder');
 
 var secrets = require('../secrets');
 var socialUtils = require('../socialUtils');
@@ -108,8 +109,13 @@ router.get('/swap', function(req, res, next) {
     //   console.log(JSON.stringify(user));
     // })
 
-    var user_uid = 'tw-' + perm_data.user_id;
-    socialUtils.socialLoginById(user_uid, req, res);
+    if(perm_data.user_id) {
+      var user_uid = 'tw-' + perm_data.user_id;
+      socialUtils.socialLoginById(user_uid, req, res);
+    }
+    else {
+      responder.respondError(res, "Got a bad Twitter account ID.  Cannot identify user.");
+    }
   });
 });
 

@@ -59,7 +59,12 @@ router.get('/swap', function(req, res, next) {
          * providers by prepending the provider's abreviation
          */
         var idObj = JSON.parse(rb);
-        var user_uid = 'fb-' + idObj.id;
+        if(idObj && idObj.id) {
+          var user_uid = 'fb-' + idObj.id;
+        }
+        else {
+          responder.respondError(res, "Problem retrieving Facebook user ID.  Cannot identify user.");
+        }
 
         socialUtils.socialLoginById(user_uid, req, res);
       });
