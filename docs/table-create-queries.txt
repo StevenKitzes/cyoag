@@ -29,6 +29,9 @@ sentiment TINYINT,
 PRIMARY KEY (user_uid, node_uid)
 );
 
+ALTER TABLE nodes CONVERT TO CHARACTER SET utf8;
+ALTER TABLE users CONVERT TO CHARACTER SET utf8;
+
 INSERT INTO users (uid, name, acct_type, session_uid) VALUES ('', 'Steverino', 'moderator', '0');
 INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet, votification) VALUES ('start', '00000000000000-0000000000-00000000000000', '', 'Path to first node.', 'First node content.', 0);
 INSERT INTO positions (user_uid, node_uid) VALUES ('', 'start');
