@@ -3,6 +3,7 @@ var ReactDOM = require('react-dom');
 
 var constants = require('../../constants');
 var logMgr = require('../../utils/logger')('NodeComponents.js');
+var uidGen = require('../../utils/uid-gen');
 
 var exports = {};
 
@@ -24,13 +25,13 @@ var Node = React.createClass({
       <div id='cyoag-node-container'>
         <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-div-link' href='#' onMouseMove={this.locateTooltip}>
           <div className='cyoag-path-item cyoag-trailing-snippet' onClick={this.navigate}>
-            {snippet.trailingSnippet.split("\n").map(function(i) {return <p className='cyoag-snippet-paragraph'>{i}</p>;})}
+            {snippet.trailingSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}
           </div>
           <div id='cyoag-tooltip-regress'>Back whence you came . . . ?</div>
         </a>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
-        <p id='cyoag-node-snippet'>{snippet.nodeSnippet.split("\n").map(function(i) {return <p className='cyoag-snippet-paragraph'>{i}</p>;})}</p>
-        <p id='cyoag-author-attribution' className='cyoag-note'>Contribution by user {context.state.snippet.authorName}</p>
+        <div id='cyoag-node-snippet'>{snippet.nodeSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}</div>
+        <p id='cyoag-author-attribution' className='cyoag-note'>Contribution by user {snippet.authorName}</p>
       </div>
     );
   },

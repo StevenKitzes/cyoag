@@ -85,7 +85,7 @@ var NameChangeComponent = React.createClass({
     else if(this.state.nameChange == 'ui') {
       return (
         <div id='cyoag-name-change-ui'>
-          <input id='cyoag-name-input' onKeyUp={this.validate} type='text' placeholder='New name'></input>
+          <input id='cyoag-name-input' type='text' placeholder='New name'></input>
           <button id='cyoag-submit-name-change-button' onClick={this.submit}>Submit</button>
         </div>
       );
@@ -96,14 +96,10 @@ var NameChangeComponent = React.createClass({
     );
   },
   submit: function() {
-    this.validate();
-    var newName = document.getElementById('cyoag-name-input').value;
-    if(newName.length < 3) {
-      this.props.context.message({
-        warning: 'Your custom name must have at least 3 characters in it.'
-      });
+    if(!this.validate()) {
       return;
     }
+    var newName = document.getElementById('cyoag-name-input').value;
     this.props.context.nameChange(newName);
     this.swap();
   },
@@ -121,9 +117,24 @@ var NameChangeComponent = React.createClass({
   },
   validate: function() {
     var newName = document.getElementById('cyoag-name-input').value;
-    if(newName.length > 16 || newName.match(/-{2,}/) || newName.match(/[^a-zA-Z0-9-]/)) {
-      document.getElementById('cyoag-name-input').value = newName.substring(0,16).replace(/-{2,}/g, '-').replace(/[^a-zA-Z0-9-]/g, '');
+    var context = this.props.context;
+    if(newName.length < 3) {
+      context.message({warning: "User names cannot be shorter than 3 characters."});
+      return false;
     }
+    else if(newName.length > 16) {
+      context.message({warning: "User names cannot be longer than 16 characters."});
+      return false;
+    }
+    else if(newName.match(/-{2,}/)) {
+      context.message({warning: "User names cannot contain consecutive dashes."});
+      return false;
+    }
+    else if(newName.match(/[^a-zA-Z0-9-]/)) {
+      context.message({warning: "User names may only contain letters and numbers."});
+      return false;
+    }
+    return true;
   }
 });
 

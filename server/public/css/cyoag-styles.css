@@ -4,7 +4,7 @@ body {
   text-align: center;
 }
 
-a {
+* {
     outline: none !important;
 }
 
@@ -348,9 +348,6 @@ button {
   padding-top: 0.1em;
   padding-right: 0.5em;
   padding-left: 0.5em;
-}
-#cyoag-input-container textarea:focus {
-  outline: none !important;
 }
 
 #cyoag-input-body-container {
