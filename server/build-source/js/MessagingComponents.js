@@ -97,11 +97,11 @@ var Modal = React.createClass({
     }
 
     return(
-      <div id='cyoag-modal-message-container'>
+      <div onClick={this.closeModal} id='cyoag-modal-message-container'>
         <div id='cyoag-modal-message-overlay'></div>
         <div id='cyoag-message-modal' className={modalType}>
           <p className='cyoag-modal-message'>{messageContent}</p>
-          <a onClick={this.closeModal} className='cyoag-link' href='#'><div className='cyoag-modal-message-button'>Click to Acknowledge</div></a>
+          <a className='cyoag-link' href='#'><div className='cyoag-modal-message-button'>Click to Acknowledge</div></a>
         </div>
       </div>
     );
