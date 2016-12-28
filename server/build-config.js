@@ -4,7 +4,7 @@ var secrets = require('./secrets');
 var config = {};
 
 config.DEBUG = true;
-config.VERBOSE = true;
+config.VERBOSE = false;
 
 config.env = constants.envLocal;
 
