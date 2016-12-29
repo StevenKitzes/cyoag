@@ -8,9 +8,14 @@ var getTimeStampString = require('./timeStamp');
 var logFile = './logs/log-' + getTimeStampString() + '.txt';
 // ensure log output directory exists
 try {
-  fs.mkdirSync('./logs');
+  fs.mkdirSync('./logs', 777);
 } catch(err) {
-  console.log('Log directory already existed.  Which is fine.');
+  if(err.toString().indexOf('EEXIST') < 0) {
+    console.log('ERROR trying to create log file output directory: ' + err);
+  }
+  else {
+    console.log('Found log output folder already existed (this is good).');
+  }
 }
 
 function appendLog(msg) {
