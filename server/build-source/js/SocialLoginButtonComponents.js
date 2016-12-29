@@ -1,7 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var logMgr = require('../../utils/logger')('SocialLoginButtonComponents.js');
+var logMgr = require('../../utils/browserLogger')('SocialLoginButtonComponents.js');
 
 var exports = {};
 

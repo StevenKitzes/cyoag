@@ -2,7 +2,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var constants = require('../../constants');
-var logMgr = require('../../utils/logger')('MarginLoginComponent.js');
+var logMgr = require('../../utils/browserLogger')('MarginLoginComponent.js');
 
 var SocialLoginButtonComponents = require('./SocialLoginButtonComponents');
 

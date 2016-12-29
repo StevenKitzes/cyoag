@@ -1,5 +1,5 @@
 var constants = require('../constants');
-var logMgr = require('../utils/logger')('handleVotification.js', true);
+var logMgr = require('../utils/serverLogger')('handleVotification.js');
 var responder = require('../responder');
 
 module.exports = function(req, res, connection, session_uid, userRow) {

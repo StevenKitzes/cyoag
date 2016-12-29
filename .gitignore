@@ -3,3 +3,4 @@ resources
 *.log
 server/secrets.js
 server/digital-ocean
+server/logs

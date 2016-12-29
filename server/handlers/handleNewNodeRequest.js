@@ -1,4 +1,4 @@
-var logMgr = require('../utils/logger')('handleNewNodeRequest.js', true);
+var logMgr = require('../utils/serverLogger')('handleNewNodeRequest.js');
 var responder = require('../responder');
 
 module.exports = function(req, res, connection, session_uid, userRow) {

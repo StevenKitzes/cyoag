@@ -2,7 +2,7 @@
 var mysql = require('mysql');
 var secrets = require('./secrets');
 
-var logMgr = require('./utils/logger')('dbAccess.js', true);
+var logMgr = require('./utils/serverLogger')('dbAccess.js');
 
 // This is a connection pool, which will be made available to this app's routes
 var pool;

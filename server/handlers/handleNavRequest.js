@@ -1,5 +1,5 @@
 var constants = require('../constants');
-var logMgr = require('../utils/logger')('handleNavRequest.js', true);
+var logMgr = require('../utils/serverLogger')('handleNavRequest.js');
 var responder = require('../responder');
 
 module.exports = function(req, res, connection, session_uid, userRow) {

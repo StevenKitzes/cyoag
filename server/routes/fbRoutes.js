@@ -5,7 +5,7 @@ var express = require('express');
 var request = require('request'); // easy HTTP request library
 var router = express.Router();
 
-var logMgr = require('../utils/logger')('fbRoutes.js', true);
+var logMgr = require('../utils/serverLogger')('fbRoutes.js');
 var config = require('../build-config');
 
 var responder = require('../responder');

@@ -1,7 +1,7 @@
 var constants = require('./constants');
 var db = require('./dbAccess')();
 
-var logMgr = require('./utils/logger')('responder.js', true);
+var logMgr = require('./utils/serverLogger')('responder.js');
 
 function respondError(res, error) {
   logMgr.error(error);
@@ -113,7 +113,7 @@ function respond(res, session_uid, msg) {
         connection.release();
         return;
       }
-      logMgr.debug('Query yielded: ' + JSON.stringify(rows[0]));
+      logMgr.verbose('Query yielded: ' + JSON.stringify(rows[0]));
 
       // if no data was found with these requirements, this is an error here
       if(rows.length < 1) {
@@ -318,7 +318,7 @@ function visitorResponse(res, node_uid, msg) {
         connection.release();
         return;
       }
-      logMgr.debug('Query yielded: ' + JSON.stringify(rows[0]));
+      logMgr.verbose('Query yielded: ' + JSON.stringify(rows[0]));
 
       // if no data was found with these requirements, this is an error here
       if(rows.length < 1) {

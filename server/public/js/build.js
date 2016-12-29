@@ -52,196 +52,11 @@
 	
 	var MainComponent = __webpack_require__(/*! ./MainComponent */ 172);
 	
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('main.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('main.js');
 	
 	logMgr.verbose('Kicking off initial render!');
 	
-	ReactDOM.render(React.createElement(MainComponent, { name: 'Player 1' }), document.getElementById('mount-main'));
-	
-	/* Everything past here is old sample code
-	
-	var React = require('react');
-	var ReactDOM = require('react-dom');
-
-	// Hello World component: display a simple prop
-	var HelloWorldComponent = React.createClass({
-	  componentWillMount: function() {
-	    console.log('+ + +Starting off with a cookie check.');
-	    var xhr = new XMLHttpRequest();
-	    // xmlHttp.onreadystatechange = () => {...}
-	    xhr.onreadystatechange = function () {
-	      if( xhr.readyState == 4 && xhr.status == 200 ) {
-	        console.log('Performed initial cookie check.  Got response: ' + xhr.responseText);
-	        document.getElementById('body').insertAdjacentHTML('beforeend','<div>'+xhr.responseText+'</div>');
-	      }
-	      else {
-	        console.log('Tried initial cookie check.  Got HTTP response status: ' + xhr.status);
-	      }
-	    }
-	    xhr.open('POST', '/cookieCheck');
-	    xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-	    xhr.send();
-	    console.log('+ + + Cookie check done.');
-	  },
-	  render: function() {
-	    return (
-	      <h1 id='italic-id' className='red-class'>Hello, {this.props.name}!</h1>
-	    );
-	  }
-	});
-
-	// State component to display simple state
-	var StateComponent = React.createClass({
-	  // ReactJS Event
-	  incrementCount: function() {
-	    this.setState({
-	      count: this.state.count + 1
-	    });
-	  },
-	  getInitialState: function() {
-	    return {
-	      count: 0
-	    }
-	  },
-	  render: function() {
-	    return (
-	      <div className='increment-component'>
-	        <h3 className='red-class'>Count: {this.state.count}.</h3>
-	        <button onClick={this.incrementCount}>Boing!</button>
-	      </div>
-	    );
-	  }
-	});
-
-	var FilteredList = React.createClass({
-	  getInitialState: function() {
-	    return {
-	      initialItems: [
-	        'apple',
-	        'banana',
-	        'crocodile',
-	        'duck',
-	        'elephant',
-	        'falafel',
-	        'gnocci',
-	        'hummus',
-	        'ice',
-	        'jelly',
-	        'kahlua',
-	        'lime',
-	        'mango',
-	        'nyoromien',
-	        'orange',
-	        'plane',
-	        'quarantine',
-	        'range',
-	        'steve',
-	        'turing',
-	        'uranus',
-	        'voldemort',
-	        'watermelon',
-	        'xenomorph',
-	        'yucatan',
-	        'zealot'
-	      ],
-	      items: []
-	    };
-	  },
-	  componentWillMount: function() {
-	    this.setState({items: this.state.initialItems});
-	  },
-	  render: function() {
-	    return (
-	      <div className='filtered-list'>
-	        <input type='text' placeholder='Search' onChange={this.filterList} />
-	        <DisplayList items={this.state.items}/>
-	      </div>
-	    );
-	  },
-	  filterList: function(event) {
-	    var updatedList = this.state.initialItems;
-	    updatedList = updatedList.filter(function(item) {
-	      return item.toLowerCase().search( event.target.value.toLowerCase() ) !== -1;
-	    });
-	    this.setState({items: updatedList});
-	  }
-	});
-	var DisplayList = React.createClass({
-	  render: function() {
-	    return (
-	      <ul>
-	        {
-	          this.props.items.map(function(item) {
-	            return <li key={item}>{item}</li>
-	          })
-	        }
-	      </ul>
-	    );
-	  }
-	});
-
-	var ButtonHolder = React.createClass({
-	  getInitialState: function() {
-	    return {
-	      content: ''
-	    };
-	  },
-	  componentWillMount: function() {
-	    this.setState({content: this.state.content});
-	  },
-	  serverPost: function() {
-	    var xmlHttp = new XMLHttpRequest();
-	    var shadowThis = this;  // cross-browser alternative t0 ...
-	    // xmlHttp.onreadystatechange = () => {...}
-	    xmlHttp.onreadystatechange = function () {
-	      if( xmlHttp.readyState == 4 && xmlHttp.status == 200 ) {
-	        shadowThis.setState({content: xmlHttp.responseText});
-	        console.log('used shadowThis!!');
-	      }
-	      else {
-	        console.log('HTTP response status: ' + xmlHttp.status);
-	      }
-	    }
-	    xmlHttp.open('POST', '/testPost');
-	    xmlHttp.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-	    xmlHttp.send(JSON.stringify({foo: "bar"}));
-	  },
-	  render: function() {
-	    if (!this.state.content || this.state.content == '') {
-	      return (
-	        <div>
-	          No content<br/>
-	          <button onClick={this.serverPost}>Touch Server</button>
-	        </div>
-	      );
-	    }
-	    return (
-	      <div>
-	        Content: {this.state.content}<br/>
-	        <button onClick={this.serverPost}>Touch Server</button>
-	      </div>
-	    );
-	  }
-	});
-
-	ReactDOM.render(
-	  <HelloWorldComponent name='Cruel World' />,
-	  document.getElementById('welcome-point')
-	);
-	ReactDOM.render(
-	  <StateComponent/>,
-	  document.getElementById('state-point')
-	);
-	ReactDOM.render(
-	  <FilteredList/>,
-	  document.getElementById('list-point')
-	);
-	ReactDOM.render(
-	  <ButtonHolder/>,
-	  document.getElementById('button-point')
-	);
-
-	*/
+	ReactDOM.render(React.createElement(MainComponent, null), document.getElementById('mount-main'));
 
 /***/ },
 /* 1 */
@@ -22135,7 +21950,7 @@
 	
 	var config = __webpack_require__(/*! ../../build-config */ 173);
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('MainComponent.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainComponent.js');
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 177);
 	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 178);
@@ -22619,7 +22434,7 @@
 	var config = {};
 	
 	config.DEBUG = true;
-	config.VERBOSE = false;
+	config.VERBOSE = true;
 	
 	config.env = constants.envLocal;
 	
@@ -22639,6 +22454,7 @@
 	    config.httpsChainLocation = secrets.httpsChainLocation;
 	    // override in Production
 	    config.DEBUG = false;
+	    config.VERBOSE = false;
 	    break;
 	  default:
 	    config.hostDomain = constants.hostDomainLocal;
@@ -22764,68 +22580,48 @@
 
 /***/ },
 /* 176 */
-/*!*************************!*\
-  !*** ./utils/logger.js ***!
-  \*************************/
+/*!********************************!*\
+  !*** ./utils/browserLogger.js ***!
+  \********************************/
 /***/ function(module, exports, __webpack_require__) {
 
 	var DEBUG = __webpack_require__(/*! ../build-config */ 173).DEBUG;
 	var VERBOSE = __webpack_require__(/*! ../build-config */ 173).VERBOSE;
 	
-	module.exports = function(sourceName, withTimestamp) {
+	module.exports = function(sourceName) {
 	  return {
 	    logSource: sourceName ? sourceName : 'Unknown source',
-	    withTimestamp: withTimestamp,
 	
 	    out: function(msg) {
 	      var output = msg + ' (' + this.logSource + ')';
-	      logWithTimestamp(output, this.withTimestamp);
+	      console.log(output);
 	    },
 	
 	    debug: function(msg) {
 	      if(DEBUG) {
 	        var output = "DEBUG: " + msg + ' (' + this.logSource + ')';
-	        logWithTimestamp(output, this.withTimestamp);
+	        console.log(output);
 	      }
 	    },
 	
 	    warn: function(warning) {
 	      var output = "! ! ! WARNING ! ! ! : " + warning + ' (' + this.logSource + ')';
-	      logWithTimestamp(output, this.withTimestamp);
+	      console.log(output);
 	    },
 	
 	    error: function(error) {
 	      var output = 'X X X ERROR X X X : ' + error + ' (' + this.logSource + ')';
-	      logWithTimestamp(output, this.withTimestamp);
+	      console.log(output);
 	    },
 	
 	    verbose: function(msg) {
 	      if(DEBUG && VERBOSE) {
 	        var output = "VERBOSE: " + msg + ' (' + this.logSource + ')';
-	        logWithTimestamp(output, this.withTimestamp);
+	        console.log(output);
 	      }
 	    }
 	  };
 	};
-	
-	function logWithTimestamp(msg, withTimestamp) {
-	  if(!withTimestamp) {
-	    console.log(msg);
-	    return;
-	  }
-	
-	  var date = new Date();
-	
-	  var
-	    year = date.getFullYear(),
-	    month = date.getMonth() + 1,
-	    day = date.getDate(),
-	    hour = date.getHours(),
-	    minute = date.getMinutes(),
-	    second = date.getSeconds();
-	
-	  console.log('[' + year + '.' + month + '.' + day + '.' + hour + '.' + minute + '.' + second + '] ' + msg);
-	}
 
 
 /***/ },
@@ -22839,7 +22635,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('HeaderComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('HeaderComponents.js');
 	
 	var exports = {};
 	
@@ -22888,7 +22684,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('MessagingComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MessagingComponents.js');
 	
 	var exports = {};
 	
@@ -23031,7 +22827,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('MainColumnComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainColumnComponents.js');
 	
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 180);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 182);
@@ -23091,7 +22887,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('NodeComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('NodeComponents.js');
 	var uidGen = __webpack_require__(/*! ../../utils/uid-gen */ 181);
 	
 	var exports = {};
@@ -23231,7 +23027,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('VotificationComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('VotificationComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 183);
 	
@@ -23337,7 +23133,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('SocialLoginButtonComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('SocialLoginButtonComponents.js');
 	
 	var exports = {};
 	
@@ -23405,7 +23201,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('PathComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23480,7 +23276,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('PathComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23740,7 +23536,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('MarginColumnComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MarginColumnComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 183);
 	
@@ -23915,7 +23711,7 @@
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
 	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/logger */ 176)('FooterComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('FooterComponents.js');
 	
 	var exports = {};
 	

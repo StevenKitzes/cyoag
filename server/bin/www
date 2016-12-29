@@ -10,7 +10,7 @@ var debug = require('debug')('server:server');
 var http = require('http');
 var https = require('https');
 
-var logger = require('../utils/logger')('www', true);
+var logger = require('../utils/serverLogger')('www');
 
 var constants = require('../constants');
 var buildConfig = require('../build-config');

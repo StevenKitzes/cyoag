@@ -1,7 +1,7 @@
 var db = require('./dbAccess')();
 var generateGuid = require('./utils/uid-gen');
 var responder = require('./responder');
-var logMgr = require('./utils/logger')('socialUtils.js', true);
+var logMgr = require('./utils/serverLogger')('socialUtils.js');
 
 var config = require('./build-config');
 var constants = require('./constants');

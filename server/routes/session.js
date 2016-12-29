@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 var cookieParser = require('cookie-parser');
 
-var logMgr = require('../utils/logger')('session.js', true);
+var logMgr = require('../utils/serverLogger')('session.js');
 var constants = require('../constants');
 var db = require('../dbAccess')();
 var generateGuid = require('../utils/uid-gen');

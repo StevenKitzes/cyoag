@@ -1,4 +1,4 @@
-var logMgr = require('../utils/logger')('handleNewNameRequest.js', true);
+var logMgr = require('../utils/serverLogger')('handleNewNameRequest.js');
 var responder = require('../responder');
 
 module.exports = function(req, res, connection, session_uid, userRow) {

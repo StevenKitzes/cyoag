@@ -4,7 +4,7 @@ var secrets = require('./secrets');
 var config = {};
 
 config.DEBUG = true;
-config.VERBOSE = false;
+config.VERBOSE = true;
 
 config.env = constants.envLocal;
 
@@ -24,6 +24,7 @@ switch(config.env) {
     config.httpsChainLocation = secrets.httpsChainLocation;
     // override in Production
     config.DEBUG = false;
+    config.VERBOSE = false;
     break;
   default:
     config.hostDomain = constants.hostDomainLocal;
