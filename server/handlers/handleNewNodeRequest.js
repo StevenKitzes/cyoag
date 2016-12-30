@@ -1,3 +1,4 @@
+var generateGuid = require('../utils/uid-gen');
 var logMgr = require('../utils/serverLogger')('handleNewNodeRequest.js');
 var responder = require('../responder');
 

@@ -130,13 +130,13 @@ var BodyHint = React.createClass({
   render: function() {
     var count = this.props.count;
 
-    if(count < 1000) {
+    if(count < 500) {
       return (
         <span className='cyoag-note-red'>Too few characters: {count}</span>
       );
     }
 
-    if(count > 5000) {
+    if(count > 2500) {
       return (
         <span className='cyoag-note-red'>Too many characters: {count}</span>
       );
