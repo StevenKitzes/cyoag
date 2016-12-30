@@ -27,20 +27,20 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     warningMsg = 'Your path teaser may not exceed 100 characters';
   }
 
-  if(inputBody.length < 1000) {
+  if(inputBody.length < 500) {
     if(warningMsg) {
-      warningMsg = warningMsg + ' and your chapter content must be at least 1,000 characters long';
+      warningMsg = warningMsg + ' and your chapter content must be at least 500 characters long';
     }
     else {
-      warningMsg = 'Your chapter content must be at least 1,000 characters long';
+      warningMsg = 'Your chapter content must be at least 500 characters long';
     }
   }
-  else if(inputBody.length > 5000) {
+  else if(inputBody.length > 2500) {
     if(warningMsg) {
-      warningMsg = warningMsg + ' and your chapter content may not exceed 5,000 characters';
+      warningMsg = warningMsg + ' and your chapter content may not exceed 2,500 characters';
     }
     else {
-      warningMsg = 'Your chapter content may not exceed 5,000 characters';
+      warningMsg = 'Your chapter content may not exceed 2,500 characters';
     }
   }
 

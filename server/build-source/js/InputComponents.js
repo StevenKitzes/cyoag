@@ -75,8 +75,8 @@ var Input = React.createClass({
     var inputPath = document.getElementById('cyoag-input-path').value || '';
     var inputBody = document.getElementById('cyoag-input-body').value || '';
 
-    if(inputBody.length > 5000) {
-      this.props.context.message({warning: "Sorry, drafts of over 5,000 characters are not permitted."});
+    if(inputBody.length > 2500) {
+      this.props.context.message({warning: "Sorry, drafts of over 2,500 characters are not permitted."});
       return;
     }
 
@@ -85,40 +85,10 @@ var Input = React.createClass({
   submit: function() {
     var inputPath = document.getElementById('cyoag-input-path').value;
     var inputBody = document.getElementById('cyoag-input-body').value;
-    var warningMsg;
-    var message = this.props.context.message;
 
-    if(inputPath.length < 4) {
-      warningMsg = 'Your path teaser must be at least 4 characters long';
+    if(validateInput(inputPath, inputBody, this.props.context.message)) {
+      this.props.context.inputSubmit(inputPath, inputBody);
     }
-    else if(inputPath.length > 100) {
-      warningMsg = 'Your path teaser may not exceed 100 characters';
-    }
-
-    if(inputBody.length < 1000) {
-      if(warningMsg) {
-        warningMsg = warningMsg + ' and your chapter content must be at least 1,000 characters long';
-      }
-      else {
-        warningMsg = 'Your chapter content must be at least 1,000 characters long';
-      }
-    }
-    else if(inputBody.length > 5000) {
-      if(warningMsg) {
-        warningMsg = warningMsg + ' and your chapter content may not exceed 5,000 characters';
-      }
-      else {
-        warningMsg = 'Your chapter content may not exceed 5,000 characters';
-      }
-    }
-
-    if(warningMsg) {
-      warningMsg = warningMsg + '.';
-      this.props.context.message({warning: warningMsg});
-      return;
-    }
-
-    this.props.context.inputSubmit(inputPath, inputBody);
   },
   updateBodyCharCount: function() {
     this.setState({
@@ -179,6 +149,118 @@ var BodyHint = React.createClass({
     }
   }
 });
+
+function validateInput(inputPath, inputBody, message) {
+  var warningMsg = '';
+
+  var whiteSpaceRegex = /\S*[\s]{3,}\S*/g;
+
+  // check new path content for too many consecutive white space chars
+  if(whiteSpaceRegex.test(inputPath)) {
+    var matches = inputPath.match(whiteSpaceRegex);
+    var problems = 'Found the following problems: ';
+    for(var i = 0; i < matches.length; i++) {
+      if(/\S*[\s]{3,}\S*/.test(matches[i])) {
+        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+      }
+    }
+    message({error: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
+      'white space characters are forbidden in path teasers.  Please correct any errors and try again!  ' +
+      problems});
+    return false;
+  }
+
+  // check new body content for too many consecutive white space chars
+  if(whiteSpaceRegex.test(inputBody)) {
+    var matches = inputBody.match(whiteSpaceRegex);
+    var problems = 'Found the following problems: ';
+    for(var i = 0; i < matches.length; i++) {
+      if(/\S*[\s]{3,}\S*/.test(matches[i])) {
+        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+      }
+    }
+    message({error: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
+      'white space characters are forbidden in chapter body content.  Please correct any errors and try again!  ' +
+      problems});
+    return false;
+  }
+
+  var startingWhiteSpaceRegex = /^\s/;
+  var endingWhiteSpaceRegex = /\s$/;
+
+  // check new path or body for starting white space
+  if(startingWhiteSpaceRegex.test(inputPath)) {
+    message({error: 'Path teasers may not begin with white space.  Please try again!'});
+    return false;
+  }
+  else if(startingWhiteSpaceRegex.test(inputBody)) {
+    message({error: 'Chapter body content may not begin with white space.  Please try again!'});
+    return false;
+  }
+
+  // check new path or body for ending white space
+  if(endingWhiteSpaceRegex.test(inputPath)) {
+    message({error: 'Path teasers may not end with white space.  Please try again!'});
+    return false;
+  }
+  else if(endingWhiteSpaceRegex.test(inputBody)) {
+    message({error: 'Chapter body content may not end with white space.  Please try again!'});
+    return false;
+  }
+
+  var repeatCharRegex = /\S*(.)\1{3,}\S*/g;
+
+  // check new path content for too many consecutive same characters
+  if(repeatCharRegex.test(inputPath)) {
+    var matches = inputPath.match(repeatCharRegex);
+    var problems = 'Found the following problems: ';
+    for(var i = 0; i < matches.length; i++) {
+      if(/(.)\1{3,}/.test(matches[i])) {
+        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+      }
+    }
+    message({error: 'Consecutive sets of 4 or more of the same character are forbidden in path teasers.  ' +
+      'Please correct any errors and try again!  ' + problems});
+    return false;
+  }
+
+  // check new body content for too many consecutive same characters
+  if(repeatCharRegex.test(inputBody)) {
+    var matches = inputBody.match(repeatCharRegex);
+    var problems = 'Found the following problems: ';
+    for(var i = 0; i < matches.length; i++) {
+      if(/(.)\1{3,}/.test(matches[i])) {
+        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+      }
+    }
+    message({error: 'Consecutive sets of 4 or more of the same character are forbidden in chapter body content.  ' +
+      'Please correct any errors and try again!  ' + problems});
+    return false;
+  }
+
+  // check input path length restrictions
+  if(inputPath.length < 4) {
+    warningMsg += 'Your path teaser must be at least 4 characters long. ';
+  }
+  else if(inputPath.length > 100) {
+    warningMsg += 'Your path teaser may not exceed 100 characters. ';
+  }
+
+  // check input body length restrictions
+  if(inputBody.length < 500) {
+    warningMsg += 'Chapter body content must be at least 500 characters long. ';
+  }
+  else if(inputBody.length > 2500) {
+    warningMsg += 'Chapter body content may not exceed 2,500 characters. ';
+  }
+
+  if(warningMsg) {
+    message({warning: warningMsg});
+    return false;
+  }
+
+  return true;
+}
 
 exports.Hidden = Hidden;
 exports.Blocked = Blocked;

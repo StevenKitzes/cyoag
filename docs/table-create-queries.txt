@@ -11,7 +11,7 @@ uid VARCHAR(40) UNIQUE PRIMARY KEY,
 parent_uid VARCHAR(40),
 author_uid VARCHAR(40),
 path_snippet VARCHAR(100),
-node_snippet VARCHAR(5000),
+node_snippet VARCHAR(2500),
 votification INTEGER,
 INDEX (parent_uid),
 INDEX (author_uid)
