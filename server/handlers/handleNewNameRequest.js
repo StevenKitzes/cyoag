@@ -1,8 +1,9 @@
-var logMgr = require('../utils/serverLogger')('handleNewNameRequest.js');
+var logMgr = require('../utils/serverLogger')('handleNewNameRequest.js', true);
 var responder = require('../responder');
 
 module.exports = function(req, res, connection, session_uid, userRow) {
   var newName = req.body.newName;
+  logMgr.out('User ' + userRow.uid + ' requested name changed to ' + newName);
   if(newName.length < 3) {
     responder.respondMsgOnly(res, {warning: "Your name may not have fewer than 3 characters in it."});
     connection.release();

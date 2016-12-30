@@ -9,6 +9,9 @@ var exports = {};
 
 // Facebook login button component
 var Node = React.createClass({
+  componentDidUpdate: function() {
+    window.scrollTo(0,0);
+  },
   navigate: function() {
     logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
     this.props.context.navigate(this.props.context.state.parentUid);

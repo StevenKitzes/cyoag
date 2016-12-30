@@ -13,6 +13,7 @@ app.use(cookieParser());
 
 /* Endpoint to check if session exists, and if so, whether it is valid, and if so, what to do with it */
 router.post('/', function(req, res, next) {
+  logMgr.out('+ + + + + + [ New User Interaction Begins ] + + + + + +');
   if(req.body) {
     logMgr.verbose('> > > > > req.body: ' + JSON.stringify(req.body));
   }
@@ -34,17 +35,17 @@ router.post('/', function(req, res, next) {
     return;
   }
   // should not have both cookie types together
-  if(req.cookies.session_uid && req.cookies.node_uid) {
+  else if(req.cookies.session_uid && req.cookies.node_uid) {
     logMgr.debug('Both cookies found!  Uh oh!');
-    responder.visitorResponse(res, constants.rootNodeUid, {warning: 'Detected traces of registered and unregistered accounts together. Resetting.'});
+    responder.visitorResponse(res, constants.rootNodeUid, {warning: 'Detected traces of registered and unregistered accounts together. Resetting cookies... please try logging in again if you have a registered account.'});
     return;
   }
   // presence of node_uid cookie indicates visitor
-  if(req.cookies.node_uid) {
-    logMgr.debug('Position cookie found.  Visitor detected.');
+  else if(req.cookies.node_uid) {
+    logMgr.out('Position cookie found.  Visitor detected.');
     // if request body includes navigation details, visitor is requesting to navigate
     if(req.body.hasOwnProperty('navigate')) {
-      logMgr.debug('Visitor requested navigation.');
+      logMgr.out('Visitor requested navigation.');
       var destination = req.body.navigate;
       if(destination == constants.defaultParentUid) {
         responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
@@ -56,13 +57,13 @@ router.post('/', function(req, res, next) {
     }
     // if navigation not requested, show the user the node at their current position
     else {
-      logMgr.debug('Surfacing node at current visitor location.');
+      logMgr.out('Surfacing node at current visitor location.');
       responder.visitorResponse(res, req.cookies.node_uid);
       return;
     }
   }
   // If session cookie existed
-  if(req.cookies.session_uid) {
+  else if(req.cookies.session_uid) {
     logMgr.out('Session ID found . . .');
     var session_uid = req.cookies.session_uid;
 
@@ -115,7 +116,9 @@ router.post('/', function(req, res, next) {
 
         // If one row was returned...
         else if(rows.length == 1) {
+          logMgr.out('Found user with the given session ID.');
           var userRow = rows[0];
+          logMgr.verbose('User details: ' + JSON.stringify(userRow));
           if(req.body.hasOwnProperty('navigate')) {
             require('../handlers/handleNavRequest')(req, res, connection, session_uid, userRow);
           }

@@ -26,6 +26,11 @@ function respondError(res, error) {
  *     respondMsgOnly(res, {error: 'Critical error requiring session reset!'});
  */
 function respondMsgOnly(res, msg) {
+  if(!msg) {
+    logMgr.out('Tried to call respondMsgOnly without message!!');
+    return;
+  }
+
   var response = {};
 
   if(msg.error) {
@@ -51,6 +56,8 @@ function respondMsgOnly(res, msg) {
 }
 
 function respond(res, session_uid, msg) {
+  logMgr.out('Beginning response construction.');
+
   var response = {};
   response.snippet = {};
   response.inputBlocking = {};
@@ -61,17 +68,23 @@ function respond(res, session_uid, msg) {
   if(msg) {
     if(msg.msg) {
       response.msg = msg.msg;
+      logMgr.out('Response will include message: ' + response.msg);
     }
-    if(msg.warning) {
+    else if(msg.warning) {
       response.warning = msg.warning;
+      logMgr.out('Response will include warning: ' + response.warning);
+    }
+    else if(msg.error) {
+      respondError(res, msg.error);
+      return;
     }
     else {
       response.msg = msg;
+      logMgr.out('Response will include warning: ' + response.msg);
     }
   }
 
   // build and send a response based on conditions
-  logMgr.out('Beginning response construction.');
   db.getConnection(function(err, connection) {
     if(err) {
       // handle any error getting connection from pool

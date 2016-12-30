@@ -1,11 +1,13 @@
 var constants = require('../constants');
-var logMgr = require('../utils/serverLogger')('handleVotification.js');
+var logMgr = require('../utils/serverLogger')('handleVotification.js', true);
 var responder = require('../responder');
 
 module.exports = function(req, res, connection, session_uid, userRow) {
   var user_uid = userRow['uid'];
   var node_uid = req.body.votify;
   var newVote = req.body.newVote;
+
+  logMgr.out('User ' + user_uid + ' voting ' + newVote + ' on node ' + node_uid);
 
   var oldValue, newValue, voteValueDiff;
   switch(newVote) {
@@ -78,6 +80,7 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     }
     else {
       // node and vote existed, so instead of creating we will need to update both
+      logMgr.out('Vote entry for this user/node combo already exists, attempting to update.');
       oldValue = row.sentiment;
       voteValueDiff = newValue - oldValue;
       query = 'UPDATE votes, nodes ' +

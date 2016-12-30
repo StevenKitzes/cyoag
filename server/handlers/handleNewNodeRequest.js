@@ -1,5 +1,5 @@
 var generateGuid = require('../utils/uid-gen');
-var logMgr = require('../utils/serverLogger')('handleNewNodeRequest.js');
+var logMgr = require('../utils/serverLogger')('handleNewNodeRequest.js', true);
 var responder = require('../responder');
 
 module.exports = function(req, res, connection, session_uid, userRow) {
@@ -7,6 +7,9 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   var inputBody = req.body.newNodeBody;
   var user_uid = userRow['uid'];
   var user_position = userRow['node_uid'];
+
+  logMgr.out('User ' + user_uid + ' requested to create a new node from position ' + user_position + ' with inputPath "' +
+    inputPath + '..." and inputBody "' + inputBody.split(0, 50) + '..."');
 
   if(!user_position) {
     responder.respondError(res, 'Unable to establish link between existing chapter and new chapter.');

@@ -1,10 +1,11 @@
 var constants = require('../constants');
-var logMgr = require('../utils/serverLogger')('handleNavRequest.js');
+var logMgr = require('../utils/serverLogger')('handleNavRequest.js', true);
 var responder = require('../responder');
 
 module.exports = function(req, res, connection, session_uid, userRow) {
   var user_uid = userRow['uid'];
   var destination = req.body.navigate;
+  logMgr.out('Navigation request received from user ' + user_uid + ' to node ' + destination);
   if(destination==constants.defaultParentUid) {
     responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
     connection.release();
