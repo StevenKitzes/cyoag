@@ -10,7 +10,7 @@ var FacebookButton = React.createClass({
   render: function() {
     return (
       <div className='cyoag-fb-login cyoag-inline-block'>
-        <a className='cyoag-link' href='/fb/login'>Facebook</a>
+        <a className='cyoag-side-padded-link' href='/fb/login'>Facebook</a>
       </div>
     );
   }
@@ -21,7 +21,7 @@ var TwitterButton = React.createClass({
   render: function() {
     return (
       <div className='cyoag-tw-button cyoag-inline-block'>
-        <a className='cyoag-link' href='/tw/login'>Twitter</a>
+        <a className='cyoag-side-padded-link' href='/tw/login'>Twitter</a>
       </div>
     );
   }

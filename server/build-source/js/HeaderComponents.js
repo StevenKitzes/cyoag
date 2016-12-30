@@ -13,8 +13,10 @@ var Header = React.createClass({
 
     return(
       <div id='cyoag-header-container'>
-        <h1>Header</h1>
-        <a href='https://stevenkitzes.github.io/cyoag/docs/functional-requirements.html'>Docs</a> | <a href='http://www.google.com'>Google</a>
+        <h1 id='cyoag-header-title'>Welcome to CYOAG!</h1>
+        <p id='cyoag-header-subtitle'>Choose Your Own Adventure Game</p>
+        <a className='cyoag-link cyoag-header-button' href='about.html'>What is this?</a> | <a className='cyoag-link cyoag-header-button' href='usage.html'>Usage and Copyright</a> | <a className='cyoag-link cyoag-header-button' href='steve.html'>About the Creator</a>
+        <hr />
       </div>
     );
   }

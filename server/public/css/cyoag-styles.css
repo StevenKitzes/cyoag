@@ -17,6 +17,10 @@ button {
   border-style: outset;
 }
 
+hr {
+  margin-top: 1em;
+}
+
 .italics {
   font-style: italic;
 }
@@ -24,13 +28,13 @@ button {
   font-family: sans-serif;
 }
 
-.cyoag-link {
+.cyoag-side-padded-link {
   color: #0077AA;
   padding-left: 1em;
   padding-right: 1em;
   text-decoration: none;
 }
-.cyoag-div-link {
+.cyoag-link, .cyoag-link:hover, .cyoag-link:visited, .cyoag-link:active, .cyoag-link:link {
   color: #0077AA;
   text-decoration: none;
 }
@@ -64,6 +68,23 @@ button {
 
 #cyoag-header-container {
   margin-bottom: 1.5em;
+}
+#cyoag-header-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+#cyoag-header-subtitle {
+  margin-top: 0;
+  padding-top: 0;
+}
+.cyoag-header-button {
+  background-color: white;
+  border-style: solid;
+  border-width: thin;
+  border-radius: 0.2em;
+  border-color: blue;
+  margin: 0 0.5em;
+  padding: 0.1em 0.3em;
 }
 
 #cyoag-message-banner {

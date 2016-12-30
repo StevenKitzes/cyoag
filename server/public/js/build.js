@@ -22714,20 +22714,32 @@
 	      { id: 'cyoag-header-container' },
 	      React.createElement(
 	        'h1',
-	        null,
-	        'Header'
+	        { id: 'cyoag-header-title' },
+	        'Welcome to CYOAG!'
+	      ),
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-header-subtitle' },
+	        'Choose Your Own Adventure Game'
 	      ),
 	      React.createElement(
 	        'a',
-	        { href: 'https://stevenkitzes.github.io/cyoag/docs/functional-requirements.html' },
-	        'Docs'
+	        { className: 'cyoag-link cyoag-header-button', href: 'about.html' },
+	        'What is this?'
 	      ),
 	      ' | ',
 	      React.createElement(
 	        'a',
-	        { href: 'http://www.google.com' },
-	        'Google'
-	      )
+	        { className: 'cyoag-link cyoag-header-button', href: 'usage.html' },
+	        'Usage and Copyright'
+	      ),
+	      ' | ',
+	      React.createElement(
+	        'a',
+	        { className: 'cyoag-link cyoag-header-button', href: 'steve.html' },
+	        'About the Creator'
+	      ),
+	      React.createElement('hr', null)
 	    );
 	  }
 	});
@@ -22862,7 +22874,7 @@
 	        ),
 	        React.createElement(
 	          'a',
-	          { className: 'cyoag-link', href: '#' },
+	          { className: 'cyoag-side-padded-link', href: '#' },
 	          React.createElement(
 	            'div',
 	            { className: 'cyoag-modal-message-button' },
@@ -22976,7 +22988,7 @@
 	      { id: 'cyoag-node-container' },
 	      React.createElement(
 	        'a',
-	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-div-link', href: '#', onMouseMove: this.locateTooltip },
+	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-link', href: '#', onMouseMove: this.locateTooltip },
 	        React.createElement(
 	          'div',
 	          { className: 'cyoag-path-item cyoag-trailing-snippet', onClick: this.navigate },
@@ -23210,7 +23222,7 @@
 	      { className: 'cyoag-fb-login cyoag-inline-block' },
 	      React.createElement(
 	        'a',
-	        { className: 'cyoag-link', href: '/fb/login' },
+	        { className: 'cyoag-side-padded-link', href: '/fb/login' },
 	        'Facebook'
 	      )
 	    );
@@ -23227,7 +23239,7 @@
 	      { className: 'cyoag-tw-button cyoag-inline-block' },
 	      React.createElement(
 	        'a',
-	        { className: 'cyoag-link', href: '/tw/login' },
+	        { className: 'cyoag-side-padded-link', href: '/tw/login' },
 	        'Twitter'
 	      )
 	    );
@@ -23301,7 +23313,7 @@
 	          var pathUid = 'node-' + item.pathUid;
 	          return React.createElement(
 	            'a',
-	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-div-link', href: '#', onMouseMove: properThis.locateTooltip.bind(null, pathUid) },
+	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-link', href: '#', onMouseMove: properThis.locateTooltip.bind(null, pathUid) },
 	            React.createElement(
 	              'div',
 	              { className: 'cyoag-path-item', onClick: properThis.navigate.bind(null, pathUid) },
@@ -23864,15 +23876,23 @@
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-footer-container' },
-	      React.createElement(
-	        'h1',
-	        null,
-	        'Footer'
-	      ),
+	      React.createElement('hr', null),
 	      React.createElement(
 	        'p',
-	        null,
-	        'Special thanks and copyright notice (C)!'
+	        { className: 'cyoag-note' },
+	        'All software written to support the CYOAG project is protected under the ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'http://www.gnu.org/licenses/gpl.html' },
+	          'GNU GPL v3.0'
+	        ),
+	        ' license.  For additional copyright information, please see the ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'usage.html' },
+	          'CYOAG Usage and Copyright'
+	        ),
+	        ' page.'
 	      )
 	    );
 	  }
