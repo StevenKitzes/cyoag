@@ -66,4 +66,6 @@ constants.votificationNone = 'none';
 constants.votificationUp = 'up';
 constants.votificationDown = 'down';
 
+constants.windowScrollTop = {x:0,y:0};
+
 module.exports = constants;

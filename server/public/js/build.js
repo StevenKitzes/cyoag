@@ -21963,6 +21963,12 @@
 	  displayName: 'MainComponent',
 	
 	  componentDidMount: mountXhrHandler,
+	  componentDidUpdate: function () {
+	    var x = this.state.windowScroll.x,
+	        y = this.state.windowScroll.y;
+	    logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
+	    window.scrollTo(x, y);
+	  },
 	  getInitialState: getDefaultStateObject,
 	  inputSubmit: inputSubmit,
 	  logoutRequest: logoutXhrHandler,
@@ -21970,7 +21976,8 @@
 	    this.setState({
 	      msg: msg.msg ? msg.msg : null,
 	      warning: msg.warning ? msg.warning : null,
-	      error: msg.error ? msg.error : null
+	      error: msg.error ? msg.error : null,
+	      windowScroll: getWindowPosition()
 	    });
 	  },
 	  nameChange: nameChange,
@@ -22031,6 +22038,7 @@
 	module.exports = MainComponent;
 	
 	function mountXhrHandler() {
+	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('Checking session status . . .');
 	  var xhr = new XMLHttpRequest();
 	  var properThis = this;
@@ -22040,7 +22048,7 @@
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Cookie check response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
-	      validateResponse(properThis, response);
+	      validateResponse(properThis, response, constants.windowScrollTop);
 	    } else {
 	      logMgr.debug('Initial cookie check yielded HTTP response status: ' + xhr.status);
 	    }
@@ -22050,12 +22058,16 @@
 	  xhr.timeout = 5000;
 	  xhr.ontimeout = function () {
 	    xhr.abort();
-	    properThis.setState({ error: 'Server response timed out; unable to detect your login status.' });
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect your login status.',
+	      windowScroll: savedWindowPosition
+	    });
 	  };
 	  xhr.send();
 	}
 	
 	function logoutXhrHandler() {
+	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('Logging out current user . . .');
 	  var xhr = new XMLHttpRequest();
 	  // xmlHttp.onreadystatechange = () => {...}
@@ -22065,7 +22077,7 @@
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Logout response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
-	      validateResponse(properThis, response);
+	      validateResponse(properThis, response, constants.windowScrollTop);
 	    } else {
 	      logMgr.debug('Logout attempt yielded HTTP response status: ' + xhr.status);
 	    }
@@ -22075,7 +22087,10 @@
 	  xhr.timeout = 5000;
 	  xhr.ontimeout = function () {
 	    xhr.abort();
-	    properThis.setState({ error: 'Server response timed out; unable to detect your login status.' });
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect your login status.',
+	      windowScroll: savedWindowPosition
+	    });
 	  };
 	  xhr.send();
 	}
@@ -22085,6 +22100,7 @@
 	    logMgr.error('Missing node ID in navigation attempt.');
 	    return;
 	  }
+	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to navigate story nodes . . .');
 	  var xhr = new XMLHttpRequest();
 	  // xmlHttp.onreadystatechange = () => {...}
@@ -22094,7 +22110,7 @@
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Navigation response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
-	      validateResponse(properThis, response);
+	      validateResponse(properThis, response, constants.windowScrollTop);
 	    } else {
 	      logMgr.debug('Navigation attempt yielded HTTP response status: ' + xhr.status);
 	    }
@@ -22104,13 +22120,17 @@
 	  xhr.timeout = 5000;
 	  xhr.ontimeout = function () {
 	    xhr.abort();
-	    properThis.setState({ error: 'Server response timed out; unable to detect your login status.' });
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect your login status.',
+	      windowScroll: savedWindowPosition
+	    });
 	  };
 	  var xhrPayload = JSON.stringify({ navigate: nodeUid });
 	  xhr.send(xhrPayload);
 	}
 	
 	function votify(nodeUid, newVote) {
+	  var savedWindowPosition = getWindowPosition();
 	  if (nodeUid == null || newVote == null) {
 	    logMgr.error('Relevant parameters missing in votification call.');
 	    return;
@@ -22124,7 +22144,7 @@
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Votification response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
-	      validateVotificationResponse(properThis, response);
+	      validateVotificationResponse(properThis, response, savedWindowPosition);
 	    } else {
 	      logMgr.debug('Votification attempt yielded HTTP response status: ' + xhr.status);
 	    }
@@ -22134,13 +22154,17 @@
 	  xhr.timeout = 5000;
 	  xhr.ontimeout = function () {
 	    xhr.abort();
-	    properThis.setState({ error: 'Server response timed out; unable to detect result of votification attempt.' });
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of votification attempt.',
+	      windowScroll: savedWindowPosition
+	    });
 	  };
 	  var xhrPayload = JSON.stringify({ votify: nodeUid, newVote: newVote });
 	  xhr.send(xhrPayload);
 	}
 	
 	function nameChange(newName) {
+	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to update their name . . .');
 	  var xhr = new XMLHttpRequest();
 	  // xmlHttp.onreadystatechange = () => {...}
@@ -22150,7 +22174,7 @@
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Name change response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
-	      validateResponse(properThis, response);
+	      validateResponse(properThis, response, savedWindowPosition);
 	    } else {
 	      logMgr.debug('Name change attempt yielded HTTP response status: ' + xhr.status);
 	    }
@@ -22160,13 +22184,17 @@
 	  xhr.timeout = 5000;
 	  xhr.ontimeout = function () {
 	    xhr.abort();
-	    properThis.setState({ error: 'Server response timed out; unable to detect result of name change attempt.' });
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of name change attempt.',
+	      windowScroll: savedWindowPosition
+	    });
 	  };
 	  var xhrPayload = JSON.stringify({ newName: newName });
 	  xhr.send(xhrPayload);
 	}
 	
 	function inputSubmit(path, body) {
+	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to submit new node . . .');
 	  var xhr = new XMLHttpRequest();
 	  // xmlHttp.onreadystatechange = () => {...}
@@ -22176,7 +22204,7 @@
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Node submission response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
-	      validateResponse(properThis, response);
+	      validateResponse(properThis, response, constants.windowScrollTop);
 	    } else {
 	      logMgr.debug('Node submission attempt yielded HTTP response status: ' + xhr.status);
 	    }
@@ -22186,13 +22214,17 @@
 	  xhr.timeout = 5000;
 	  xhr.ontimeout = function () {
 	    xhr.abort();
-	    properThis.setState({ error: 'Server response timed out; unable to detect result of node submission attempt.' });
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of node submission attempt.',
+	      windowScroll: savedWindowPosition
+	    });
 	  };
 	  var xhrPayload = JSON.stringify({ newNodePath: path, newNodeBody: body });
 	  xhr.send(xhrPayload);
 	}
 	
 	function saveDraft(path, body) {
+	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to save draft . . .');
 	  var xhr = new XMLHttpRequest();
 	  // xmlHttp.onreadystatechange = () => {...}
@@ -22202,7 +22234,7 @@
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Draft salvation response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
-	      validateResponse(properThis, response);
+	      validateResponse(properThis, response, constants.windowScrollTop);
 	    } else {
 	      logMgr.debug('Draft salvation attempt yielded HTTP response status: ' + xhr.status);
 	    }
@@ -22212,14 +22244,17 @@
 	  xhr.timeout = 5000;
 	  xhr.ontimeout = function () {
 	    xhr.abort();
-	    properThis.setState({ error: 'Server response timed out; unable to verify that your draft was saved.' });
+	    properThis.setState({
+	      error: 'Server response timed out; unable to verify that your draft was saved.',
+	      windowScroll: savedWindowPosition
+	    });
 	  };
 	  var xhrPayload = JSON.stringify({ draftPath: path, draftBody: body });
 	  xhr.send(xhrPayload);
 	}
 	
-	function validateVotificationResponse(properThis, response) {
-	  if (validateMessageResponse(properThis, response)) {
+	function validateVotificationResponse(properThis, response, newWindowPosition) {
+	  if (validateMessageResponse(properThis, response, newWindowPosition)) {
 	    return;
 	  }
 	
@@ -22249,13 +22284,16 @@
 	    votification: response.votification,
 	    msg: response.msg ? response.msg : null,
 	    warning: response.warning ? response.warning : null,
-	    error: response.error ? response.error : null
+	    error: response.error ? response.error : null,
+	    windowScroll: newWindowPosition
 	  });
 	  logMgr.verbose('State was set successfully after validation!');
 	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 	}
-	function validateResponse(properThis, response) {
-	  if (validateMessageResponse(properThis, response)) {
+	
+	// scrollTop tells us whether we want to scroll the window to the top after validating and initializing a React re-render
+	function validateResponse(properThis, response, newWindowPosition) {
+	  if (validateMessageResponse(properThis, response, newWindowPosition)) {
 	    return;
 	  }
 	
@@ -22355,13 +22393,15 @@
 	    inputBlocking: response.inputBlocking,
 	    msg: response.msg ? response.msg : null,
 	    warning: response.warning ? response.warning : null,
-	    error: response.error ? response.error : null
+	    error: response.error ? response.error : null,
+	    windowScroll: newWindowPosition || constants.windowScrollTop
 	  });
 	  logMgr.verbose('State was set successfully after validation!');
 	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 	}
-	function validateMessageResponse(context, response) {
-	  // don't do a full response validation if we are told to expect only an alert message
+	
+	// don't do a full response validation if we are told to expect only an alert message
+	function validateMessageResponse(context, response, newWindowPosition) {
 	  if (response.messageOnly) {
 	    logMgr.verbose('Got message-only response.');
 	    context.setState({
@@ -22372,7 +22412,8 @@
 	    context.setState({
 	      msg: response.msg ? response.msg : null,
 	      warning: response.warning ? response.warning : null,
-	      error: response.error ? response.error : null
+	      error: response.error ? response.error : null,
+	      windowScroll: newWindowPosition || constants.windowScrollTop
 	    });
 	    return true;
 	  }
@@ -22396,7 +22437,8 @@
 	    inputBlocking: constants.inputBlockingHide,
 	    msg: null,
 	    warning: null,
-	    error: null
+	    error: null,
+	    windowScroll: constants.windowScrollTop
 	  };
 	}
 	
@@ -22417,8 +22459,27 @@
 	    inputBlocking: constants.inputBlockingHide,
 	    msg: null,
 	    warning: null,
-	    error: errorMessage
+	    error: errorMessage,
+	    windowScroll: constants.windowScrollTop
 	  };
+	}
+	
+	// this function returns a JSON object consisting of window scroll position as {x: #, y: #}
+	function getWindowPosition() {
+	  // modified from http://stackoverflow.com/questions/3464876/javascript-get-window-x-y-position-for-scroll
+	  var doc = document.documentElement;
+	  logMgr.verbose('window.pageXOffset: ' + window.pageXOffset);
+	  logMgr.verbose('window.pageYOffset: ' + window.pageYOffset);
+	  logMgr.verbose('doc.scrollLeft: ' + doc.scrollLeft);
+	  logMgr.verbose('doc.scrollTop: ' + doc.scrollTop);
+	  logMgr.verbose('doc.clientLeft: ' + doc.clientLeft);
+	  logMgr.verbose('doc.clientTop: ' + doc.clientTop);
+	  var pos = {
+	    x: (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),
+	    y: (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0)
+	  };
+	  logMgr.verbose('Got window scroll position: ' + JSON.stringify(pos));
+	  return pos;
 	}
 
 /***/ },
@@ -22542,6 +22603,8 @@
 	constants.votificationNone = 'none';
 	constants.votificationUp = 'up';
 	constants.votificationDown = 'down';
+	
+	constants.windowScrollTop = {x:0,y:0};
 	
 	module.exports = constants;
 
