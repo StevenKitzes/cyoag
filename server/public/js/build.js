@@ -22793,13 +22793,13 @@
 	
 	    return React.createElement(
 	      'div',
-	      { id: 'cyoag-message-banner' },
+	      { onClick: this.closeBanner, id: 'cyoag-message-banner', title: 'Click to dismiss this message.' },
 	      React.createElement(
 	        'p',
 	        { className: className },
 	        React.createElement(
 	          'a',
-	          { onClick: this.closeBanner, id: 'cyoag-message-banner-x', href: '#' },
+	          { id: 'cyoag-message-banner-x', href: '#' },
 	          'x'
 	        ),
 	        messageContent
@@ -22850,7 +22850,7 @@
 	
 	    return React.createElement(
 	      'div',
-	      { onClick: this.closeModal, id: 'cyoag-modal-message-container' },
+	      { onClick: this.closeModal, id: 'cyoag-modal-message-container', title: 'Click to dismiss.' },
 	      React.createElement('div', { id: 'cyoag-modal-message-overlay' }),
 	      React.createElement(
 	        'div',

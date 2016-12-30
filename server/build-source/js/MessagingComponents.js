@@ -48,8 +48,8 @@ var Banner = React.createClass({
     }
 
     return(
-      <div id='cyoag-message-banner'>
-        <p className={className}><a onClick={this.closeBanner} id='cyoag-message-banner-x' href='#'>x</a>{messageContent}</p>
+      <div onClick={this.closeBanner} id='cyoag-message-banner' title='Click to dismiss this message.'>
+        <p className={className}><a id='cyoag-message-banner-x' href='#'>x</a>{messageContent}</p>
       </div>
     );
   }
@@ -97,7 +97,7 @@ var Modal = React.createClass({
     }
 
     return(
-      <div onClick={this.closeModal} id='cyoag-modal-message-container'>
+      <div onClick={this.closeModal} id='cyoag-modal-message-container' title='Click to dismiss.'>
         <div id='cyoag-modal-message-overlay'></div>
         <div id='cyoag-message-modal' className={modalType}>
           <p className='cyoag-modal-message'>{messageContent}</p>
