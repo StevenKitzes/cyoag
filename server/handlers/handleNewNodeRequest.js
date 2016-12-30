@@ -6,7 +6,6 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   var inputBody = req.body.newNodeBody;
   var user_uid = userRow['uid'];
   var user_position = userRow['node_uid'];
-  var warningMsg;
 
   if(!user_position) {
     responder.respondError(res, 'Unable to establish link between existing chapter and new chapter.');
@@ -20,28 +19,118 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     return;
   }
 
-  if(inputPath.length < 4) {
-    warningMsg = 'Your path teaser must be at least 4 characters long';
-  }
-  else if(inputPath.length > 100) {
-    warningMsg = 'Your path teaser may not exceed 100 characters';
+  //
+  // INPUT VALIDATION
+
+  var warningMsg = '';
+
+  var whiteSpaceRegex = /\S*[\s]{3,}\S*/g;
+
+  // check new path content for too many consecutive white space chars
+  if(whiteSpaceRegex.test(inputPath)) {
+    var matches = inputPath.match(whiteSpaceRegex);
+    var problems = 'Found the following problems: ';
+    for(var i = 0; i < matches.length; i++) {
+      if(/\S*[\s]{3,}\S*/.test(matches[i])) {
+        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+      }
+    }
+    responder.respondMsgOnly(res, {warning: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
+      'white space characters together in your story content are forbidden in path teasers.  Please correct any errors and try again!  ' +
+      problems});
+    connection.release();
+    return;
   }
 
+  // check new body content for too many consecutive white space chars
+  if(whiteSpaceRegex.test(inputBody)) {
+    var matches = inputBody.match(whiteSpaceRegex);
+    var problems = 'Found the following problems: ';
+    for(var i = 0; i < matches.length; i++) {
+      if(/\S*[\s]{3,}\S*/.test(matches[i])) {
+        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+      }
+    }
+    responder.respondMsgOnly(res, {warning: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
+      'white space characters together in your story content are forbidden in story content.  Please correct any errors and try again!  ' +
+      problems});
+    connection.release();
+    return;
+  }
+
+  var startingWhiteSpaceRegex = /^\s/;
+  var endingWhiteSpaceRegex = /\s$/;
+
+  // check new path or body for starting white space
+  if(startingWhiteSpaceRegex.test(inputPath)) {
+    responder.respondMsgOnly(res, {warning: 'Path teasers may not begin with white space.  Please try again!'});
+    connection.release();
+    return;
+  }
+  else if(startingWhiteSpaceRegex.test(inputBody)) {
+    responder.respondMsgOnly(res, {warning: 'Story content may not begin with white space.  Please try again!'});
+    connection.release();
+    return;
+  }
+
+  // check new path or body for ending white space
+  if(endingWhiteSpaceRegex.test(inputPath)) {
+    responder.respondMsgOnly(res, {warning: 'Path teasers may not end with white space.  Please try again!'});
+    connection.release();
+    return;
+  }
+  else if(endingWhiteSpaceRegex.test(inputBody)) {
+    responder.respondMsgOnly(res, {warning: 'Story content may not end with white space.  Please try again!'});
+    connection.release();
+    return;
+  }
+
+  var repeatCharRegex = /\S*(.)\1{3,}\S*/g;
+
+  // check new path content for too many consecutive same characters
+  if(repeatCharRegex.test(inputPath)) {
+    var matches = inputPath.match(repeatCharRegex);
+    var problems = 'Found the following problems: ';
+    for(var i = 0; i < matches.length; i++) {
+      if(/(.)\1{3,}/.test(matches[i])) {
+        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+      }
+    }
+    responder.respondMsgOnly(res, {warning: 'Consecutive sets of 4 or more of the same character are forbidden in path teasers.  ' +
+      'Please correct any errors and try again!  ' + problems});
+    connection.release();
+    return;
+  }
+
+  // check new body content for too many consecutive same characters
+  if(repeatCharRegex.test(inputBody)) {
+    var matches = inputBody.match(repeatCharRegex);
+    var problems = 'Found the following problems: ';
+    for(var i = 0; i < matches.length; i++) {
+      if(/(.)\1{3,}/.test(matches[i])) {
+        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+      }
+    }
+    responder.respondMsgOnly(res, {warning: 'Consecutive sets of 4 or more of the same character are forbidden in story content.  ' +
+      'Please correct any errors and try again!  ' + problems});
+    connection.release();
+    return;
+  }
+
+  // check input path length restrictions
+  if(inputPath.length < 4) {
+    warningMsg += 'Your path teaser must be at least 4 characters long. ';
+  }
+  else if(inputPath.length > 100) {
+    warningMsg += 'Your path teaser may not exceed 100 characters. ';
+  }
+
+  // check input body length restrictions
   if(inputBody.length < 500) {
-    if(warningMsg) {
-      warningMsg = warningMsg + ' and your chapter content must be at least 500 characters long';
-    }
-    else {
-      warningMsg = 'Your chapter content must be at least 500 characters long';
-    }
+    warningMsg += 'Your chapter content must be at least 500 characters long. ';
   }
   else if(inputBody.length > 2500) {
-    if(warningMsg) {
-      warningMsg = warningMsg + ' and your chapter content may not exceed 2,500 characters';
-    }
-    else {
-      warningMsg = 'Your chapter content may not exceed 2,500 characters';
-    }
+    warningMsg += 'Your chapter content may not exceed 2,500 characters. ';
   }
 
   if(warningMsg) {
@@ -50,6 +139,9 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     connection.release();
     return;
   }
+
+  // INPUT VALIDATION
+  //
 
   // ensure user did not author the current node
   var query = 'SELECT author_uid FROM nodes WHERE uid=?;';
