@@ -260,6 +260,9 @@ button {
 }
 #cyoag-node-snippet {
   font-size: 1.2em;
+  text-align: justify;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 #cyoag-tooltip-regress {
   color: white;
@@ -313,6 +316,8 @@ button {
   border-radius: 1em;
   border-color: blue;
   padding: 0.5em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
 }
 .cyoag-tooltip-progress {
   color: white;
