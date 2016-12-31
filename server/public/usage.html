@@ -71,7 +71,7 @@
         }
         xhr.open('POST', '/crcSubmit');
         xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
-        xhr.timeout = 5000;
+        xhr.timeout = 10000;
         xhr.ontimeout = function() {
           xhr.abort();
           feedback('Server response timed out; unable to submit your message at this time.');
