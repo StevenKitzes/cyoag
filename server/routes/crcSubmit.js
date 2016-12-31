@@ -48,18 +48,21 @@ router.post('/', function(req, res, next) {
       // if the POST request itself experiences an error
       logMgr.error('Problem getting response from Google Captcha validation service.');
       logMgr.error(error);
+      res.send('The server encountered a problem communicating with Google for reCAPTCHA validation.  You might need to refresh the page.');
       return;
     }
     if(!body || body.success == undefined) {
       // if the POST returns but content is unexpected
       logMgr.error('Problem parsing body in Google Captcha validation service (unexpected response).');
       logMgr.error('Google Captcha reply body: ' + JSON.stringify(body));
+      res.send('The server got an unexpected result from reCAPTCHA validation attempts.  You might need to refresh the page.');
       return;
     }
     if(!body.success) {
       // if we got a defined, but falsey, success state
       logMgr.error('Google returned a fail state in Captcha validation.');
       logMgr.error(JSON.stringify());
+      res.send('reCAPTCHA validation failed.  You might need to refresh the page and try completing the reCAPTCHA challenge again.');
       return;
     }
     // if everything seems to have gone well
@@ -75,26 +78,19 @@ function sendMail(name, confirmAddress, message, res) {
   var transporter = nodemailer.createTransport('smtps://' + secrets.emailAcct + '@gmail.com:' + secrets.emailPass + '@smtp.gmail.com');
 
   var mailBody = '' +
-    '[This message is a confirmation of receipt of a copyright claim filed with CYOAG.  If you did not file such a claim, ' +
-    'please disregard this message.]\r\n\r\n' +
+    '[This message confirms receipt of a copyright claim filed with CYOAG.]\r\n\r\n' +
 
-    'Hi ' + name + ', and thanks for getting in touch.\r\n\r\n' +
+    name + ' entered email address:\r\n' +
+    confirmAddress + '\r\n\r\n' +
 
-    'This email is simply to confirm receipt of your message.  I will be getting in touch with you as soon as I can so ' +
-    'that we can resolve any issues you may have found with content on CYOAG.\r\n\r\n' +
-
-    'For confirmation purposes, your email address is ' + confirmAddress + ' and the message I received from you is:\r\n' +
-    message + '\r\n\r\n' +
-
-    'Thanks for your time and understanding,\r\n' +
-    '- Steven Kitzes';
+    name + ' entered message content:\r\n' +
+    message;
 
   // mailOptions to send the initial mail to myself
   var mailOptions = {
-    from: 'Steven Kitzes <cyoag.steve@gmail.com>',
-    to: confirmAddress, // list of receivers
-    bcc: 'cyoag.steve@gmail.com', // list of BCC receivers
-    subject: 'CYOAG - Copyright Claim Confirmation', // Subject line
+    from: 'Steven Kitzes <cyoag.steve@gmail.com>', // sender
+    to: 'cyoag.steve@gmail.com', // list of receivers
+    subject: 'CYOAG - Copyright Claim', // Subject line
     text: mailBody // plaintext body
   };
 
@@ -118,7 +114,7 @@ function sendMail(name, confirmAddress, message, res) {
       replyMsg += 'please make sure you use a valid email address.';
       res.send(replyMsg);
     }
-    var successMsg = 'Success!  You should receive a confirmation email shortly.  If you do not receive an email confirmation within a few minutes, please double check that you entered your email address correctly, and try again.  Thanks for your time!';
+    var successMsg = 'Success!  Your message has been successfully delivered to the CYOAG moderation team.  If you do not receive a reply from us within a couple of business days, please confirm that you entered valid contact details, and try submitting this form again.  Thanks for your time!';
     res.send(successMsg);
   });
 }
