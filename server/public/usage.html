@@ -12,18 +12,16 @@
       <hr />
       <p>If you believe your copyrighted work was posted on CYOAG without your permission, please feel free to get in touch with us
         using the form below, and we will be happy to work with you to verify your claim and have the content removed.<p>
-      <form action='/crcSubmit' method='POST'>
-        Your name:<br />
-        <input name='name' id='cyoag-uac-name' type='text' placeholder="Your Name"></input><br /><br />
-        Your email address: <br />
-        <input name='email' id='cyoag-uac-email' type='text' placeholder="Your E-Mail"></input><br /><br />
-        Your message:<br />
-        <textarea name='message' id='cyoag-uac-message' placeholder='Your Message' width='100em' height='5em'></textarea><br />
-        <span class='cyoag-note'>(please include contact details so we can collaborate on infringement claim resolution)</span><br /><br />
-        <div class="g-recaptcha" data-sitekey="6Ld4NhAUAAAAAMcO5QOr9a56765p9ZVsk9CDVnBK"></div><br /><br />
-        <input type='submit' value='Submit'></input><br /><br />
-      </form>
+      Your name:<br />
+      <input name='name' id='cyoag-uac-name' type='text' placeholder="Your Name"></input><br /><br />
+      Your email address: <br />
+      <input name='email' id='cyoag-uac-email' type='text' placeholder="Your E-Mail"></input><br /><br />
+      Your message:<br />
+      <textarea name='message' id='cyoag-uac-message' placeholder='Your Message' width='100em' height='5em'></textarea><br />
+      <span class='cyoag-note'>(please include contact details so we can collaborate on infringement claim resolution)</span><br /><br />
+      <div class="g-recaptcha" data-sitekey="6Ld4NhAUAAAAAMcO5QOr9a56765p9ZVsk9CDVnBK"></div><br /><br />
       <div id='cyoag-uac-feedback'></div>
+      <button id='cyoag-uac-submit'>Submit</button>
     </div>
     <script type='text/javascript'>
       window.addEventListener('load', init, false);
@@ -33,37 +31,52 @@
       function init() {
         document.getElementById('cyoag-uac-submit').addEventListener('click', submitCrc, false);
         feedback = function(msg) {
-          document.getElementById('cyoag-uac-feedback').innerHTML = msg;
+          document.getElementById('cyoag-uac-feedback').innerHTML = msg ? msg + '<br /><br />' : '';
         }
       }
 
+        // alert(grecaptcha.getResponse());
       function submitCrc(e) {
         var name = document.getElementById('cyoag-uac-name').value;
         var email = document.getElementById('cyoag-uac-email').value;
         var message = document.getElementById('cyoag-uac-message').value;
+        var captcha = grecaptcha.getResponse();
 
         if(!name) {
-          feedback('Please enter a user name!');
-          if(e.preventDefault) {
-            e.preventDefault();
-          }
-          return false;
+          feedback('Please enter a contact name!');
+          return;
         }
         if(!/[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}/i.test(email)) {
           feedback('Please enter a valid email address!');
-          if(e.preventDefault) {
-            e.preventDefault();
-          }
-          return false;
+          return;
         }
         if(!message) {
           feedback('Please enter a message!');
-          if(e.preventDefault) {
-            e.preventDefault();
-          }
-          return false;
+          return;
         }
-        feedback('Request submitted.  If all goes well, you should receive an email confirmation of your message.');
+        if(!captcha) {
+          feedback('Please complete the reCAPTCHA verification above!');
+          return;
+        }
+        feedback('Claim submitted.  Processing . . .');
+        xhr({name:name, email:email, message:message, captcha:captcha});
+      }
+
+      function xhr(payload) {
+        var xhr = new XMLHttpRequest();
+        xhr.onreadystatechange = function() {
+          if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
+            feedback(xhr.responseText);
+          }
+        }
+        xhr.open('POST', '/crcSubmit');
+        xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+        xhr.timeout = 5000;
+        xhr.ontimeout = function() {
+          xhr.abort();
+          feedback('Server response timed out; unable to submit your message at this time.');
+        }
+        xhr.send(JSON.stringify(payload));
       }
     </script>
   </body>
