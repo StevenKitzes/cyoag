@@ -9,7 +9,7 @@ var responder = require('../responder');
 
 var secrets = require('../secrets');
 var socialUtils = require('../socialUtils');
-var logMgf = require('../utils/serverLogger')('twRoutes.js');
+var logMgf = require('../utils/serverLogger')('twRoutes.js', true);
 var config = require('../build-config');
 
 // Route to kick off a Twitter login event

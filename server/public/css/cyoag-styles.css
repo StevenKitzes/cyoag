@@ -428,3 +428,19 @@ hr {
   height: 16px;
   width: 16px;
 }
+
+/* info page specific */
+.g-recaptcha {
+  display: inline-block;
+  margin: 0 auto;
+}
+
+.cyoag-info-page-container {
+  margin: 0 auto;
+  width: 80%;
+}
+
+#cyoag-uac-message {
+  height: 5em;
+  width: 30em;
+}

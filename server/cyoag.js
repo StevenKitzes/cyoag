@@ -10,6 +10,7 @@ var helmet = require('helmet');
 var buildConfig = require('./build-config');
 var constants = require('./constants');
 
+var crcSubmit = require('./routes/crcSubmit');
 var index = require('./routes/index');
 var fbRoutes = require('./routes/fbRoutes');
 var twRoutes = require('./routes/twRoutes');
@@ -31,6 +32,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/crcSubmit', crcSubmit);
 app.use('/index', index);
 app.use('/fb', fbRoutes);
 app.use('/tw', twRoutes);
