@@ -37,6 +37,10 @@ var MarginLogin = React.createClass({
       <div id='cyoag-margin-login-container'>
         <h4>Login with:</h4>
         <SocialLoginButtonComponents.FacebookButton /> <SocialLoginButtonComponents.TwitterButton />
+        <a href='usage.html'><div id='cyoag-social-note-container'>
+          <img id='cyoag-info-badge' src='images/info-gray.png' />
+          <div id='cyoag-social-note-column'><p id='cyoag-social-note' className='cyoag-note-green'>Note: CYOAG will not gather or use <em>any</em> of your personal information!</p></div>
+        </div></a>
       </div>
     );
   }

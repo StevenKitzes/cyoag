@@ -20,6 +20,9 @@ var BegLogin = React.createClass({
           <h4>Register to save your position, contribute your own story snippets, and gain voting rights!</h4>
           <SocialLoginButtonComponents.FacebookButton />
           <SocialLoginButtonComponents.TwitterButton />
+          <a href='usage.html'><div className='cyoag-social-note-container'>
+            <p className='cyoag-social-note cyoag-note-green'>Note: CYOAG does not gather <em>any</em> personal information!  More info: <img className='cyoag-info-badge' src='images/info-gray.png' /></p>
+          </div></a>
         </div>
       );
     }

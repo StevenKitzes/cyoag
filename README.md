@@ -2,7 +2,7 @@
 
 Choose Your Own Adventure Game - A user-generated text adventure
 
-Choose Your Own Adventure Game, or CYOAG for short, is an idea Steven Kitzes
+Choose Your Own Adventure Game, or CYOAG for short, is an idea Steven K
 came up with, based on the choose-your-own-adventure books he grew up with.
 The basic idea behind these books was that the reader would be presented with
 very short chapters for context; then get to pick from a handful of options

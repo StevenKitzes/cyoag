@@ -8,6 +8,10 @@ body {
     outline: none !important;
 }
 
+a, a:link, a:hover, a:active, a:visited {
+  text-decoration: none;
+}
+
 div {
   text-align: center;
 }
@@ -55,6 +59,41 @@ hr {
   color: darkred;
   font-family: sans-serif;
   font-size: 0.8em;
+}
+
+#cyoag-social-note-container {
+  line-height: 1.2em;
+  margin-top: 0.5em;
+}
+#cyoag-info-badge {
+  display: inline-block;
+  margin-right: 0.5em;
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: middle;
+}
+#cyoag-social-note-column {
+  display: inline-block;
+  width: 80%;
+  vertical-align: middle;
+}
+#cyoag-social-note {
+  margin: 0 !important;
+}
+.cyoag-social-note-container {
+  line-height: 1.2em;
+}
+.cyoag-info-badge {
+  display: inline-block;
+  margin-right: 0.5em;
+  height: 1.2em;
+  width: 1.2em;
+  vertical-align: top;
+}
+.cyoag-social-note {
+  line-height: 1.5em;
+  margin: 0.5em 0 !important;
+  vertical-align: middle;
 }
 
 .cyoag-inline-block {
@@ -430,6 +469,11 @@ hr {
 }
 
 /* info page specific */
+ul {
+  display: inline-block;
+  text-align: left;
+}
+
 .g-recaptcha {
   display: inline-block;
   margin: 0 auto;
@@ -438,6 +482,11 @@ hr {
 .cyoag-info-page-container {
   margin: 0 auto;
   width: 80%;
+}
+
+.cyoag-back-to-top {
+  margin-top: -1em;
+  text-align: right;
 }
 
 #cyoag-uac-message {

@@ -22627,6 +22627,11 @@
 	secrets.TW_KEY = 'uvhrxDCLSVNlyLGgHGwCBzxqT';
 	secrets.TW_SECRET = 'M5WEIkyStvKQ2zkJbXZyxoc1g9FIV7MphTimpJmNJWgW0rzVgy';
 	
+	secrets.captchaSecretKey = '6Ld4NhAUAAAAACAsPRLbmUQQlZPW7j6VtRKMhALP';
+	
+	secrets.emailAcct = 'cyoag.steve';
+	secrets.emailPass = '^g0cy0Acer';
+	
 	secrets.httpsPrivKeyLocation = '/etc/letsencrypt/live/cyoag.com/privkey.pem';
 	secrets.httpsFullChainLocation = '/etc/letsencrypt/live/cyoag.com/fullchain.pem';
 	secrets.httpsChainLocation = '/etc/letsencrypt/live/cyoag.com/chain.pem';
@@ -22738,6 +22743,12 @@
 	        'a',
 	        { className: 'cyoag-link cyoag-header-button', href: 'steve.html' },
 	        'About the Creator'
+	      ),
+	      ' | ',
+	      React.createElement(
+	        'a',
+	        { className: 'cyoag-link cyoag-header-button', href: 'https://github.com/stevenkitzes/cyoag' },
+	        'Project on GitHub'
 	      ),
 	      React.createElement('hr', null)
 	    );
@@ -23126,7 +23137,27 @@
 	          'Register to save your position, contribute your own story snippets, and gain voting rights!'
 	        ),
 	        React.createElement(SocialLoginButtonComponents.FacebookButton, null),
-	        React.createElement(SocialLoginButtonComponents.TwitterButton, null)
+	        React.createElement(SocialLoginButtonComponents.TwitterButton, null),
+	        React.createElement(
+	          'a',
+	          { href: 'usage.html' },
+	          React.createElement(
+	            'div',
+	            { className: 'cyoag-social-note-container' },
+	            React.createElement(
+	              'p',
+	              { className: 'cyoag-social-note cyoag-note-green' },
+	              'Note: CYOAG does not gather ',
+	              React.createElement(
+	                'em',
+	                null,
+	                'any'
+	              ),
+	              ' personal information!  More info: ',
+	              React.createElement('img', { className: 'cyoag-info-badge', src: 'images/info-gray.png' })
+	            )
+	          )
+	        )
 	      );
 	    }
 	  }
@@ -23731,7 +23762,31 @@
 	      ),
 	      React.createElement(SocialLoginButtonComponents.FacebookButton, null),
 	      ' ',
-	      React.createElement(SocialLoginButtonComponents.TwitterButton, null)
+	      React.createElement(SocialLoginButtonComponents.TwitterButton, null),
+	      React.createElement(
+	        'a',
+	        { href: 'usage.html' },
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-social-note-container' },
+	          React.createElement('img', { id: 'cyoag-info-badge', src: 'images/info-gray.png' }),
+	          React.createElement(
+	            'div',
+	            { id: 'cyoag-social-note-column' },
+	            React.createElement(
+	              'p',
+	              { id: 'cyoag-social-note', className: 'cyoag-note-green' },
+	              'Note: CYOAG will not gather or use ',
+	              React.createElement(
+	                'em',
+	                null,
+	                'any'
+	              ),
+	              ' of your personal information!'
+	            )
+	          )
+	        )
+	      )
 	    );
 	  }
 	});

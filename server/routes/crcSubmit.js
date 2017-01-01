@@ -88,7 +88,7 @@ function sendMail(name, confirmAddress, message, res) {
 
   // mailOptions to send the initial mail to myself
   var mailOptions = {
-    from: 'Steven Kitzes <cyoag.steve@gmail.com>', // sender
+    from: 'Steve <cyoag.steve@gmail.com>', // sender
     to: 'cyoag.steve@gmail.com', // list of receivers
     subject: 'CYOAG - Copyright Claim', // Subject line
     text: mailBody // plaintext body
