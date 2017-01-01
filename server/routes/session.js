@@ -109,7 +109,7 @@ router.post('/', function(req, res, next) {
 
         // If no rows returned, no user was found with that session ID, so surface a visitor with appropriate message
         else if(rows.length == 0) {
-          responder.visitorResponse(res, constants.rootNodeUid, {warning: 'Got an expired session ID.  You can try logging in again, or continue using the site as a visitor.'});
+          responder.visitorResponse(res, constants.rootNodeUid, {warning: 'Detected an expired session ID.  You can try logging in again, or continue using the site as a visitor.'});
           connection.release();
           return;
         }

@@ -471,6 +471,7 @@ hr {
 /* info page specific */
 ul {
   display: inline-block;
+  line-height: 1.25em;
   text-align: left;
 }
 
@@ -490,6 +491,12 @@ ul {
 }
 
 #cyoag-uac-message {
+  font-size: 1em;
   height: 5em;
   width: 30em;
+}
+
+#cyoag-steve-pic {
+  margin-top: 1em;
+  width: 10em;
 }
