@@ -21,21 +21,21 @@ var Blocked = React.createClass({
     if(this.props.blocking.top && this.props.blocking.side) {
       return (
         <div id='cyoag-input-container'>
-          <p id='cyoag-input-blocked-message'>(You may not add paths to your own chapters, or chapters that you have already added paths to!)</p>
+          <p id='cyoag-input-blocked-message'>You may not add paths to your own chapters, or chapters that you have already added paths to!</p>
         </div>
       );
     }
     else if(this.props.blocking.top) {
       return (
         <div id='cyoag-input-container'>
-          <p id='cyoag-input-blocked-message'>(You may not add paths to your own chapters!)</p>
+          <p id='cyoag-input-blocked-message'>You may not add paths to your own chapters!</p>
         </div>
       );
     }
     else {
       return (
         <div id='cyoag-input-container'>
-          <p id='cyoag-input-blocked-message'>(You may not add multiple paths to the same chapter!)</p>
+          <p id='cyoag-input-blocked-message'>You may not add multiple paths to the same chapter!</p>
         </div>
       );
     }
