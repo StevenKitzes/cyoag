@@ -82,7 +82,7 @@ var NameChangeComponent = React.createClass({
     if(this.state.nameChange == 'beg') {
       return (
         <div id='cyoag-name-change-ui'>
-          <button id='cyoag-swap-name-change-button' onClick={this.swap}>Customize Your Name</button>
+          <button id='cyoag-swap-name-change-button' onClick={this.swap}>Customize Your Pen Name</button>
         </div>
       );
     }

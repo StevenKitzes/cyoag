@@ -68,7 +68,7 @@ var Votification = React.createClass({
 
     return (
       <div id='cyoag-votification-container'>
-        <h4>How did you like this chapter?</h4>
+        <h4 id='cyoag-votification-prompt'>How did you like this chapter?</h4>
         <a href='#'><img id='cyoag-upvote-button' onClick={voteUp} src={upImgPath} /></a>
         <a href='#'><img id='cyoag-downvote-button' onClick={voteDown} src={downImgPath} /></a>
       </div>
