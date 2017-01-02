@@ -55,7 +55,7 @@ constants.portHttps = 443;
 
 constants.rootNodeUid = 'start';
 
-constants.rootTrailingSnippet = '... a cold wind blows.';
+constants.rootTrailingSnippet = '... by way of prologue.';
 constants.rootLastPath = 'The writer takes up his pen.';
 
 constants.trailingSnippetLength = 200;
