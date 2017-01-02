@@ -9,7 +9,7 @@ var responder = require('../responder');
 
 var secrets = require('../secrets');
 var socialUtils = require('../socialUtils');
-var logMgf = require('../utils/serverLogger')('twRoutes.js', true);
+var logMgr = require('../utils/serverLogger')('twRoutes.js', true);
 var config = require('../build-config');
 
 // Route to kick off a Twitter login event
@@ -87,6 +87,7 @@ router.get('/swap', function(req, res, next) {
     // In the callback, we are finally ready to make Twitter API calls
     // specifically relating to a user, e.g. to retrieve a userId.
     var perm_data = qs.parse(body);
+    logMgr.verbose('Got perm data: ' + JSON.stringify(perm_data));
     // var oauth = {
     //   consumer_key: secrets.TW_KEY,
     //   consumer_secret: secrets.TW_SECRET,

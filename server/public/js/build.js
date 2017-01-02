@@ -22729,25 +22729,25 @@
 	      ),
 	      React.createElement(
 	        'a',
-	        { className: 'cyoag-link cyoag-header-button', href: 'about.html' },
-	        'What is this?'
+	        { className: 'cyoag-link cyoag-button', href: 'about.html' },
+	        'What is CYOAG?'
 	      ),
 	      ' | ',
 	      React.createElement(
 	        'a',
-	        { className: 'cyoag-link cyoag-header-button', href: 'usage.html' },
+	        { className: 'cyoag-link cyoag-button', href: 'usage.html' },
 	        'Usage and Copyright'
 	      ),
 	      ' | ',
 	      React.createElement(
 	        'a',
-	        { className: 'cyoag-link cyoag-header-button', href: 'steve.html' },
+	        { className: 'cyoag-link cyoag-button', href: 'steve.html' },
 	        'About the Creator'
 	      ),
 	      ' | ',
 	      React.createElement(
 	        'a',
-	        { className: 'cyoag-link cyoag-header-button', href: 'https://github.com/stevenkitzes/cyoag' },
+	        { className: 'cyoag-link cyoag-button', href: 'https://github.com/stevenkitzes/cyoag' },
 	        'Project on GitHub'
 	      ),
 	      React.createElement('hr', null)
@@ -23134,29 +23134,7 @@
 	        React.createElement(
 	          'h4',
 	          null,
-	          'Register to save your position, contribute your own story snippets, and gain voting rights!'
-	        ),
-	        React.createElement(SocialLoginButtonComponents.FacebookButton, null),
-	        React.createElement(SocialLoginButtonComponents.TwitterButton, null),
-	        React.createElement(
-	          'a',
-	          { href: 'usage.html' },
-	          React.createElement(
-	            'div',
-	            { className: 'cyoag-social-note-container' },
-	            React.createElement(
-	              'p',
-	              { className: 'cyoag-social-note cyoag-note-green' },
-	              'Note: CYOAG does not gather ',
-	              React.createElement(
-	                'em',
-	                null,
-	                'any'
-	              ),
-	              ' personal information!  More info: ',
-	              React.createElement('img', { className: 'cyoag-info-badge', src: 'images/info-gray.png' })
-	            )
-	          )
+	          'Register an account to save your position, contribute your own story snippets, and gain voting rights!'
 	        )
 	      );
 	    }
@@ -23253,11 +23231,12 @@
 	      { className: 'cyoag-fb-login cyoag-inline-block' },
 	      React.createElement(
 	        'a',
-	        { className: 'cyoag-side-padded-link', href: '/fb/login' },
+	        { className: 'cyoag-side-padded-link cyoag-button', onClick: this.validateTos, href: '/fb/login' },
 	        'Facebook'
 	      )
 	    );
-	  }
+	  },
+	  validateTos: validateTos
 	});
 	
 	// Twitter login button component
@@ -23270,11 +23249,12 @@
 	      { className: 'cyoag-tw-button cyoag-inline-block' },
 	      React.createElement(
 	        'a',
-	        { className: 'cyoag-side-padded-link', href: '/tw/login' },
+	        { className: 'cyoag-side-padded-link cyoag-button', onClick: this.validateTos, href: '/tw/login' },
 	        'Twitter'
 	      )
 	    );
-	  }
+	  },
+	  validateTos: validateTos
 	});
 	
 	// Logout button component
@@ -23289,6 +23269,19 @@
 	    );
 	  }
 	});
+	
+	function validateTos(e) {
+	  if (!document.getElementById('cyoag-tos-checkbox').checked) {
+	    if (e.preventDefault) {
+	      e.preventDefault();
+	    }
+	    if (e.stopPropagation) {
+	      e.stopPropagation();
+	    }
+	    this.props.context.message({ warning: 'You must accept the Terms and Conditions to register your account.  (Sorry, you can blame every litigious dickhead who ever filed a frivolous lawsuit that led us to this state of affairs.)' });
+	    return false;
+	  }
+	}
 	
 	exports.FacebookButton = FacebookButton;
 	exports.TwitterButton = TwitterButton;
@@ -23736,7 +23729,7 @@
 	    if (context.state.acctType != constants.acctTypeVisitor) {
 	      loginComponent = React.createElement(MarginLogout, { context: context, logoutRequest: context.logoutRequest });
 	    } else {
-	      loginComponent = React.createElement(MarginLogin, null);
+	      loginComponent = React.createElement(MarginLogin, { context: context });
 	    }
 	
 	    return React.createElement(
@@ -23760,9 +23753,21 @@
 	        null,
 	        'Login with:'
 	      ),
-	      React.createElement(SocialLoginButtonComponents.FacebookButton, null),
+	      React.createElement(SocialLoginButtonComponents.FacebookButton, { context: this.props.context }),
 	      ' ',
-	      React.createElement(SocialLoginButtonComponents.TwitterButton, null),
+	      React.createElement(SocialLoginButtonComponents.TwitterButton, { context: this.props.context }),
+	      React.createElement(
+	        'label',
+	        { id: 'cyoag-tos-label' },
+	        'Agree to ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'tos.html' },
+	          'Terms and Conditions'
+	        ),
+	        ': ',
+	        React.createElement('input', { id: 'cyoag-tos-checkbox', type: 'checkbox' })
+	      ),
 	      React.createElement(
 	        'a',
 	        { href: 'usage.html' },
@@ -23935,13 +23940,25 @@
 	      React.createElement(
 	        'p',
 	        { className: 'cyoag-note' },
-	        'All software written to support the CYOAG project is protected under the ',
+	        'Your use of this site implies your understanding of and consent to abide by the CYOAG ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'tos.html' },
+	          'Terms, Conditions, and User Agreement'
+	        ),
+	        ' and ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'priv-pol.html' },
+	          'Privacy Policy'
+	        ),
+	        '.  All software written to support the CYOAG project is protected under the ',
 	        React.createElement(
 	          'a',
 	          { className: 'cyoag-link', href: 'http://www.gnu.org/licenses/gpl.html' },
 	          'GNU GPL v3.0'
 	        ),
-	        ' license.  For additional copyright information, please see the ',
+	        ' license.  For additional information, please see the ',
 	        React.createElement(
 	          'a',
 	          { className: 'cyoag-link', href: 'usage.html' },

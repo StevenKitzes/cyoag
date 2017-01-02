@@ -19,7 +19,7 @@ var MarginColumn = React.createClass({
       loginComponent = <MarginLogout context={context} logoutRequest={context.logoutRequest} />;
     }
     else {
-      loginComponent = <MarginLogin />;
+      loginComponent = <MarginLogin context={context}/>;
     }
 
     return (
@@ -36,7 +36,8 @@ var MarginLogin = React.createClass({
     return (
       <div id='cyoag-margin-login-container'>
         <h4>Login with:</h4>
-        <SocialLoginButtonComponents.FacebookButton /> <SocialLoginButtonComponents.TwitterButton />
+        <SocialLoginButtonComponents.FacebookButton context={this.props.context}/> <SocialLoginButtonComponents.TwitterButton context={this.props.context}/>
+        <label id='cyoag-tos-label'>Agree to <a className='cyoag-link' href='tos.html'>Terms and Conditions</a>: <input id='cyoag-tos-checkbox' type="checkbox"></input></label>
         <a href='usage.html'><div id='cyoag-social-note-container'>
           <img id='cyoag-info-badge' src='images/info-gray.png' />
           <div id='cyoag-social-note-column'><p id='cyoag-social-note' className='cyoag-note-green'>Note: CYOAG will not gather or use <em>any</em> of your personal information!</p></div>

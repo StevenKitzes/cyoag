@@ -116,12 +116,13 @@ hr {
   margin-top: 0;
   padding-top: 0;
 }
-.cyoag-header-button {
+.cyoag-button {
   background-color: white;
   border-style: solid;
   border-width: thin;
   border-radius: 0.2em;
   border-color: blue;
+  display: inline-block;
   margin: 0 0.5em;
   padding: 0.1em 0.3em;
 }
@@ -295,6 +296,11 @@ hr {
   margin-top: 1em;
 }
 
+#cyoag-tos-label {
+  display: inline-block;
+  margin-top: 0.5em;
+}
+
 #cyoag-node-container {
   margin-right: auto;
   margin-left: auto;
@@ -355,9 +361,9 @@ hr {
   width: 50%;
 }
 #cyoag-votification-container h4 {
-  margin-top: 0px;
+  margin-top: 0;
   margin-right: auto;
-  margin-bottom: .5em;
+  margin-bottom: 0;
   margin-left: auto;
 }
 
@@ -488,6 +494,10 @@ ul {
 .cyoag-back-to-top {
   margin-top: -1em;
   text-align: right;
+}
+
+#cyoag-toc-header {
+  margin-bottom: 0;
 }
 
 #cyoag-uac-message {
