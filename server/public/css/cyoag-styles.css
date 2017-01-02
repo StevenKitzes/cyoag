@@ -46,7 +46,7 @@ hr {
   display: none;
 }
 .cyoag-note {
-  color: #BBBBBB;
+  color: #666666;
   font-family: sans-serif;
   font-size: 0.8em;
 }
@@ -360,6 +360,9 @@ hr {
   margin-bottom: .5em;
   margin-left: auto;
 }
+#cyoag-votification-prompt {
+  margin-bottom: 0.5em;
+}
 
 #cyoag-path-list {
   margin-top: 1em;
@@ -492,4 +495,13 @@ ul {
 #cyoag-uac-message {
   height: 5em;
   width: 30em;
+}
+
+#cyoag-steve-pic {
+  margin-top: 1em;
+  width: 10em;
+}
+
+#cyoag-rules-block {
+  text-align: justify;
 }
