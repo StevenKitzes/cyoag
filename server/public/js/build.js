@@ -22593,7 +22593,11 @@
 	
 	constants.rootNodeUid = 'start';
 	
+<<<<<<< Updated upstream
 	constants.rootTrailingSnippet = '... a cold wind blows.';
+=======
+	constants.rootTrailingSnippet = '... by way of prologue.';
+>>>>>>> Stashed changes
 	constants.rootLastPath = 'The writer takes up his pen.';
 	
 	constants.trailingSnippetLength = 200;
@@ -22729,25 +22733,42 @@
 	      ),
 	      React.createElement(
 	        'a',
+<<<<<<< Updated upstream
 	        { className: 'cyoag-link cyoag-header-button', href: 'about.html' },
 	        'What is this?'
+=======
+	        { className: 'cyoag-link cyoag-button', href: 'about.html' },
+	        'What is CYOAG?'
+>>>>>>> Stashed changes
 	      ),
 	      ' | ',
 	      React.createElement(
 	        'a',
+<<<<<<< Updated upstream
 	        { className: 'cyoag-link cyoag-header-button', href: 'usage.html' },
+=======
+	        { className: 'cyoag-link cyoag-button', href: 'usage.html' },
+>>>>>>> Stashed changes
 	        'Usage and Copyright'
 	      ),
 	      ' | ',
 	      React.createElement(
 	        'a',
+<<<<<<< Updated upstream
 	        { className: 'cyoag-link cyoag-header-button', href: 'steve.html' },
+=======
+	        { className: 'cyoag-link cyoag-button', href: 'steve.html' },
+>>>>>>> Stashed changes
 	        'About the Creator'
 	      ),
 	      ' | ',
 	      React.createElement(
 	        'a',
+<<<<<<< Updated upstream
 	        { className: 'cyoag-link cyoag-header-button', href: 'https://github.com/stevenkitzes/cyoag' },
+=======
+	        { className: 'cyoag-link cyoag-button', href: 'https://github.com/stevenkitzes/cyoag' },
+>>>>>>> Stashed changes
 	        'Project on GitHub'
 	      ),
 	      React.createElement('hr', null)
@@ -23134,6 +23155,7 @@
 	        React.createElement(
 	          'h4',
 	          null,
+<<<<<<< Updated upstream
 	          'Register to save your position, contribute your own story snippets, and gain voting rights!'
 	        ),
 	        React.createElement(SocialLoginButtonComponents.FacebookButton, null),
@@ -23157,6 +23179,9 @@
 	              React.createElement('img', { className: 'cyoag-info-badge', src: 'images/info-gray.png' })
 	            )
 	          )
+=======
+	          'Register an account to save your position, contribute your own story snippets, and gain voting rights!'
+>>>>>>> Stashed changes
 	        )
 	      );
 	    }
@@ -23207,7 +23232,11 @@
 	      { id: 'cyoag-votification-container' },
 	      React.createElement(
 	        'h4',
+<<<<<<< Updated upstream
 	        null,
+=======
+	        { id: 'cyoag-votification-prompt' },
+>>>>>>> Stashed changes
 	        'How did you like this chapter?'
 	      ),
 	      React.createElement(
@@ -23253,11 +23282,20 @@
 	      { className: 'cyoag-fb-login cyoag-inline-block' },
 	      React.createElement(
 	        'a',
+<<<<<<< Updated upstream
 	        { className: 'cyoag-side-padded-link', href: '/fb/login' },
 	        'Facebook'
 	      )
 	    );
 	  }
+=======
+	        { className: 'cyoag-side-padded-link cyoag-button', onClick: this.validateTos, href: '/fb/login' },
+	        'Facebook'
+	      )
+	    );
+	  },
+	  validateTos: validateTos
+>>>>>>> Stashed changes
 	});
 	
 	// Twitter login button component
@@ -23270,11 +23308,20 @@
 	      { className: 'cyoag-tw-button cyoag-inline-block' },
 	      React.createElement(
 	        'a',
+<<<<<<< Updated upstream
 	        { className: 'cyoag-side-padded-link', href: '/tw/login' },
 	        'Twitter'
 	      )
 	    );
 	  }
+=======
+	        { className: 'cyoag-side-padded-link cyoag-button', onClick: this.validateTos, href: '/tw/login' },
+	        'Twitter'
+	      )
+	    );
+	  },
+	  validateTos: validateTos
+>>>>>>> Stashed changes
 	});
 	
 	// Logout button component
@@ -23290,6 +23337,22 @@
 	  }
 	});
 	
+<<<<<<< Updated upstream
+=======
+	function validateTos(e) {
+	  if (!document.getElementById('cyoag-tos-checkbox').checked) {
+	    if (e.preventDefault) {
+	      e.preventDefault();
+	    }
+	    if (e.stopPropagation) {
+	      e.stopPropagation();
+	    }
+	    this.props.context.message({ warning: 'You must accept the Terms and Conditions to register or login with your account.' });
+	    return false;
+	  }
+	}
+	
+>>>>>>> Stashed changes
 	exports.FacebookButton = FacebookButton;
 	exports.TwitterButton = TwitterButton;
 	exports.LogoutButton = LogoutButton;
@@ -23736,7 +23799,11 @@
 	    if (context.state.acctType != constants.acctTypeVisitor) {
 	      loginComponent = React.createElement(MarginLogout, { context: context, logoutRequest: context.logoutRequest });
 	    } else {
+<<<<<<< Updated upstream
 	      loginComponent = React.createElement(MarginLogin, null);
+=======
+	      loginComponent = React.createElement(MarginLogin, { context: context });
+>>>>>>> Stashed changes
 	    }
 	
 	    return React.createElement(
@@ -23760,12 +23827,33 @@
 	        null,
 	        'Login with:'
 	      ),
+<<<<<<< Updated upstream
 	      React.createElement(SocialLoginButtonComponents.FacebookButton, null),
 	      ' ',
 	      React.createElement(SocialLoginButtonComponents.TwitterButton, null),
 	      React.createElement(
 	        'a',
 	        { href: 'usage.html' },
+=======
+	      React.createElement(SocialLoginButtonComponents.FacebookButton, { context: this.props.context }),
+	      ' ',
+	      React.createElement(SocialLoginButtonComponents.TwitterButton, { context: this.props.context }),
+	      React.createElement(
+	        'label',
+	        { id: 'cyoag-tos-label' },
+	        'Agree to ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'tos.html' },
+	          'Terms and Conditions'
+	        ),
+	        ': ',
+	        React.createElement('input', { id: 'cyoag-tos-checkbox', type: 'checkbox' })
+	      ),
+	      React.createElement(
+	        'a',
+	        { href: 'priv-pol.html' },
+>>>>>>> Stashed changes
 	        React.createElement(
 	          'div',
 	          { id: 'cyoag-social-note-container' },
@@ -23776,6 +23864,7 @@
 	            React.createElement(
 	              'p',
 	              { id: 'cyoag-social-note', className: 'cyoag-note-green' },
+<<<<<<< Updated upstream
 	              'Note: CYOAG will not gather or use ',
 	              React.createElement(
 	                'em',
@@ -23783,6 +23872,9 @@
 	                'any'
 	              ),
 	              ' of your personal information!'
+=======
+	              'Learn about social media account integration in the CYOAG Privacy Policy!'
+>>>>>>> Stashed changes
 	            )
 	          )
 	        )
@@ -23845,7 +23937,11 @@
 	        React.createElement(
 	          'button',
 	          { id: 'cyoag-swap-name-change-button', onClick: this.swap },
+<<<<<<< Updated upstream
 	          'Customize Your Name'
+=======
+	          'Customize Your Pen Name'
+>>>>>>> Stashed changes
 	        )
 	      );
 	    } else if (this.state.nameChange == 'ui') {
@@ -23935,13 +24031,33 @@
 	      React.createElement(
 	        'p',
 	        { className: 'cyoag-note' },
+<<<<<<< Updated upstream
 	        'All software written to support the CYOAG project is protected under the ',
+=======
+	        'Your use of this site implies your understanding of and consent to abide by the CYOAG ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'tos.html' },
+	          'Terms, Conditions, and User Agreement'
+	        ),
+	        ' and ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'priv-pol.html' },
+	          'Privacy Policy'
+	        ),
+	        '.  All software written to support the CYOAG project is protected under the ',
+>>>>>>> Stashed changes
 	        React.createElement(
 	          'a',
 	          { className: 'cyoag-link', href: 'http://www.gnu.org/licenses/gpl.html' },
 	          'GNU GPL v3.0'
 	        ),
+<<<<<<< Updated upstream
 	        ' license.  For additional copyright information, please see the ',
+=======
+	        ' license.  For additional information, please see the ',
+>>>>>>> Stashed changes
 	        React.createElement(
 	          'a',
 	          { className: 'cyoag-link', href: 'usage.html' },
