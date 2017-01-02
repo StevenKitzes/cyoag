@@ -36,6 +36,19 @@ var LogoutButton = React.createClass({
   }
 });
 
+function validateTos(e) {
+  if(!document.getElementById('cyoag-tos-checkbox').checked) {
+    if(e.preventDefault) {
+      e.preventDefault();
+    }
+    if(e.stopPropagation) {
+      e.stopPropagation();
+    }
+    this.props.context.message({warning: 'You must accept the Terms and Conditions to register or login with your account.'});
+    return false;
+  }
+}
+
 exports.FacebookButton = FacebookButton;
 exports.TwitterButton = TwitterButton;
 exports.LogoutButton = LogoutButton;
