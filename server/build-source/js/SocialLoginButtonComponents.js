@@ -46,7 +46,7 @@ function validateTos(e) {
     if(e.stopPropagation) {
       e.stopPropagation();
     }
-    this.props.context.message({warning: 'You must accept the Terms and Conditions to register your account.  (Sorry, you can blame every litigious dickhead who ever filed a frivolous lawsuit that led us to this state of affairs.)'});
+    this.props.context.message({warning: 'You must accept the Terms and Conditions to register or login with your account.'});
     return false;
   }
 }
