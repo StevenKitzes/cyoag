@@ -367,7 +367,7 @@ hr {
   margin-left: auto;
 }
 #cyoag-votification-prompt {
-  margin-bottom: 0.5em;
+  margin-bottom: 0.5em !important;
 }
 
 #cyoag-path-list {
