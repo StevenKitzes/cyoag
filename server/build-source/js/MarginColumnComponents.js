@@ -38,9 +38,9 @@ var MarginLogin = React.createClass({
         <h4>Login with:</h4>
         <SocialLoginButtonComponents.FacebookButton context={this.props.context}/> <SocialLoginButtonComponents.TwitterButton context={this.props.context}/>
         <label id='cyoag-tos-label'>Agree to <a className='cyoag-link' href='tos.html'>Terms and Conditions</a>: <input id='cyoag-tos-checkbox' type="checkbox"></input></label>
-        <a href='usage.html'><div id='cyoag-social-note-container'>
+        <a href='priv-pol.html'><div id='cyoag-social-note-container'>
           <img id='cyoag-info-badge' src='images/info-gray.png' />
-          <div id='cyoag-social-note-column'><p id='cyoag-social-note' className='cyoag-note-green'>Note: CYOAG will not gather or use <em>any</em> of your personal information!</p></div>
+          <div id='cyoag-social-note-column'><p id='cyoag-social-note' className='cyoag-note-green'>Learn how and why CYOAG connects with your social media account in the CYOAG Privacy Policy!</p></div>
         </div></a>
       </div>
     );
