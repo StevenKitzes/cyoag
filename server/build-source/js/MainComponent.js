@@ -19,6 +19,7 @@ var MainComponent = React.createClass({
     logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
     window.scrollTo(x, y);
   },
+  deleteChapter: deleteChapter,
   getInitialState: getDefaultStateObject,
   inputSubmit: inputSubmit,
   logoutRequest: logoutXhrHandler,
@@ -37,6 +38,7 @@ var MainComponent = React.createClass({
 
     var context = {};
     context.state = this.state;
+    context.deleteChapter = this.deleteChapter;
     context.inputSubmit = this.inputSubmit;
     context.logoutRequest = this.logoutRequest;
     context.message = this.message;
@@ -172,6 +174,37 @@ function navigateXhrHandler(nodeUid) {
     });
   }
   var xhrPayload = JSON.stringify({navigate: nodeUid});
+  xhr.send(xhrPayload);
+}
+
+function deleteChapter() {
+  var savedWindowPosition = getWindowPosition();
+  logMgr.debug('User attempting to delete a story node . . .');
+  var xhr = new XMLHttpRequest();
+  // xmlHttp.onreadystatechange = () => {...}
+  var properThis = this;
+  xhr.onreadystatechange = function() {
+    if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
+      logMgr.debug('Status 200 (or 304)!');
+      logMgr.verbose('Deletion response payload: ' + xhr.responseText);
+      var response = JSON.parse(xhr.responseText);
+      validateResponse(properThis, response, constants.windowScrollTop);
+    }
+    else {
+      logMgr.debug('Deletion attempt yielded HTTP response status: ' + xhr.status);
+    }
+  }
+  xhr.open('POST', '/session');
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xhr.timeout = 5000;
+  xhr.ontimeout = function() {
+    xhr.abort();
+    properThis.setState({
+      error: 'Server response timed out; unable to detect result of deletion attempt.',
+      windowScroll: savedWindowPosition
+    });
+  }
+  var xhrPayload = JSON.stringify({deleteTarget: properThis.state.nodeUid});
   xhr.send(xhrPayload);
 }
 

@@ -31,7 +31,7 @@ var Node = React.createClass({
         </a>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
         <div id='cyoag-node-snippet'>{snippet.nodeSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}</div>
-        <p id='cyoag-author-attribution' className='cyoag-note'>Contribution by user {snippet.authorName}</p>
+        <NodeOwnerUi context={context} />
       </div>
     );
   },
@@ -39,6 +39,42 @@ var Node = React.createClass({
     var tooltip = document.querySelector('#cyoag-tooltip-regress');
     tooltip.style.top = (mouseEvent.clientY + pageYOffset) + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
     tooltip.style.left = (mouseEvent.clientX + pageXOffset) + 'px';
+  }
+});
+
+var NodeOwnerUi = React.createClass({
+  render: function() {
+    var context = this.props.context;
+    var userIsOwner = context.state.inputBlocking.top;
+    var paths = context.state.paths;
+    var pathCount = paths.length;
+
+    if(!userIsOwner) {
+      // if the user is not the owner, just display who the owner is
+      return (
+        <div id='cyoag-owner-ui'>
+          <p id='cyoag-author-attribution' className='cyoag-note'>Contribution by user {context.state.snippet.authorName}</p>
+        </div>
+      );
+    }
+    else if(pathCount > 0) {
+      // if the user is the author but someone already appended to this chapter, let the owner know
+      return (
+        <div id='cyoag-owner-ui'>
+          <p id='cyoag-deletion-forbidden' className='cyoag-note'>You authored this chapter, but it cannot be modified because
+            another has already been added to it, or a draft is pending on it.</p>
+        </div>
+      );
+    }
+    else {
+      // if the user is the author and modification is permitted
+      return (
+        <div id='cyoag-owner-ui'>
+          <p id='cyoag-modification-permitted' className='cyoag-note'>You authored this chapter, and have modification privileges.</p>
+          <button id='cyoag-delete-chapter-button' onClick={context.deleteChapter}>Delete this chapter</button>
+        </div>
+      );
+    }
   }
 });
 

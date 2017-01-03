@@ -356,6 +356,7 @@ hr {
   border-width: 2px;
   border-radius: 1em;
   border-color: blue;
+  margin-top: 1em;
   padding: 1em;
   display: inline-block;
   width: 50%;
@@ -415,6 +416,8 @@ hr {
   border-radius: 2em;
   border-color: blue;
   margin: 1em auto;
+  padding-left: 1em;
+  padding-right: 1em;
   width: 75%;
 }
 #cyoag-input-container textarea {
