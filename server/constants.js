@@ -49,6 +49,9 @@ constants.modalTypeMessage = 'cyoag-modal-type-message';
 constants.modalTypeWarning = 'cyoag-modal-type-warning';
 constants.modalTypeError = 'cyoag-modal-type-error';
 
+constants.nodeStatusDeleted = 'deleted';
+constants.nodeStatusVisible = 'visible';
+
 constants.portLocal = 3000;
 constants.portProd = 80;
 constants.portHttps = 443;

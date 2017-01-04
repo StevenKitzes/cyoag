@@ -28,7 +28,7 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
   // now we will have to query the DB to learn if we must update existing votes, or create a new row
   var query =
-    'SELECT nodes.uid, votes.sentiment AS sentiment ' +
+    'SELECT nodes.uid, nodes.status AS nodeStatus, votes.sentiment AS sentiment ' +
       'FROM nodes ' +
         'LEFT JOIN votes ' +
           'ON nodes.uid=votes.node_uid AND votes.user_uid=? AND votes.node_uid=? ' +
@@ -49,7 +49,10 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
     var row = rows[0];
 
-    if(row.sentiment == null) {
+    if(row.nodeStatus == constants.nodeStatusDeleted) {
+      // user tried to vote on a deleted node! notify and move user to a valid node (recursively)
+    }
+    else if(row.sentiment == null) {
       // node existed so row returned, but no vote on that node for this user
       // create vote, and don't forget to update node's votification count
       query = 'START TRANSACTION; ' +

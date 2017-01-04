@@ -186,14 +186,14 @@ module.exports = function(req, res, connection, session_uid, userRow) {
       // insert new chapter!!
       query =
         'START TRANSACTION; ' +
-          'INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet, votification) ' +
-          'SELECT ?, positions.node_uid, positions.user_uid, ?, ?, ? ' +
+          'INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet, votification, status) ' +
+          'SELECT ?, positions.node_uid, positions.user_uid, ?, ?, ?, ? ' +
             'FROM positions ' +
             'WHERE positions.user_uid=?;' +
           'UPDATE positions SET node_uid=? WHERE user_uid=?; ' +
         'COMMIT;';
       var newNodeUid = generateGuid();
-      connection.query(query, [newNodeUid, inputPath, inputBody, 0, user_uid, newNodeUid, user_uid], function(err, rows) {
+      connection.query(query, [newNodeUid, inputPath, inputBody, 0, constants.nodeStatusVisible, user_uid, newNodeUid, user_uid], function(err, rows) {
         if(err) {
           responder.respondError(res, 'Database error saving new chapter information.');
           logMgr.error(err);

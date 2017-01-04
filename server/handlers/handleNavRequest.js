@@ -12,13 +12,22 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     return;
   }
 
-  var query = 'UPDATE positions SET node_uid=? WHERE user_uid=?;';
-  connection.query(query, [destination, user_uid], function(err, result) {
+  var query =
+    'UPDATE positions ' +
+      'INNER JOIN nodes ON positions.node_uid=nodes.uid ' +
+    'SET positions.node_uid=? ' +
+      'WHERE positions.user_uid=? AND nodes.status=?;';
+  connection.query(query, [destination, user_uid, constants.nodeStatusVisible], function(err, rows) {
     if(err) {
       responder.respondError(res, 'Database error attempting to set new user position.');
       logMgr.error(err);
       connection.release();
       return;
+    }
+
+    if(rows.affectedRows < 1) {
+      // no updates made, meaning no such node, or node status deleted; fix!
+      // user needs to be moved to a safe, undeleted node
     }
 
     responder.respond(res, session_uid);

@@ -13,6 +13,7 @@ author_uid VARCHAR(40),
 path_snippet VARCHAR(100),
 node_snippet VARCHAR(2500),
 votification INTEGER,
+status VARCHAR(16),
 INDEX (parent_uid),
 INDEX (author_uid)
 );
