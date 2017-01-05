@@ -216,8 +216,8 @@ function respond(res, session_uid, msg) {
       // now get paths out from here by finding the nodes that have this node as a parent
       query =
         'SELECT uid as pathUid, author_uid as authorUid, path_snippet as pathSnippet, votification as pathVotification ' +
-          'FROM nodes WHERE parent_uid=?;';
-      connection.query(query, [response.nodeUid], function(error, rows) {
+          'FROM nodes WHERE parent_uid=? AND status<>?;';
+      connection.query(query, [response.nodeUid], constants.nodeStatusDeleted, function(error, rows) {
         if(error) {
           respondError(res, 'Database error retrieving path information from node.');
           logMgr.error(error);

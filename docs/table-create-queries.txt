@@ -20,14 +20,17 @@ INDEX (author_uid)
 
 CREATE TABLE IF NOT EXISTS positions (
 user_uid VARCHAR(40) UNIQUE PRIMARY KEY,
-node_uid VARCHAR(40)
+node_uid VARCHAR(40),
+INDEX (node_uid)
 );
 
 CREATE TABLE IF NOT EXISTS votes (
 user_uid VARCHAR(40),
 node_uid VARCHAR(40),
 sentiment TINYINT,
-PRIMARY KEY (user_uid, node_uid)
+PRIMARY KEY (user_uid, node_uid),
+INDEX (user_uid),
+INDEX (node_uid)
 );
 
 ALTER TABLE nodes CONVERT TO CHARACTER SET utf8;
