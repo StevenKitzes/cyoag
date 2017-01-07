@@ -35,11 +35,11 @@ function respondMsgOnly(res, msg) {
 
   if(msg.error) {
     response.error = msg.error;
-    logMgr.out('Responding with error: ' + msg.error);
+    logMgr.error('Responding with error: ' + msg.error);
   }
   else if(msg.warning) {
     response.warning = msg.warning;
-    logMgr.out('Responding with warning: ' + msg.warning);
+    logMgr.warn('Responding with warning: ' + msg.warning);
   }
   else if(msg.msg) {
     response.msg = msg.msg;

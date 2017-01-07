@@ -39,7 +39,7 @@ router.get('/swap', function(req, res, next) {
   request(swapUrl, function(error, response, responseBody) {
     // catch errors
     if(error) { logMgr.error(error); return; }
-    if(response.statusCode != 200) { logMgr.warning('Oops!  Got status code: ' + response.statusCode); return; }
+    if(response.statusCode != 200) { logMgr.warn('Oops!  Got status code: ' + response.statusCode); return; }
 
     // make a JSON object out of the response and get the token out
     var tokenObj = JSON.parse(responseBody);
@@ -51,7 +51,7 @@ router.get('/swap', function(req, res, next) {
       var getUserIdUrl = 'https://graph.facebook.com/me?fields=id&access_token=' + token;
       request(getUserIdUrl, function(e, r, rb) {
         if(e) { logMgr.error(e); return; }
-        if(r.statusCode != 200) { logMgr.warning('Uh oh!  Got status code: ' + r.statusCode); return; }
+        if(r.statusCode != 200) { logMgr.warn('Uh oh!  Got status code: ' + r.statusCode); return; }
 
         /*
          * Get the user's social ID from the response payload.  idObj.id is

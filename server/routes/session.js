@@ -78,7 +78,10 @@ router.post('/', function(req, res, next) {
       }
 
       // Build query and callback to check for users with the current session_uid
-      var query = 'SELECT * FROM users LEFT JOIN positions ON users.uid=positions.user_uid WHERE session_uid=?;'
+      var query =
+        'SELECT * FROM users ' +
+          'LEFT JOIN positions ON users.uid=positions.user_uid ' +
+        'WHERE session_uid=?;'
       logMgr.out('Executing query to search for users with the current session_uid.');
       connection.query(query, [session_uid], function(err, rows) {
         if(err) {
@@ -88,23 +91,11 @@ router.post('/', function(req, res, next) {
           return;
         }
 
-        // If multiple rows were returned, clear all session_uid entries
-        // with this value to '0' and clear the current user's cookie
+        // If multiple rows were returned, set new random uids for session_uid entries
         if(rows.length > 1) {
-          logMgr.warning('Found ' + rows.length + ' matching rows.  Removing duplicate session IDs in DB.');
-          query = 'UPDATE users SET session_uid="0" WHERE session_uid=?;'
-          connection.query(query, [session_uid], function(err, rows) {
-            if(err) {
-              responder.respondError(res, 'Database error trying to clear duplicate session IDs.');
-              logMgr.error(err);
-              connection.release();
-              return;
-            }
-
-            responder.respond(res, session_uid);
-            connection.release();
-            return;
-          });
+          responder.respondError(res, 'Problem retrieving session ID.  Found duplicate entries.');
+          connection.release();
+          return;
         } // end clearing matched session_uid values
 
         // If no rows returned, no user was found with that session ID, so surface a visitor with appropriate message
@@ -117,32 +108,51 @@ router.post('/', function(req, res, next) {
         // If one row was returned...
         else if(rows.length == 1) {
           logMgr.out('Found user with the given session ID.');
+
           var userRow = rows[0];
-          logMgr.verbose('User details: ' + JSON.stringify(userRow));
-          if(req.body.hasOwnProperty('navigate')) {
-            require('../handlers/handleNavRequest')(req, res, connection, session_uid, userRow);
+          // make sure user has a position
+          if(userRow.user_uid == null || userRow.node_uid == null) {
+            query = 'INSERT INTO positions (user_uid, node_uid) VALUES (?, ?);';
+            connection.query(query, [userRow.uid, constants.rootNodeUid], function(err, rows) {
+              if(err) {
+                responder.respondError(res, 'Database error trying to restore missing user position.');
+                connection.release();
+                return;
+              }
+
+              responder.respond(res, session_uid, {warning: 'Your position was lost or missing.  We are placing you back at the beginning of the story.'});
+              connection.release();
+              return;
+            });
           }
-          else if(req.body.hasOwnProperty('newName')) {
-            require('../handlers/handleNewNameRequest')(req, res, connection, session_uid, userRow);
-          }
-          else if(req.body.hasOwnProperty('newNodePath')) {
-            require('../handlers/handleNewNodeRequest')(req, res, connection, session_uid, userRow);
-          }
-          else if(req.body.hasOwnProperty('draftPath')) {
-            require('../handlers/handleDraftSaveRequest')(req, res, connection, session_uid, userRow);
-          }
-          else if(req.body.hasOwnProperty('votify')) {
-            require('../handlers/handleVotification')(req, res, connection, session_uid, userRow);
-          }
-          else if(req.body.hasOwnProperty('deleteTarget')) {
-            require('../handlers/handleDeletionRequest')(req, res, connection, session_uid, userRow);
-          }
+
           else {
-            // If no particular request was detected, simply surface data for user at current location
-            logMgr.out('User made no specific request; surfacing chapter data for the current location of the user.');
-            responder.respond(res, session_uid);
-            connection.release();
-            return;
+            logMgr.verbose('User details: ' + JSON.stringify(userRow));
+            if(req.body.hasOwnProperty('navigate')) {
+              require('../handlers/handleNavRequest')(req, res, connection, session_uid, userRow);
+            }
+            else if(req.body.hasOwnProperty('newName')) {
+              require('../handlers/handleNewNameRequest')(req, res, connection, session_uid, userRow);
+            }
+            else if(req.body.hasOwnProperty('newNodePath')) {
+              require('../handlers/handleNewNodeRequest')(req, res, connection, session_uid, userRow);
+            }
+            else if(req.body.hasOwnProperty('draftPath')) {
+              require('../handlers/handleDraftSaveRequest')(req, res, connection, session_uid, userRow);
+            }
+            else if(req.body.hasOwnProperty('votify')) {
+              require('../handlers/handleVotification')(req, res, connection, session_uid, userRow);
+            }
+            else if(req.body.hasOwnProperty('deleteTarget')) {
+              require('../handlers/handleDeletionRequest')(req, res, connection, session_uid, userRow);
+            }
+            else {
+              // If no particular request was detected, simply surface data for user at current location
+              logMgr.out('User made no specific request; surfacing chapter data for the current location of the user.');
+              responder.respond(res, session_uid);
+              connection.release();
+              return;
+            }
           }
         }
       });
