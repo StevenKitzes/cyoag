@@ -2,7 +2,7 @@ var constants = require('../constants');
 var logMgr = require('../utils/serverLogger')('handleNavRequest.js', true);
 var responder = require('../responder');
 
-module.exports = function(req, res, connection, session_uid, userRow) {
+module.exports = function(req, res, connection, session_uid, userRow, forwardedMessage) {
   var user_uid = userRow.uid;
   var user_position = userRow.node_uid;
   var destination = req.body.navigate;
@@ -59,7 +59,7 @@ module.exports = function(req, res, connection, session_uid, userRow) {
         // if destination was already a safe node, we can just respond to the client now
         if(rows[0].status == constants.nodeStatusVisible) {
           logMgr.out('Nav request targeted a safe node.  Already repositioned.  Building response.');
-          responder.respond(res, session_uid);
+          responder.respond(res, session_uid, forwardedMessage ? forwardedMessage : null);
           connection.release();
           return;
         }
@@ -92,8 +92,10 @@ module.exports = function(req, res, connection, session_uid, userRow) {
               logMgr.debug('Affected rows (checking whether a user position was updated or not): ' + rows.affectedRows);
 
               // user successfully repositioned, respond with a message explaining why the user wasn't moved where expected
-              responder.respond(res, session_uid, {warning: 'That chapter appears to have been deleted while you were ' +
-              'reading!  Moving you to the nearest previous, undeleted node.'})
+              responder.respond(res, session_uid,
+                forwardedMessage ?
+                  forwardedMessage :
+                  {warning: 'That chapter seems to have been deleted while you were reading!  Moving you to the nearest previous, undeleted node.'})
               connection.release();
               return;
             });

@@ -2,6 +2,8 @@ var generateGuid = require('../utils/uid-gen');
 var logMgr = require('../utils/serverLogger')('handleNewNodeRequest.js', true);
 var responder = require('../responder');
 
+var navigate = require('./handleNavRequest');
+
 module.exports = function(req, res, connection, session_uid, userRow) {
   var inputPath = req.body.newNodePath;
   var inputBody = req.body.newNodeBody;
@@ -147,14 +149,25 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   // INPUT VALIDATION
   //
 
-  // ensure user did not author the current node
-  var query = 'SELECT author_uid FROM nodes WHERE uid=?;';
+  // ensure user did not author the current node, that current node exists, and that it is not status deleted
+  var query = 'SELECT status, author_uid FROM nodes WHERE uid=?;';
   connection.query(query, [user_position], function(err, rows) {
     if(err) {
       responder.respondError(res, 'Database error validating user permission to post new content at this position.');
       logMgr.error(err);
       connection.release();
       return;
+    }
+
+    if(rows.length < 1) {
+      // no rows returned; current node didn't even exist!  No idea where user is; send them to start
+      req.body.navigate = constants.rootNodeUid;
+      navigate(req, res, connection, session_uid, userRow, {error: 'Attempted to append to a chapter that does not exist!  You are being sent back to the beginning of the story.'});
+      return;
+    }
+
+    if(rows[0].status != constants.nodeStatusVisible) {
+      // not a valid node to append new story nodes to
     }
 
     if(rows[0].author_uid == user_uid) {

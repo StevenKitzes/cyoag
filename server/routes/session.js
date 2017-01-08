@@ -69,13 +69,13 @@ router.post('/', function(req, res, next) {
 
     // Get a db connection from the pool
     db.getConnection(function(err, connection) {
-      logMgr.verbose('Got DB connection from pool to check if any user has this session.');
       // If there's an error getting DB connection to check users with this session ID
       if(err) {
         responder.respondError(res, 'There was a problem getting a database connection.  Cannot validate session ID.');
         logMgr.error(err);
         return;
       }
+      logMgr.verbose('Got DB connection from pool to check if any user has this session.');
 
       // Build query and callback to check for users with the current session_uid
       var query =
@@ -116,6 +116,8 @@ router.post('/', function(req, res, next) {
             connection.query(query, [userRow.uid, constants.rootNodeUid], function(err, rows) {
               if(err) {
                 responder.respondError(res, 'Database error trying to restore missing user position.');
+                logMgr.error(err);
+                logMgr.debug('userRow: ' + JSON.stringify(userRow));
                 connection.release();
                 return;
               }

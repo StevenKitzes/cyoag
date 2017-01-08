@@ -46,9 +46,28 @@ var NodeOwnerUi = React.createClass({
   render: function() {
     var context = this.props.context;
     var userIsOwner = context.state.inputBlocking.top;
+    var userIsModerator = (context.state.acctType == constants.acctTypeModerator);
     var paths = context.state.paths;
     var pathCount = paths.length;
 
+    if(userIsModerator && userIsOwner) {
+      // if the user is moderator and owner, they can do whatever they want with this node
+      return (
+        <div id='cyoag-moderator-and-owner-ui'>
+          <p id='cyoag-modification-permitted' className='cyoag-note'>You are a moderator and the owner of this chapter, so you have modification privileges.</p>
+          <button id='cyoag-delete-chapter-button' onClick={context.deleteChapter}>Delete this chapter</button>
+        </div>
+      );
+    }
+    if(userIsModerator) {
+      // if the user is a moderator they can delete no matter what
+      return (
+        <div id='cyoag-moderator-ui'>
+          <p id='cyoag-modification-permitted' className='cyoag-note'>As a moderator, you have modification privileges.</p>
+          <button id='cyoag-delete-chapter-button' onClick={context.deleteChapter}>Delete this chapter</button>
+        </div>
+      );
+    }
     if(!userIsOwner) {
       // if the user is not the owner, just display who the owner is
       return (
@@ -57,8 +76,8 @@ var NodeOwnerUi = React.createClass({
         </div>
       );
     }
-    else if(pathCount > 0) {
-      // if the user is the author but someone already appended to this chapter, let the owner know
+    if(pathCount > 0) {
+      // if the user is the owner but someone already appended to this chapter, let the owner know
       return (
         <div id='cyoag-owner-ui'>
           <p id='cyoag-deletion-forbidden' className='cyoag-note'>You authored this chapter, but it cannot be modified because

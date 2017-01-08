@@ -23046,9 +23046,44 @@
 	  render: function () {
 	    var context = this.props.context;
 	    var userIsOwner = context.state.inputBlocking.top;
+	    var userIsModerator = context.state.acctType == constants.acctTypeModerator;
 	    var paths = context.state.paths;
 	    var pathCount = paths.length;
 	
+	    if (userIsModerator && userIsOwner) {
+	      // if the user is moderator and owner, they can do whatever they want with this node
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-moderator-and-owner-ui' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
+	          'You are a moderator and the owner of this chapter, so you have modification privileges.'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-delete-chapter-button', onClick: context.deleteChapter },
+	          'Delete this chapter'
+	        )
+	      );
+	    }
+	    if (userIsModerator) {
+	      // if the user is a moderator they can delete no matter what
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-moderator-ui' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
+	          'As a moderator, you have modification privileges.'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-delete-chapter-button', onClick: context.deleteChapter },
+	          'Delete this chapter'
+	        )
+	      );
+	    }
 	    if (!userIsOwner) {
 	      // if the user is not the owner, just display who the owner is
 	      return React.createElement(
@@ -23061,8 +23096,9 @@
 	          context.state.snippet.authorName
 	        )
 	      );
-	    } else if (pathCount > 0) {
-	      // if the user is the author but someone already appended to this chapter, let the owner know
+	    }
+	    if (pathCount > 0) {
+	      // if the user is the owner but someone already appended to this chapter, let the owner know
 	      return React.createElement(
 	        'div',
 	        { id: 'cyoag-owner-ui' },
