@@ -103,6 +103,7 @@ function respond(res, session_uid, msg) {
         'nodes.path_snippet as pathSnippet, ' +
         'nodes.parent_uid as parentUid, ' +
         'nodes.author_uid as authorUid, ' +
+        'nodes.status as status, ' +
         'votes.sentiment as sentiment, ' +
         'authors.name as authorName, ' +
         'authors.acct_type as authorAcctType ' +

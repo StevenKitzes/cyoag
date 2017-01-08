@@ -58,10 +58,13 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
         // if destination was already a safe node, we can just respond to the client now
         if(rows[0].status == constants.nodeStatusVisible) {
+          logMgr.out('Nav request targeted a safe node.  Already repositioned.  Building response.');
           responder.respond(res, session_uid);
           connection.release();
           return;
         }
+
+        logMgr.out('Nav request pointed to an unsafe node (deleted, etc; not visible).  Attempting to move to a safe node.');
 
         // now we can recursively ensure the user is on a safe node
         var currentUid = destination;
@@ -69,8 +72,12 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
         // define recursive function without running it yet
         var tryUpdateCurrent = function() {
+          logMgr.debug('Beginning safe node search ladder recursion with:');
+          logMgr.debug('currentUid: ' + currentUid);
+          logMgr.debug('currentStatus: ' + currentStatus);
           // if we made it to a safe node, return without recursing
           if(currentStatus == constants.nodeStatusVisible) {
+            logMgr.debug('Found a visible node with uid: ' + currentUid);
             // set user position, respond
             query = 'UPDATE positions SET node_uid=? WHERE user_uid=?;';
             connection.query(query, [currentUid, user_uid], function(err, rows) {
@@ -81,6 +88,8 @@ module.exports = function(req, res, connection, session_uid, userRow) {
                 connection.release();
                 return;
               }
+
+              logMgr.debug('Affected rows (checking whether a user position was updated or not): ' + rows.affectedRows);
 
               // user successfully repositioned, respond with a message explaining why the user wasn't moved where expected
               responder.respond(res, session_uid, {warning: 'That chapter appears to have been deleted while you were ' +
@@ -122,6 +131,9 @@ module.exports = function(req, res, connection, session_uid, userRow) {
               // update values and recurse!
               currentUid = rows[0].parentUid;
               currentStatus = rows[0].status;
+              logMgr.debug('Recursing with:');
+              logMgr.debug('currentUid: ' + currentUid);
+              logMgr.debug('currentStatus: ' + currentStatus);
               tryUpdateCurrent();
             });
           }

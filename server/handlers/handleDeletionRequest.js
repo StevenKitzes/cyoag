@@ -34,9 +34,9 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   var query =
     'START TRANSACTION;' +
       'SELECT author_uid, parent_uid FROM nodes WHERE uid=?;' +
-      'SELECT COUNT(*) AS count FROM nodes WHERE parent_uid=?;' +
+      'SELECT COUNT(*) AS count FROM nodes WHERE parent_uid=? AND status=?;' +
     'COMMIT;';
-  connection.query(query, [deleteTarget, deleteTarget], function(err, rows) {
+  connection.query(query, [deleteTarget, deleteTarget, constants.nodeStatusVisible], function(err, rows) {
     if(err) {
       responder.respondError(res, 'Database error validating chapter and user properties for chapter deletion.');
       connection.release();

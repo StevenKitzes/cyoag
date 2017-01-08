@@ -2,6 +2,8 @@ var constants = require('../constants');
 var logMgr = require('../utils/serverLogger')('handleVotification.js', true);
 var responder = require('../responder');
 
+var navigate = require('./handleNavRequest');
+
 module.exports = function(req, res, connection, session_uid, userRow) {
   var user_uid = userRow['uid'];
   var node_uid = req.body.votify;
@@ -51,6 +53,11 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
     if(row.nodeStatus == constants.nodeStatusDeleted) {
       // user tried to vote on a deleted node! notify and move user to a valid node (recursively)
+      logMgr.out('User attempted to vote on a deleted node.  Trying to move user to a safe node.');
+      // add nav property to request object to simulate nav request
+      req.body.navigate = node_uid;
+      navigate(req, res, connection, session_uid, userRow);
+      return;
     }
     else if(row.sentiment == null) {
       // node existed so row returned, but no vote on that node for this user
@@ -68,18 +75,10 @@ module.exports = function(req, res, connection, session_uid, userRow) {
           return;
         }
 
-        res.clearCookie(constants.cookieNode);
-        res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
-        res.send(
-          JSON.stringify({
-            votification: newVote
-          })
-        );
+        responder.respond(res, session_uid);
         connection.release();
         return;
       });
-      //
-      // end messy transaction code required by NPM mysql module:
     }
     else {
       // node and vote existed, so instead of creating we will need to update both
@@ -97,13 +96,7 @@ module.exports = function(req, res, connection, session_uid, userRow) {
           return;
         }
 
-        res.clearCookie(constants.cookieNode);
-        res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
-        res.send(
-          JSON.stringify({
-            votification: newVote
-          })
-        );
+        responder.respond(res, session_uid);
         connection.release();
         return;
       });

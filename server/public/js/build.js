@@ -22176,7 +22176,7 @@
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Votification response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
-	      validateVotificationResponse(properThis, response, savedWindowPosition);
+	      validateResponse(properThis, response, savedWindowPosition);
 	    } else {
 	      logMgr.debug('Votification attempt yielded HTTP response status: ' + xhr.status);
 	    }
@@ -22283,44 +22283,6 @@
 	  };
 	  var xhrPayload = JSON.stringify({ draftPath: path, draftBody: body });
 	  xhr.send(xhrPayload);
-	}
-	
-	function validateVotificationResponse(properThis, response, newWindowPosition) {
-	  if (validateMessageResponse(properThis, response, newWindowPosition)) {
-	    return;
-	  }
-	
-	  logMgr.debug('Attempting to validate votification response from server . . .');
-	  if (!response) {
-	    // wow... if you don't even get a response, something is nightmarishly wrong
-	    var errorMessage = 'Got no valid response object from server whatsoever.';
-	    logMgr.error(errorMessage);
-	    properThis.setState(getErrorStateObject(errorMessage));
-	    return;
-	  }
-	  if (response.error) {
-	    // set an error state based on the returned error
-	    logMgr.error(response.error);
-	    properThis.setState(getErrorStateObject(response.error));
-	    return;
-	  }
-	  if (!response.hasOwnProperty('votification') || response.votification != constants.votificationNone && response.votification != constants.votificationUp && response.votification != constants.votificationDown) {
-	    // can't determine votification status; set err, display err content
-	    var errorMessage = 'Could not retrieve new votification status from the server.';
-	    logMgr.error(errorMessage);
-	    properThis.setState(getErrorStateObject(errorMessage));
-	    return;
-	  }
-	  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
-	  properThis.setState({
-	    votification: response.votification,
-	    msg: response.msg ? response.msg : null,
-	    warning: response.warning ? response.warning : null,
-	    error: response.error ? response.error : null,
-	    windowScroll: newWindowPosition
-	  });
-	  logMgr.verbose('State was set successfully after validation!');
-	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
 	}
 	
 	// scrollTop tells us whether we want to scroll the window to the top after validating and initializing a React re-render
@@ -23107,7 +23069,7 @@
 	        React.createElement(
 	          'p',
 	          { id: 'cyoag-deletion-forbidden', className: 'cyoag-note' },
-	          'You authored this chapter, but it cannot be modified because another has already been added to it, or a draft is pending on it.'
+	          'You authored this chapter, but it cannot be modified because another chapter has already been added to it, or a draft is pending on it.'
 	        )
 	      );
 	    } else {
