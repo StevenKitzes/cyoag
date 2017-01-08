@@ -140,6 +140,8 @@ function respond(res, session_uid, msg) {
         return;
       }
 
+      logMgr.debug('Successfully got a single row as result.');
+
       var row = rows[0];
 
       // catch any problems thus far and handle them
@@ -179,6 +181,8 @@ function respond(res, session_uid, msg) {
         return;
       }
 
+      logMgr.debug('Passed initial validation checks . . .');
+
       response.userName = row.userName;
       response.acctType = row.acctType;
       response.nodeUid = row.nodeUid;
@@ -213,17 +217,21 @@ function respond(res, session_uid, msg) {
       }
       response.inputBlocking.top = (row.userUid == row.authorUid) ? true : false;
 
+      logMgr.debug('Votification, blocking, snippet, and other response properties set . . . ');
+
       // now get paths out from here by finding the nodes that have this node as a parent
       query =
         'SELECT uid as pathUid, author_uid as authorUid, path_snippet as pathSnippet, votification as pathVotification ' +
           'FROM nodes WHERE parent_uid=? AND status<>?;';
-      connection.query(query, [response.nodeUid], constants.nodeStatusDeleted, function(error, rows) {
+      connection.query(query, [response.nodeUid, constants.nodeStatusDeleted], function(error, rows) {
         if(error) {
           respondError(res, 'Database error retrieving path information from node.');
           logMgr.error(error);
           connection.release();
           return;
         }
+
+        logMgr.out('Setting response paths . . .');
 
         // for each row, with no-rows-returned being a legal state
         response.paths = [];

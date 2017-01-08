@@ -43,9 +43,10 @@ module.exports = function(req, res, connection, session_uid, userRow) {
       return;
     }
 
-    var authorUid = rows[0].author_uid;
-    var parentUid = rows[0].parent_uid;
-    var pathCount = rows[1].count;
+    // because these results are part of a transaction, the indexes are a bit wonky
+    var author_uid = rows[1][0].author_uid;
+    var parent_uid = rows[1][0].parent_uid;
+    var pathCount = rows[2][0].count;
 
     logMgr.verbose('Got query rows from deletion request: ' + JSON.stringify(rows));
 
@@ -69,7 +70,7 @@ module.exports = function(req, res, connection, session_uid, userRow) {
           'UPDATE positions SET node_uid=? WHERE node_uid=?; ' + // set position of all users (including the deleting user) at deleted node, to the parent of the deleted node
           'UPDATE nodes SET status=? WHERE uid=?; ' + // delete the targeted node
         'COMMIT;';
-      connection.query(query, [parentUid, deleteTarget, constants.nodeStatusDeleted, deleteTarget], function(err, rows) {
+      connection.query(query, [parent_uid, deleteTarget, constants.nodeStatusDeleted, deleteTarget], function(err, rows) {
         if(err) {
           responder.respondError(res, 'A database error occurred while trying to delete the target chapter.  The chapter was probably not deleted.');
           connection.release();

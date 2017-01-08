@@ -62,7 +62,7 @@ var NodeOwnerUi = React.createClass({
       return (
         <div id='cyoag-owner-ui'>
           <p id='cyoag-deletion-forbidden' className='cyoag-note'>You authored this chapter, but it cannot be modified because
-            another has already been added to it, or a draft is pending on it.</p>
+            another chapter has already been added to it, or a draft is pending on it.</p>
         </div>
       );
     }
