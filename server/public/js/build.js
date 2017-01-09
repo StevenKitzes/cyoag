@@ -22947,6 +22947,8 @@
 	    var inputComponent;
 	    if (context.state.acctType == constants.acctTypeVisitor || context.state.inputBlocking == constants.inputBlockingHide) {
 	      inputComponent = React.createElement(InputComponents.Hidden, null);
+	    } else if (context.state.editMode) {
+	      inputComponent = React.createElement(InputComponents.Edit, { context: context });
 	    } else if (context.state.inputBlocking.top || context.state.inputBlocking.side) {
 	      inputComponent = React.createElement(InputComponents.Blocked, { blocking: context.state.inputBlocking });
 	    } else {
