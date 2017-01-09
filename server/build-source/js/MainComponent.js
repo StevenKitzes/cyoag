@@ -20,6 +20,7 @@ var MainComponent = React.createClass({
     window.scrollTo(x, y);
   },
   deleteChapter: deleteChapter,
+  editChapter: editChapter,
   getInitialState: getDefaultStateObject,
   inputSubmit: inputSubmit,
   logoutRequest: logoutXhrHandler,
@@ -39,6 +40,7 @@ var MainComponent = React.createClass({
     var context = {};
     context.state = this.state;
     context.deleteChapter = this.deleteChapter;
+    context.editChapter = this.editChapter;
     context.inputSubmit = this.inputSubmit;
     context.logoutRequest = this.logoutRequest;
     context.message = this.message;
@@ -206,6 +208,10 @@ function deleteChapter() {
   }
   var xhrPayload = JSON.stringify({deleteTarget: properThis.state.nodeUid});
   xhr.send(xhrPayload);
+}
+
+function editChapter() {
+  this.setState({editMode: true});
 }
 
 function votify(nodeUid, newVote) {
@@ -446,6 +452,7 @@ function validateResponse(properThis, response, newWindowPosition) {
     snippet: response.snippet,
     paths: response.paths,
     inputBlocking: response.inputBlocking,
+    editMode: false,  // always reset this to false when taking in response from server
     msg: response.msg ? response.msg : null,
     warning: response.warning ? response.warning : null,
     error: response.error ? response.error : null,
@@ -490,6 +497,7 @@ function getDefaultStateObject() {
     },
     paths: [],
     inputBlocking: constants.inputBlockingHide,
+    editMode: false,
     msg: null,
     warning: null,
     error: null,
@@ -512,6 +520,7 @@ function getErrorStateObject(errorMessage) {
     },
     paths: [],
     inputBlocking: constants.inputBlockingHide,
+    editMode: false,
     msg: null,
     warning: null,
     error: errorMessage,

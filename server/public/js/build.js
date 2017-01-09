@@ -21970,6 +21970,7 @@
 	    window.scrollTo(x, y);
 	  },
 	  deleteChapter: deleteChapter,
+	  editChapter: editChapter,
 	  getInitialState: getDefaultStateObject,
 	  inputSubmit: inputSubmit,
 	  logoutRequest: logoutXhrHandler,
@@ -21989,6 +21990,7 @@
 	    var context = {};
 	    context.state = this.state;
 	    context.deleteChapter = this.deleteChapter;
+	    context.editChapter = this.editChapter;
 	    context.inputSubmit = this.inputSubmit;
 	    context.logoutRequest = this.logoutRequest;
 	    context.message = this.message;
@@ -22159,6 +22161,10 @@
 	  };
 	  var xhrPayload = JSON.stringify({ deleteTarget: properThis.state.nodeUid });
 	  xhr.send(xhrPayload);
+	}
+	
+	function editChapter() {
+	  this.setState({ editMode: true });
 	}
 	
 	function votify(nodeUid, newVote) {
@@ -22385,6 +22391,7 @@
 	    snippet: response.snippet,
 	    paths: response.paths,
 	    inputBlocking: response.inputBlocking,
+	    editMode: false, // always reset this to false when taking in response from server
 	    msg: response.msg ? response.msg : null,
 	    warning: response.warning ? response.warning : null,
 	    error: response.error ? response.error : null,
@@ -22429,6 +22436,7 @@
 	    },
 	    paths: [],
 	    inputBlocking: constants.inputBlockingHide,
+	    editMode: false,
 	    msg: null,
 	    warning: null,
 	    error: null,
@@ -22451,6 +22459,7 @@
 	    },
 	    paths: [],
 	    inputBlocking: constants.inputBlockingHide,
+	    editMode: false,
 	    msg: null,
 	    warning: null,
 	    error: errorMessage,
@@ -22990,6 +22999,11 @@
 	    var snippet = context.state.snippet;
 	
 	    var trailingSnippetId = 'node-' + context.state.parentUid;
+	    var modificationsComponent = context.state.editMode ? React.createElement('div', { id: 'cyoag-modification-container' }) : React.createElement(
+	      'div',
+	      { id: 'cyoag-modification-container' },
+	      React.createElement(ModificationsComponent, { context: context })
+	    );
 	
 	    return React.createElement(
 	      'div',
@@ -23030,7 +23044,7 @@
 	          );
 	        })
 	      ),
-	      React.createElement(NodeOwnerUi, { context: context })
+	      modificationsComponent
 	    );
 	  },
 	  locateTooltip: function (mouseEvent) {
@@ -23040,8 +23054,8 @@
 	  }
 	});
 	
-	var NodeOwnerUi = React.createClass({
-	  displayName: 'NodeOwnerUi',
+	var ModificationsComponent = React.createClass({
+	  displayName: 'ModificationsComponent',
 	
 	  render: function () {
 	    var context = this.props.context;
@@ -23062,13 +23076,18 @@
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-delete-chapter-button', onClick: context.deleteChapter },
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.editChapter },
+	          'Edit this chapter'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.deleteChapter },
 	          'Delete this chapter'
 	        )
 	      );
 	    }
 	    if (userIsModerator) {
-	      // if the user is a moderator they can delete no matter what
+	      // if the user is a moderator they can modify no matter what
 	      return React.createElement(
 	        'div',
 	        { id: 'cyoag-moderator-ui' },
@@ -23079,7 +23098,12 @@
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-delete-chapter-button', onClick: context.deleteChapter },
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.editChapter },
+	          'Edit this chapter'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.deleteChapter },
 	          'Delete this chapter'
 	        )
 	      );
@@ -23932,9 +23956,15 @@
 	        'div',
 	        { id: 'cyoag-name-change-ui' },
 	        React.createElement('input', { id: 'cyoag-name-input', type: 'text', placeholder: 'New name' }),
+	        React.createElement('br', null),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-submit-name-change-button', onClick: this.submit },
+	          { id: 'cyoag-swap-name-change-button', className: 'cyoag-side-spaced-button', onClick: this.swap },
+	          'Cancel'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-submit-name-change-button', className: 'cyoag-side-spaced-button', onClick: this.submit },
 	          'Submit'
 	        )
 	      );

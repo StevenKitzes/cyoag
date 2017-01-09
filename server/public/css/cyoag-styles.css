@@ -20,6 +20,10 @@ button {
   border-radius: 2em;
   border-style: outset;
 }
+.cyoag-side-spaced-button {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
 
 hr {
   margin-top: 1em;
@@ -287,13 +291,22 @@ hr {
   margin-left: auto;
 }
 
+#cyoag-swap-name-change-button {
+  border-color: lightblue;
+}
+#cyoag-submit-name-change-button {
+  border-color: lightgreen;
+}
+
 #cyoag-name-input {
+  margin-bottom: 0.5em;
   margin-right: 0.5em;
   width: 8em;
 }
 
 #cyoag-logout-button {
   margin-top: 1em;
+  border-color: darkred;
 }
 
 #cyoag-tos-label {
@@ -348,6 +361,16 @@ hr {
 
 .cyoag-trailing-snippet-link:hover #cyoag-tooltip-regress {
   display: block;
+}
+
+#cyoag-delete-chapter-button {
+  /*box-shadow: 0 0 1em darkred;*/
+  /*background-color: red;*/
+  border-color: red;
+}
+#cyoag-edit-chapter-button {
+  /*box-shadow: 0 0 1em darkorange;*/
+  border-color: orange;
 }
 
 #cyoag-votification-container {

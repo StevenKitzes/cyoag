@@ -90,8 +90,9 @@ var NameChangeComponent = React.createClass({
     else if(this.state.nameChange == 'ui') {
       return (
         <div id='cyoag-name-change-ui'>
-          <input id='cyoag-name-input' type='text' placeholder='New name'></input>
-          <button id='cyoag-submit-name-change-button' onClick={this.submit}>Submit</button>
+          <input id='cyoag-name-input' type='text' placeholder='New name'></input><br />
+          <button id='cyoag-swap-name-change-button' className='cyoag-side-spaced-button' onClick={this.swap}>Cancel</button>
+          <button id='cyoag-submit-name-change-button' className='cyoag-side-spaced-button' onClick={this.submit}>Submit</button>
         </div>
       );
     }
