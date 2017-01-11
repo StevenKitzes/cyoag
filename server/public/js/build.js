@@ -21962,6 +21962,7 @@
 	var MainComponent = React.createClass({
 	  displayName: 'MainComponent',
 	
+	  cancelEdit: cancelEdit,
 	  componentDidMount: mountXhrHandler,
 	  componentDidUpdate: function () {
 	    var x = this.state.windowScroll.x,
@@ -21990,6 +21991,7 @@
 	    var context = {};
 	    context.state = this.state;
 	    context.deleteChapter = this.deleteChapter;
+	    context.cancelEdit = this.cancelEdit;
 	    context.editChapter = this.editChapter;
 	    context.inputSubmit = this.inputSubmit;
 	    context.logoutRequest = this.logoutRequest;
@@ -22164,7 +22166,16 @@
 	}
 	
 	function editChapter() {
-	  this.setState({ editMode: true });
+	  this.setState({
+	    editMode: true,
+	    windowScroll: getWindowPosition()
+	  });
+	}
+	function cancelEdit() {
+	  this.setState({
+	    editMode: false,
+	    windowScroll: getWindowPosition()
+	  });
 	}
 	
 	function votify(nodeUid, newVote) {
@@ -23096,7 +23107,9 @@
 	        React.createElement(
 	          'p',
 	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
-	          'As a moderator, you have modification privileges.'
+	          'As a moderator, you have modification privileges. (Original content by user ',
+	          context.state.snippet.authorName,
+	          ')'
 	        ),
 	        React.createElement(
 	          'button',
@@ -23146,7 +23159,12 @@
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-delete-chapter-button', onClick: context.deleteChapter },
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.editChapter },
+	          'Edit this chapter'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.deleteChapter },
 	          'Delete this chapter'
 	        )
 	      );
@@ -23632,6 +23650,103 @@
 	  }
 	});
 	
+	// Display input fields with hints so users can edit an existing post
+	var Edit = React.createClass({
+	  displayName: 'Edit',
+	
+	  cancel: function () {
+	    this.props.context.cancelEdit();
+	  },
+	  componentDidMount: function () {
+	    var snippet = this.props.context.state.snippet;
+	    document.getElementById('cyoag-input-path').value = snippet.lastPath;
+	    document.getElementById('cyoag-input-body').value = snippet.nodeSnippet;
+	  },
+	  getInitialState: function () {
+	    var snippet = this.props.context.state.snippet;
+	    return {
+	      pathCharCount: snippet.lastPath.length,
+	      bodyCharCount: snippet.nodeSnippet.length
+	    };
+	  },
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-input-container' },
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-input-cta' },
+	        React.createElement(
+	          'em',
+	          null,
+	          'Editing chapter'
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-input-path-container' },
+	        'Path teaser for this chapter:',
+	        React.createElement('br', null),
+	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', onKeyUp: this.updatePathCharCount, placeholder: 'Path snippet - minimum 4 characters, maximum 100 characters.' }),
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-path-char-hint' },
+	          React.createElement(PathHint, { count: this.state.pathCharCount })
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-input-body-container' },
+	        'Body content for this chapter:',
+	        React.createElement('br', null),
+	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', onKeyUp: this.updateBodyCharCount, placeholder: 'Chapter content - minimum 1000 characters, maximum 5000 characters.' }),
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-input-body-hints-container' },
+	          React.createElement(
+	            'div',
+	            { id: 'cyoag-body-char-hint' },
+	            React.createElement(BodyHint, { count: this.state.bodyCharCount })
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'cyoag-resize-input-hint cyoag-note' },
+	            'Drag to resize! ^'
+	          )
+	        )
+	      ),
+	      React.createElement(
+	        'button',
+	        { id: 'cyoag-input-cancel', className: 'cyoag-side-spaced-button', onClick: this.cancel },
+	        'Cancel'
+	      ),
+	      React.createElement(
+	        'button',
+	        { id: 'cyoag-input-submit', className: 'cyoag-side-spaced-button', onClick: this.submit },
+	        'Save changes'
+	      )
+	    );
+	  },
+	  submit: function () {
+	    var inputPath = document.getElementById('cyoag-input-path').value;
+	    var inputBody = document.getElementById('cyoag-input-body').value;
+	
+	    if (validateInput(inputPath, inputBody, this.props.context.message)) {
+	      this.props.context.editSubmit(inputPath, inputBody);
+	    }
+	  },
+	  updateBodyCharCount: function () {
+	    this.setState({
+	      bodyCharCount: document.getElementById('cyoag-input-body').value.length
+	    });
+	  },
+	  updatePathCharCount: function () {
+	    this.setState({
+	      pathCharCount: document.getElementById('cyoag-input-path').value.length
+	    });
+	  }
+	});
+	
 	var PathHint = React.createClass({
 	  displayName: 'PathHint',
 	
@@ -23654,14 +23769,14 @@
 	        'Too many characters: ',
 	        count
 	      );
-	    } else {
-	      return React.createElement(
-	        'span',
-	        { className: 'cyoag-note-green' },
-	        'Characters: ',
-	        count
-	      );
 	    }
+	
+	    return React.createElement(
+	      'span',
+	      { className: 'cyoag-note-green' },
+	      'Characters: ',
+	      count
+	    );
 	  }
 	});
 	
@@ -23687,14 +23802,14 @@
 	        'Too many characters: ',
 	        count
 	      );
-	    } else {
-	      return React.createElement(
-	        'span',
-	        { className: 'cyoag-note-green' },
-	        'Characters: ',
-	        count
-	      );
 	    }
+	
+	    return React.createElement(
+	      'span',
+	      { className: 'cyoag-note-green' },
+	      'Characters: ',
+	      count
+	    );
 	  }
 	});
 	
@@ -23803,6 +23918,7 @@
 	exports.Hidden = Hidden;
 	exports.Blocked = Blocked;
 	exports.Input = Input;
+	exports.Edit = Edit;
 	
 	module.exports = exports;
 

@@ -13,6 +13,7 @@ var FooterComponents = require('./FooterComponents');
 
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
+  cancelEdit: cancelEdit,
   componentDidMount: mountXhrHandler,
   componentDidUpdate: function() {
     var x = this.state.windowScroll.x, y = this.state.windowScroll.y;
@@ -40,6 +41,7 @@ var MainComponent = React.createClass({
     var context = {};
     context.state = this.state;
     context.deleteChapter = this.deleteChapter;
+    context.cancelEdit = this.cancelEdit;
     context.editChapter = this.editChapter;
     context.inputSubmit = this.inputSubmit;
     context.logoutRequest = this.logoutRequest;
@@ -211,7 +213,16 @@ function deleteChapter() {
 }
 
 function editChapter() {
-  this.setState({editMode: true});
+  this.setState({
+    editMode: true,
+    windowScroll: getWindowPosition()
+  });
+}
+function cancelEdit() {
+  this.setState({
+    editMode: false,
+    windowScroll: getWindowPosition()
+  });
 }
 
 function votify(nodeUid, newVote) {

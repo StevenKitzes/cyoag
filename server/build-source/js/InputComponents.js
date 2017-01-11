@@ -102,6 +102,64 @@ var Input = React.createClass({
   }
 });
 
+// Display input fields with hints so users can edit an existing post
+var Edit = React.createClass({
+  cancel: function() {
+    this.props.context.cancelEdit();
+  },
+  componentDidMount: function() {
+    var snippet = this.props.context.state.snippet;
+    document.getElementById('cyoag-input-path').value = snippet.lastPath;
+    document.getElementById('cyoag-input-body').value = snippet.nodeSnippet;
+  },
+  getInitialState: function() {
+    var snippet = this.props.context.state.snippet;
+    return {
+      pathCharCount: snippet.lastPath.length,
+      bodyCharCount: snippet.nodeSnippet.length
+    };
+  },
+  render: function() {
+    return (
+      <div id='cyoag-input-container'>
+        <p id='cyoag-input-cta'><em>Editing chapter</em></p>
+        <div id='cyoag-input-path-container'>
+          Path teaser for this chapter:<br />
+          <textarea id='cyoag-input-path' type='text' onKeyUp={this.updatePathCharCount} placeholder='Path snippet - minimum 4 characters, maximum 100 characters.'></textarea>
+          <div id='cyoag-path-char-hint'><PathHint count={this.state.pathCharCount} /></div>
+        </div>
+        <div id='cyoag-input-body-container'>
+          Body content for this chapter:<br />
+          <textarea id='cyoag-input-body' type='text' onKeyUp={this.updateBodyCharCount} placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
+          <div id='cyoag-input-body-hints-container'>
+            <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
+          </div>
+        </div>
+        <button id='cyoag-input-cancel' className='cyoag-side-spaced-button' onClick={this.cancel}>Cancel</button>
+        <button id='cyoag-input-submit' className='cyoag-side-spaced-button' onClick={this.submit}>Save changes</button>
+      </div>
+    );
+  },
+  submit: function() {
+    var inputPath = document.getElementById('cyoag-input-path').value;
+    var inputBody = document.getElementById('cyoag-input-body').value;
+
+    if(validateInput(inputPath, inputBody, this.props.context.message)) {
+      this.props.context.editSubmit(inputPath, inputBody);
+    }
+  },
+  updateBodyCharCount: function() {
+    this.setState({
+      bodyCharCount: document.getElementById('cyoag-input-body').value.length
+    });
+  },
+  updatePathCharCount: function() {
+    this.setState({
+      pathCharCount: document.getElementById('cyoag-input-path').value.length
+    });
+  }
+});
+
 var PathHint = React.createClass({
   render: function() {
     var count = this.props.count;
@@ -118,11 +176,9 @@ var PathHint = React.createClass({
       );
     }
 
-    else {
-      return (
-        <span className='cyoag-note-green'>Characters: {count}</span>
-      );
-    }
+    return (
+      <span className='cyoag-note-green'>Characters: {count}</span>
+    );
   }
 });
 
@@ -142,11 +198,9 @@ var BodyHint = React.createClass({
       );
     }
 
-    else {
-      return (
-        <span className='cyoag-note-green'>Characters: {count}</span>
-      );
-    }
+    return (
+      <span className='cyoag-note-green'>Characters: {count}</span>
+    );
   }
 });
 
@@ -265,5 +319,6 @@ function validateInput(inputPath, inputBody, message) {
 exports.Hidden = Hidden;
 exports.Blocked = Blocked;
 exports.Input = Input;
+exports.Edit = Edit;
 
 module.exports = exports;
