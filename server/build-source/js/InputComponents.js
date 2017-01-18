@@ -117,7 +117,7 @@ var Edit = React.createClass({
       this.editDetected = true;
       window.onbeforeunload = this.warnBeforeUnload;
     }
-  }
+  },
   componentDidMount: function() {
     var snippet = this.props.context.state.snippet;
     document.getElementById('cyoag-input-path').value = snippet.lastPath;

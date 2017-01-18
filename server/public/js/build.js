@@ -23657,16 +23657,74 @@
 	  cancel: function () {
 	    this.props.context.cancelEdit();
 	  },
+	  checkForEdits: function () {
+	    if (this.state.originalLastPath == document.getElementById('cyoag-input-path').value && this.state.originalNodeSnippet == document.getElementById('cyoag-input-body').value) {
+	      this.editDetected = false;
+	      window.onbeforeunload = null;
+	    } else {
+	      this.editDetected = true;
+	      window.onbeforeunload = this.warnBeforeUnload;
+	    }
+	  },
 	  componentDidMount: function () {
 	    var snippet = this.props.context.state.snippet;
 	    document.getElementById('cyoag-input-path').value = snippet.lastPath;
 	    document.getElementById('cyoag-input-body').value = snippet.nodeSnippet;
+	
+	    // strategy:
+	    // record original snippet state for comparison
+	    // create bool representation of whether a change has been made
+	    // start listening for changes on textareas
+	    //   on change, check whether modifications are present, set bool accordingly
+	    //     if changes present, set window.onbefureunload to appropriate function var
+	    //     else, set window.unbeforeunload = null
+	    // start listening for clicks on any anchor tag or button element
+	    //   if clicked while a modification is detected, show user confirmation
+	    //     if confirmed:
+	    //       cancel all anchor/button click listeners
+	    //       cancel window.onbeforeunload (set null)
+	    //       let the click go through
+	    //     if user wants to stay, cancel/preventDefault the click event
+	
+	    // strategy:
+	    // record original snippet state for comparison (done in getInitialState at this component's state level)
+	    // create bool representation of whether a change has been made (done in getInitialState at this component's property level)
+	    // start listening for changes on textareas (cyoag-input-path and cyoag-input-body)
+	    var pathInput = document.getElementById('cyoag-input-path');
+	    var bodyInput = document.getElementById('cyoag-input-body');
+	
+	    if (pathInput.addEventListener) {
+	      pathInput.addEventListener('input', this.checkForEdits, false);
+	    } else if (pathInput.attachEvent) {
+	      pathInput.attachEvent('onpropertychange', this.checkForEdits);
+	    }
+	
+	    if (bodyInput.addEventListener) {
+	      bodyInput.addEventListener('input', this.checkForEdits, false);
+	    } else if (bodyInput.attachEvent) {
+	      bodyInput.attachEvent('onpropertychange', this.checkForEdits);
+	    }
+	
+	    //   on change, set bool based on whether modifications exist (done in component's this.checkForEdits function)
+	    //     if changes present, set window.onbefureunload to appropriate function var (done in this.checkForEdits)
+	    //     else, set window.unbeforeunload = null (done in this.checkForEdits)
+	
+	    // start listening for clicks on any anchor tag or button element
+	    //   if clicked while a modification is detected, show user confirmation
+	    //     if confirmed:
+	    //       cancel all anchor/button click listeners
+	    //       cancel window.onbeforeunload (set null)
+	    //       let the click go through
+	    //     if user wants to stay, cancel/preventDefault the click event
 	  },
 	  getInitialState: function () {
 	    var snippet = this.props.context.state.snippet;
+	    this.editDetected = false;
 	    return {
 	      pathCharCount: snippet.lastPath.length,
-	      bodyCharCount: snippet.nodeSnippet.length
+	      bodyCharCount: snippet.nodeSnippet.length,
+	      originalLastPath: snippet.lastPath,
+	      originalNodeSnippet: snippet.nodeSnippet
 	    };
 	  },
 	  render: function () {
@@ -23744,6 +23802,21 @@
 	    this.setState({
 	      pathCharCount: document.getElementById('cyoag-input-path').value.length
 	    });
+	  },
+	  // borrowed from http://stackoverflow.com/questions/1119289/how-to-show-the-are-you-sure-you-want-to-navigate-away-from-this-page-when-ch
+	  warnBeforeUnload: function (e) {
+	    // If we haven't been passed the event get the window.event
+	    e = e || window.event;
+	
+	    var message = 'Unsaved edits will be lost forever (seriously)!  Are you certain you wish to proceed?';
+	
+	    // For IE6-8 and Firefox prior to version 4
+	    if (e) {
+	      e.returnValue = message;
+	    }
+	
+	    // For Chrome, Safari, IE8+ and Opera 12+
+	    return message;
 	  }
 	});
 	
