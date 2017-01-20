@@ -27,7 +27,7 @@ var Node = React.createClass({
 
     return(
       <div id='cyoag-node-container'>
-        <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-link' href='#' onMouseMove={this.locateTooltip}>
+        <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-link' onMouseMove={this.locateTooltip}>
           <div className='cyoag-path-item cyoag-trailing-snippet' onClick={this.navigate}>
             {snippet.trailingSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}
           </div>

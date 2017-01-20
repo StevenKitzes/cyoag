@@ -16,9 +16,12 @@ var MainComponent = React.createClass({
   cancelEdit: cancelEdit,
   componentDidMount: mountXhrHandler,
   componentDidUpdate: function() {
-    var x = this.state.windowScroll.x, y = this.state.windowScroll.y;
-    logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
-    window.scrollTo(x, y);
+    restoreScroll(this.state.windowScroll);
+  },
+  componentWillMount: function() {
+    // this takes place before render
+    this.editsPending = false;
+    window.onbeforeunload = null;
   },
   deleteChapter: deleteChapter,
   editChapter: editChapter,
@@ -48,6 +51,7 @@ var MainComponent = React.createClass({
     context.message = this.message;
     context.nameChange = this.nameChange;
     context.navigate = this.navigate;
+    context.setEditsPending = this.setEditsPending;
     context.saveDraft = this.saveDraft;
     context.votify = this.votify;
 
@@ -80,13 +84,46 @@ var MainComponent = React.createClass({
       </div>
     );
   },
+  setEditsPending: function(b) {
+    this.editsPending = b;
+  },
   saveDraft: saveDraft,
   votify: votify
 });
 
 module.exports = MainComponent;
 
+// returns true if user DOES want to RETAIN pending edits (and cancel requested action)
+// returns false if user wants to DISCARD pending edits (and continue with requested action) or if there are no pending edits
+function checkPendingEdits(editsPending, altConfirmationMessage) {
+  logMgr.verbose('Confirming whether user wants to discard pending edits.');
+  // if no edits are pending, return false
+  if(!editsPending) {
+    logMgr.verbose('But no edits were pending!');
+    return false;
+  }
+
+  var confMsg = altConfirmationMessage ? altConfirmationMessage : constants.confirmDiscardUnsavedEdits;
+  // if the user says they want to DISCARD saved edits
+  if(confirm(confMsg)) {
+    logMgr.verbose('User confirmed they are prepared to discard pending edits.');
+    return false;
+  }
+
+  // edits are pending, and the user does NOT want to discard them
+  logMgr.verbose('Edits are pending and the user does not want to discard them.');
+  return true;
+}
+
 function mountXhrHandler() {
+  if(checkPendingEdits(this.editsPending)) {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('Checking session status . . .');
   var xhr = new XMLHttpRequest();
@@ -117,6 +154,14 @@ function mountXhrHandler() {
 }
 
 function logoutXhrHandler() {
+  if(checkPendingEdits(this.editsPending)) {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('Logging out current user . . .');
   var xhr = new XMLHttpRequest();
@@ -147,11 +192,19 @@ function logoutXhrHandler() {
 }
 
 function navigateXhrHandler(nodeUid) {
-  if(nodeUid == null) {
-    logMgr.error('Missing node ID in navigation attempt.');
+  if(checkPendingEdits(this.editsPending)) {
     return;
   }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   var savedWindowPosition = getWindowPosition();
+  if(nodeUid == null) {
+    this.message({error: 'Missing node ID in navigation attempt.'});
+    return;
+  }
   logMgr.debug('User attempting to navigate story nodes . . .');
   var xhr = new XMLHttpRequest();
   // xmlHttp.onreadystatechange = () => {...}
@@ -182,6 +235,20 @@ function navigateXhrHandler(nodeUid) {
 }
 
 function deleteChapter() {
+  if(!confirm('Are you positive you want to delete this chapter?  This can only be undone by a CYOAG administrator ' +
+  '(not even by a moderator)!'))
+  {
+    return;
+  }
+
+  if(checkPendingEdits(this.editsPending)) {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to delete a story node . . .');
   var xhr = new XMLHttpRequest();
@@ -213,12 +280,26 @@ function deleteChapter() {
 }
 
 function editChapter() {
+  if(checkPendingEdits(this.editsPending, 'You already have work pending on a new chapter!  Do you want to proceed to ' +
+    'discard this work, or cancel your request to edit the existing chapter?'))
+  {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   this.setState({
     editMode: true,
     windowScroll: getWindowPosition()
   });
 }
 function cancelEdit() {
+  if(checkPendingEdits(this.editsPending)) {
+    return;
+  }
+
   this.setState({
     editMode: false,
     windowScroll: getWindowPosition()
@@ -226,6 +307,18 @@ function cancelEdit() {
 }
 
 function votify(nodeUid, newVote) {
+  if(checkPendingEdits(this.editsPending,
+    'Voting can cause pending edits to be lost ... you might want to vote after your edits are submitted! ' +
+    'Do you still want to vote now (dangerous), or would you like to cancel your vote until you are done editing (safe)?'))
+  {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+    resetNewChapterInputs();  // don't keep unsaved changes lying around once listeners are disabled
+  }
+
   var savedWindowPosition = getWindowPosition();
   if(nodeUid == null || newVote == null) {
     logMgr.error('Relevant parameters missing in votification call.');
@@ -261,6 +354,17 @@ function votify(nodeUid, newVote) {
 }
 
 function nameChange(newName) {
+  if(checkPendingEdits(this.editsPending, 'Changing your name will trigger a page reload ... you might want to change your ' +
+    'name after submitting your edits!  Do you want to proceed with changing your name and discarding your unsaved work?'))
+  {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+    resetNewChapterInputs();  // don't keep unsaved changes lying around once listeners are disabled
+  }
+
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to update their name . . .');
   var xhr = new XMLHttpRequest();
@@ -539,6 +643,17 @@ function getErrorStateObject(errorMessage) {
   };
 }
 
+function resetNewChapterInputs() {
+  var inputPathElement = document.getElementById('cyoag-input-path');
+  var inputBodyElement = document.getElementById('cyoag-input-body');
+  if(inputPathElement) {
+    inputPathElement.value = '';
+  }
+  if(inputBodyElement) {
+    inputBodyElement.value = '';
+  }
+}
+
 // this function returns a JSON object consisting of window scroll position as {x: #, y: #}
 function getWindowPosition() {
   // modified from http://stackoverflow.com/questions/3464876/javascript-get-window-x-y-position-for-scroll
@@ -555,4 +670,10 @@ function getWindowPosition() {
   }
   logMgr.verbose('Got window scroll position: ' + JSON.stringify(pos));
   return pos;
+}
+
+function restoreScroll(scrollCoord) {
+  var x = scrollCoord.x, y = scrollCoord.y;
+  logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
+  window.scrollTo(x, y);
 }

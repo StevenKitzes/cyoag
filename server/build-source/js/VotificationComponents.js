@@ -8,7 +8,6 @@ var SocialLoginButtonComponents = require('./SocialLoginButtonComponents');
 
 var exports = {};
 
-// Facebook login button component
 var BegLogin = React.createClass({
   render: function() {
     logMgr.verbose('Rendering...');
@@ -64,14 +63,25 @@ var Votification = React.createClass({
     return (
       <div id='cyoag-votification-container'>
         <h4 id='cyoag-votification-prompt'>How did you like this chapter?</h4>
-        <a href='#'><img id='cyoag-upvote-button' onClick={voteUp} src={upImgPath} /></a>
-        <a href='#'><img id='cyoag-downvote-button' onClick={voteDown} src={downImgPath} /></a>
+        <a><img id='cyoag-upvote-button' onClick={voteUp} src={upImgPath} /></a>
+        <a><img id='cyoag-downvote-button' onClick={voteDown} src={downImgPath} /></a>
       </div>
+    );
+  }
+});
+
+var Hidden = React.createClass({
+  render: function() {
+    logMgr.verbose('Rendering...');
+    return(
+        <div id='cyoag-votification-container' className='cyoag-hidden'>
+        </div>
     );
   }
 });
 
 exports.BegLogin = BegLogin;
 exports.Votification = Votification;
+exports.Hidden = Hidden;
 
 module.exports = exports;

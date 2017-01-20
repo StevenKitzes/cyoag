@@ -19,7 +19,10 @@ var MainColumn = React.createClass({
     var context = this.props.context;
 
     var votificationComponent;
-    if(context.state.acctType != constants.acctTypeVisitor) {
+    if(context.state.editMode) {
+      votificationComponent = <VotificationComponents.Hidden />;
+    }
+    else if(context.state.acctType != constants.acctTypeVisitor) {
       votificationComponent = <VotificationComponents.Votification context={context} />;
     }
     else {

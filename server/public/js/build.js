@@ -52,7 +52,7 @@
 	
 	var MainComponent = __webpack_require__(/*! ./MainComponent */ 172);
 	
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('main.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('main.js');
 	
 	logMgr.verbose('Kicking off initial render!');
 	
@@ -21948,9 +21948,9 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var config = __webpack_require__(/*! ../../build-config */ 173);
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainComponent.js');
+	var config = __webpack_require__(/*! ../../build-config */ 174);
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('MainComponent.js');
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 177);
 	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 178);
@@ -21965,10 +21965,12 @@
 	  cancelEdit: cancelEdit,
 	  componentDidMount: mountXhrHandler,
 	  componentDidUpdate: function () {
-	    var x = this.state.windowScroll.x,
-	        y = this.state.windowScroll.y;
-	    logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
-	    window.scrollTo(x, y);
+	    restoreScroll(this.state.windowScroll);
+	  },
+	  componentWillMount: function () {
+	    // this takes place before render
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
 	  },
 	  deleteChapter: deleteChapter,
 	  editChapter: editChapter,
@@ -21998,6 +22000,7 @@
 	    context.message = this.message;
 	    context.nameChange = this.nameChange;
 	    context.navigate = this.navigate;
+	    context.setEditsPending = this.setEditsPending;
 	    context.saveDraft = this.saveDraft;
 	    context.votify = this.votify;
 	
@@ -22037,13 +22040,45 @@
 	      React.createElement(MessagingComponents.Modal, { context: context })
 	    );
 	  },
+	  setEditsPending: function (b) {
+	    this.editsPending = b;
+	  },
 	  saveDraft: saveDraft,
 	  votify: votify
 	});
 	
 	module.exports = MainComponent;
 	
+	// returns true if user DOES want to RETAIN pending edits (and cancel requested action)
+	// returns false if user wants to DISCARD pending edits (and continue with requested action) or if there are no pending edits
+	function checkPendingEdits(editsPending, altConfirmationMessage) {
+	  logMgr.verbose('Confirming whether user wants to discard pending edits.');
+	  // if no edits are pending, return false
+	  if (!editsPending) {
+	    logMgr.verbose('But no edits were pending!');
+	    return false;
+	  }
+	
+	  var confMsg = altConfirmationMessage ? altConfirmationMessage : constants.confirmDiscardUnsavedEdits;
+	  // if the user says they want to DISCARD saved edits
+	  if (confirm(confMsg)) {
+	    logMgr.verbose('User confirmed they are prepared to discard pending edits.');
+	    return false;
+	  }
+	
+	  // edits are pending, and the user does NOT want to discard them
+	  logMgr.verbose('Edits are pending and the user does not want to discard them.');
+	  return true;
+	}
+	
 	function mountXhrHandler() {
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
 	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('Checking session status . . .');
 	  var xhr = new XMLHttpRequest();
@@ -22073,6 +22108,13 @@
 	}
 	
 	function logoutXhrHandler() {
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
 	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('Logging out current user . . .');
 	  var xhr = new XMLHttpRequest();
@@ -22102,11 +22144,18 @@
 	}
 	
 	function navigateXhrHandler(nodeUid) {
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
+	  var savedWindowPosition = getWindowPosition();
 	  if (nodeUid == null) {
-	    logMgr.error('Missing node ID in navigation attempt.');
+	    this.message({ error: 'Missing node ID in navigation attempt.' });
 	    return;
 	  }
-	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to navigate story nodes . . .');
 	  var xhr = new XMLHttpRequest();
 	  // xmlHttp.onreadystatechange = () => {...}
@@ -22136,6 +22185,17 @@
 	}
 	
 	function deleteChapter() {
+	  if (!confirm('Are you positive you want to delete this chapter?  This can only be undone by a CYOAG administrator ' + '(not even by a moderator)!')) {
+	    return;
+	  }
+	
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
 	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to delete a story node . . .');
 	  var xhr = new XMLHttpRequest();
@@ -22166,12 +22226,23 @@
 	}
 	
 	function editChapter() {
+	  if (checkPendingEdits(this.editsPending, 'You already have work pending on a new chapter!  Do you want to proceed to ' + 'discard this work, or cancel your request to edit the existing chapter?')) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
 	  this.setState({
 	    editMode: true,
 	    windowScroll: getWindowPosition()
 	  });
 	}
 	function cancelEdit() {
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  }
+	
 	  this.setState({
 	    editMode: false,
 	    windowScroll: getWindowPosition()
@@ -22179,6 +22250,14 @@
 	}
 	
 	function votify(nodeUid, newVote) {
+	  if (checkPendingEdits(this.editsPending, 'Voting can cause pending edits to be lost ... you might want to vote after your edits are submitted! ' + 'Do you still want to vote now (dangerous), or would you like to cancel your vote until you are done editing (safe)?')) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	    resetNewChapterInputs(); // don't keep unsaved changes lying around once listeners are disabled
+	  }
+	
 	  var savedWindowPosition = getWindowPosition();
 	  if (nodeUid == null || newVote == null) {
 	    logMgr.error('Relevant parameters missing in votification call.');
@@ -22213,6 +22292,14 @@
 	}
 	
 	function nameChange(newName) {
+	  if (checkPendingEdits(this.editsPending, 'Changing your name will trigger a page reload ... you might want to change your ' + 'name after submitting your edits!  Do you want to proceed with changing your name and discarding your unsaved work?')) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	    resetNewChapterInputs(); // don't keep unsaved changes lying around once listeners are disabled
+	  }
+	
 	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to update their name . . .');
 	  var xhr = new XMLHttpRequest();
@@ -22478,6 +22565,17 @@
 	  };
 	}
 	
+	function resetNewChapterInputs() {
+	  var inputPathElement = document.getElementById('cyoag-input-path');
+	  var inputBodyElement = document.getElementById('cyoag-input-body');
+	  if (inputPathElement) {
+	    inputPathElement.value = '';
+	  }
+	  if (inputBodyElement) {
+	    inputBodyElement.value = '';
+	  }
+	}
+	
 	// this function returns a JSON object consisting of window scroll position as {x: #, y: #}
 	function getWindowPosition() {
 	  // modified from http://stackoverflow.com/questions/3464876/javascript-get-window-x-y-position-for-scroll
@@ -22495,16 +22593,69 @@
 	  logMgr.verbose('Got window scroll position: ' + JSON.stringify(pos));
 	  return pos;
 	}
+	
+	function restoreScroll(scrollCoord) {
+	  var x = scrollCoord.x,
+	      y = scrollCoord.y;
+	  logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
+	  window.scrollTo(x, y);
+	}
 
 /***/ },
 /* 173 */
+/*!********************************!*\
+  !*** ./utils/browserLogger.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var DEBUG = __webpack_require__(/*! ../build-config */ 174).DEBUG;
+	var VERBOSE = __webpack_require__(/*! ../build-config */ 174).VERBOSE;
+	
+	module.exports = function(sourceName) {
+	  return {
+	    logSource: sourceName ? sourceName : 'Unknown source',
+	
+	    out: function(msg) {
+	      var output = msg + ' (' + this.logSource + ')';
+	      console.log(output);
+	    },
+	
+	    debug: function(msg) {
+	      if(DEBUG) {
+	        var output = "DEBUG: " + msg + ' (' + this.logSource + ')';
+	        console.log(output);
+	      }
+	    },
+	
+	    warn: function(warning) {
+	      var output = "! ! ! WARNING ! ! ! : " + warning + ' (' + this.logSource + ')';
+	      console.log(output);
+	    },
+	
+	    error: function(error) {
+	      var output = 'X X X ERROR X X X : ' + error + ' (' + this.logSource + ')';
+	      console.log(output);
+	    },
+	
+	    verbose: function(msg) {
+	      if(DEBUG && VERBOSE) {
+	        var output = "VERBOSE: " + msg + ' (' + this.logSource + ')';
+	        console.log(output);
+	      }
+	    }
+	  };
+	};
+
+
+/***/ },
+/* 174 */
 /*!*************************!*\
   !*** ./build-config.js ***!
   \*************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var constants = __webpack_require__(/*! ./constants */ 174);
-	var secrets = __webpack_require__(/*! ./secrets */ 175);
+	var constants = __webpack_require__(/*! ./constants */ 175);
+	var secrets = __webpack_require__(/*! ./secrets */ 176);
 	
 	var config = {};
 	
@@ -22544,7 +22695,7 @@
 
 
 /***/ },
-/* 174 */
+/* 175 */
 /*!**********************!*\
   !*** ./constants.js ***!
   \**********************/
@@ -22557,6 +22708,10 @@
 	constants.acctTypeModerator = 'moderator';
 	constants.acctTypeRegistered = 'registered';
 	constants.acctTypeVisitor = 'visitor';
+	
+	constants.confirmDiscardUnsavedEdits = 'There are unsaved changes detected in your work.  These will be lost ' +
+	  'forever if you continue ' +
+	  '(seriously)!  Are you certain you wish to proceed?';
 	
 	// this maxAge value acconts for 2 weeks until expiry
 	constants.cookieExpiry = {maxAge: 1209600000, httpOnly: true};
@@ -22627,7 +22782,7 @@
 
 
 /***/ },
-/* 175 */
+/* 176 */
 /*!********************!*\
   !*** ./secrets.js ***!
   \********************/
@@ -22664,52 +22819,6 @@
 
 
 /***/ },
-/* 176 */
-/*!********************************!*\
-  !*** ./utils/browserLogger.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var DEBUG = __webpack_require__(/*! ../build-config */ 173).DEBUG;
-	var VERBOSE = __webpack_require__(/*! ../build-config */ 173).VERBOSE;
-	
-	module.exports = function(sourceName) {
-	  return {
-	    logSource: sourceName ? sourceName : 'Unknown source',
-	
-	    out: function(msg) {
-	      var output = msg + ' (' + this.logSource + ')';
-	      console.log(output);
-	    },
-	
-	    debug: function(msg) {
-	      if(DEBUG) {
-	        var output = "DEBUG: " + msg + ' (' + this.logSource + ')';
-	        console.log(output);
-	      }
-	    },
-	
-	    warn: function(warning) {
-	      var output = "! ! ! WARNING ! ! ! : " + warning + ' (' + this.logSource + ')';
-	      console.log(output);
-	    },
-	
-	    error: function(error) {
-	      var output = 'X X X ERROR X X X : ' + error + ' (' + this.logSource + ')';
-	      console.log(output);
-	    },
-	
-	    verbose: function(msg) {
-	      if(DEBUG && VERBOSE) {
-	        var output = "VERBOSE: " + msg + ' (' + this.logSource + ')';
-	        console.log(output);
-	      }
-	    }
-	  };
-	};
-
-
-/***/ },
 /* 177 */
 /*!*********************************************!*\
   !*** ./build-source/js/HeaderComponents.js ***!
@@ -22719,8 +22828,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('HeaderComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('HeaderComponents.js');
 	
 	var exports = {};
 	
@@ -22786,8 +22895,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MessagingComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('MessagingComponents.js');
 	
 	var exports = {};
 	
@@ -22839,7 +22948,7 @@
 	        { className: className },
 	        React.createElement(
 	          'a',
-	          { id: 'cyoag-message-banner-x', href: '#' },
+	          { id: 'cyoag-message-banner-x' },
 	          'x'
 	        ),
 	        messageContent
@@ -22902,7 +23011,7 @@
 	        ),
 	        React.createElement(
 	          'a',
-	          { className: 'cyoag-side-padded-link', href: '#' },
+	          { className: 'cyoag-side-padded-link' },
 	          React.createElement(
 	            'div',
 	            { className: 'cyoag-modal-message-button' },
@@ -22929,8 +23038,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('MainColumnComponents.js');
 	
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 180);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 182);
@@ -22949,7 +23058,9 @@
 	    var context = this.props.context;
 	
 	    var votificationComponent;
-	    if (context.state.acctType != constants.acctTypeVisitor) {
+	    if (context.state.editMode) {
+	      votificationComponent = React.createElement(VotificationComponents.Hidden, null);
+	    } else if (context.state.acctType != constants.acctTypeVisitor) {
 	      votificationComponent = React.createElement(VotificationComponents.Votification, { context: context });
 	    } else {
 	      votificationComponent = React.createElement(VotificationComponents.BegLogin, { context: context });
@@ -22991,8 +23102,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('NodeComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('NodeComponents.js');
 	var uidGen = __webpack_require__(/*! ../../utils/uid-gen */ 181);
 	
 	var exports = {};
@@ -23023,7 +23134,7 @@
 	      { id: 'cyoag-node-container' },
 	      React.createElement(
 	        'a',
-	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-link', href: '#', onMouseMove: this.locateTooltip },
+	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-link', onMouseMove: this.locateTooltip },
 	        React.createElement(
 	          'div',
 	          { className: 'cyoag-path-item cyoag-trailing-snippet', onClick: this.navigate },
@@ -23236,14 +23347,13 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('VotificationComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('VotificationComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 183);
 	
 	var exports = {};
 	
-	// Facebook login button component
 	var BegLogin = React.createClass({
 	  displayName: 'BegLogin',
 	
@@ -23314,20 +23424,30 @@
 	      ),
 	      React.createElement(
 	        'a',
-	        { href: '#' },
+	        null,
 	        React.createElement('img', { id: 'cyoag-upvote-button', onClick: voteUp, src: upImgPath })
 	      ),
 	      React.createElement(
 	        'a',
-	        { href: '#' },
+	        null,
 	        React.createElement('img', { id: 'cyoag-downvote-button', onClick: voteDown, src: downImgPath })
 	      )
 	    );
 	  }
 	});
 	
+	var Hidden = React.createClass({
+	  displayName: 'Hidden',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	    return React.createElement('div', { id: 'cyoag-votification-container', className: 'cyoag-hidden' });
+	  }
+	});
+	
 	exports.BegLogin = BegLogin;
 	exports.Votification = Votification;
+	exports.Hidden = Hidden;
 	
 	module.exports = exports;
 
@@ -23341,7 +23461,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('SocialLoginButtonComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('SocialLoginButtonComponents.js');
 	
 	var exports = {};
 	
@@ -23423,8 +23543,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23438,6 +23558,7 @@
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
+	
 	    var properThis = this;
 	    var context = this.props.context;
 	    var paths = context.state.paths;
@@ -23461,7 +23582,7 @@
 	          var pathUid = 'node-' + item.pathUid;
 	          return React.createElement(
 	            'a',
-	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-link', href: '#', onMouseMove: properThis.locateTooltip.bind(null, pathUid) },
+	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-link', onMouseMove: properThis.locateTooltip.bind(null, pathUid) },
 	            React.createElement(
 	              'div',
 	              { className: 'cyoag-path-item', onClick: properThis.navigate.bind(null, pathUid) },
@@ -23498,8 +23619,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23555,6 +23676,47 @@
 	var Input = React.createClass({
 	  displayName: 'Input',
 	
+	  checkForEdits: function (e) {
+	    logMgr.debug('Checking for edits . . .');
+	    if (document.getElementById('cyoag-input-path').value.length == 0 && document.getElementById('cyoag-input-body').value.length == 0) {
+	      // if no changes are detected, set editsPending false and onbeforeunload listener null
+	      logMgr.debug('Path and body inputs were both length 0, so no edits are detected.');
+	      this.props.context.setEditsPending(false);
+	      window.onbeforeunload = null;
+	    } else {
+	      // if changes detected, set editsPending true and onbeforeunload to a listener
+	      logMgr.debug('Path or body input had length > 0, so edits were detected.');
+	      this.props.context.setEditsPending(true);
+	      window.onbeforeunload = warnBeforeUnload;
+	    }
+	  },
+	  componentDidMount: function () {
+	    var inputPathElement = document.getElementById('cyoag-input-path');
+	    var inputBodyElement = document.getElementById('cyoag-input-body');
+	
+	    // all browsers excpet short bus IE
+	    if (inputPathElement.addEventListener) {
+	      // attempt to remove listeners from input elements to prevent duplicate listener firing
+	      logMgr.debug('Removing existing event listeners to input fields for all browsers except O.G. IE . . .');
+	      inputPathElement.removeEventListener('input', this.checkForEdits);
+	      inputBodyElement.removeEventListener('input', this.checkForEdits);
+	      // now add the listeners for changes to these input elements
+	      inputPathElement.addEventListener('input', this.checkForEdits, false);
+	      inputBodyElement.addEventListener('input', this.checkForEdits, false);
+	      logMgr.debug('. . . then added them back on.');
+	    }
+	    // short bus IE
+	    else {
+	        // attempt to remove listeners from input elements to prevent duplicate listener firing
+	        logMgr.debug('Removing existing event listeners to input fields for O.G. IE . . .');
+	        inputPathElement.detachEvent('onpropertychange', this.checkForEdits);
+	        inputBodyElement.detachEvent('onpropertychange', this.checkForEdits);
+	        // now add the listeners for changes to these input elements
+	        inputPathElement.attachEvent('onpropertychange', this.checkForEdits);
+	        inputBodyElement.attachEvent('onpropertychange', this.checkForEdits);
+	        logMgr.debug('. . . then added them back on.');
+	      }
+	  },
 	  getInitialState: function () {
 	    return {
 	      pathCharCount: 0,
@@ -23629,6 +23791,8 @@
 	    }
 	
 	    this.props.context.saveDraft(inputPath, inputBody);
+	    this.props.context.setEditsPending(false);
+	    window.onbeforeunload = null;
 	  },
 	  submit: function () {
 	    var inputPath = document.getElementById('cyoag-input-path').value;
@@ -23636,6 +23800,8 @@
 	
 	    if (validateInput(inputPath, inputBody, this.props.context.message)) {
 	      this.props.context.inputSubmit(inputPath, inputBody);
+	      this.props.context.setEditsPending(false);
+	      window.onbeforeunload = null;
 	    }
 	  },
 	  updateBodyCharCount: function () {
@@ -23657,69 +23823,52 @@
 	  cancel: function () {
 	    this.props.context.cancelEdit();
 	  },
-	  checkForEdits: function () {
+	  checkForEdits: function (e) {
 	    if (this.state.originalLastPath == document.getElementById('cyoag-input-path').value && this.state.originalNodeSnippet == document.getElementById('cyoag-input-body').value) {
-	      this.editDetected = false;
+	      // if no changes are detected, set editsPending false and onbeforeunload listener null
+	      this.props.context.setEditsPending(false);
 	      window.onbeforeunload = null;
 	    } else {
-	      this.editDetected = true;
-	      window.onbeforeunload = this.warnBeforeUnload;
+	      // if changes detected, set editsPending true and onbeforeunload to a listener
+	      this.props.context.setEditsPending(true);
+	      window.onbeforeunload = warnBeforeUnload;
 	    }
 	  },
 	  componentDidMount: function () {
 	    var snippet = this.props.context.state.snippet;
-	    document.getElementById('cyoag-input-path').value = snippet.lastPath;
-	    document.getElementById('cyoag-input-body').value = snippet.nodeSnippet;
 	
-	    // strategy:
-	    // record original snippet state for comparison
-	    // create bool representation of whether a change has been made
-	    // start listening for changes on textareas
-	    //   on change, check whether modifications are present, set bool accordingly
-	    //     if changes present, set window.onbefureunload to appropriate function var
-	    //     else, set window.unbeforeunload = null
-	    // start listening for clicks on any anchor tag or button element
-	    //   if clicked while a modification is detected, show user confirmation
-	    //     if confirmed:
-	    //       cancel all anchor/button click listeners
-	    //       cancel window.onbeforeunload (set null)
-	    //       let the click go through
-	    //     if user wants to stay, cancel/preventDefault the click event
+	    var inputPathElement = document.getElementById('cyoag-input-path');
+	    var inputBodyElement = document.getElementById('cyoag-input-body');
 	
-	    // strategy:
-	    // record original snippet state for comparison (done in getInitialState at this component's state level)
-	    // create bool representation of whether a change has been made (done in getInitialState at this component's property level)
-	    // start listening for changes on textareas (cyoag-input-path and cyoag-input-body)
-	    var pathInput = document.getElementById('cyoag-input-path');
-	    var bodyInput = document.getElementById('cyoag-input-body');
+	    // set the snippet contents as the initial input field contents
+	    inputPathElement.value = snippet.lastPath;
+	    inputBodyElement.value = snippet.nodeSnippet;
 	
-	    if (pathInput.addEventListener) {
-	      pathInput.addEventListener('input', this.checkForEdits, false);
-	    } else if (pathInput.attachEvent) {
-	      pathInput.attachEvent('onpropertychange', this.checkForEdits);
+	    // all browsers excpet short bus IE
+	    if (inputPathElement.addEventListener) {
+	      // attempt to remove listeners from input elements to prevent duplicate listener firing
+	      logMgr.debug('Removing existing event listeners to input fields for all browsers except O.G. IE . . .');
+	      inputPathElement.removeEventListener('input', this.checkForEdits);
+	      inputBodyElement.removeEventListener('input', this.checkForEdits);
+	      // now add the listeners for changes to these input elements
+	      inputPathElement.addEventListener('input', this.checkForEdits, false);
+	      inputBodyElement.addEventListener('input', this.checkForEdits, false);
+	      logMgr.debug('. . . then added them back on.');
 	    }
-	
-	    if (bodyInput.addEventListener) {
-	      bodyInput.addEventListener('input', this.checkForEdits, false);
-	    } else if (bodyInput.attachEvent) {
-	      bodyInput.attachEvent('onpropertychange', this.checkForEdits);
-	    }
-	
-	    //   on change, set bool based on whether modifications exist (done in component's this.checkForEdits function)
-	    //     if changes present, set window.onbefureunload to appropriate function var (done in this.checkForEdits)
-	    //     else, set window.unbeforeunload = null (done in this.checkForEdits)
-	
-	    // start listening for clicks on any anchor tag or button element
-	    //   if clicked while a modification is detected, show user confirmation
-	    //     if confirmed:
-	    //       cancel all anchor/button click listeners
-	    //       cancel window.onbeforeunload (set null)
-	    //       let the click go through
-	    //     if user wants to stay, cancel/preventDefault the click event
+	    // short bus IE
+	    else {
+	        // attempt to remove listeners from input elements to prevent duplicate listener firing
+	        logMgr.debug('Removing existing event listeners to input fields for O.G. IE . . .');
+	        inputPathElement.detachEvent('onpropertychange', this.checkForEdits);
+	        inputBodyElement.detachEvent('onpropertychange', this.checkForEdits);
+	        // now add the listeners for changes to these input elements
+	        inputPathElement.attachEvent('onpropertychange', this.checkForEdits);
+	        inputBodyElement.attachEvent('onpropertychange', this.checkForEdits);
+	        logMgr.debug('. . . then added them back on.');
+	      }
 	  },
 	  getInitialState: function () {
 	    var snippet = this.props.context.state.snippet;
-	    this.editDetected = false;
 	    return {
 	      pathCharCount: snippet.lastPath.length,
 	      bodyCharCount: snippet.nodeSnippet.length,
@@ -23790,7 +23939,10 @@
 	    var inputBody = document.getElementById('cyoag-input-body').value;
 	
 	    if (validateInput(inputPath, inputBody, this.props.context.message)) {
-	      this.props.context.editSubmit(inputPath, inputBody);
+	      // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
+	      this.props.context.submitEdits(inputPath, inputBody);
+	      this.props.context.setEditsPending(false);
+	      window.onbeforeunload = null;
 	    }
 	  },
 	  updateBodyCharCount: function () {
@@ -23802,21 +23954,6 @@
 	    this.setState({
 	      pathCharCount: document.getElementById('cyoag-input-path').value.length
 	    });
-	  },
-	  // borrowed from http://stackoverflow.com/questions/1119289/how-to-show-the-are-you-sure-you-want-to-navigate-away-from-this-page-when-ch
-	  warnBeforeUnload: function (e) {
-	    // If we haven't been passed the event get the window.event
-	    e = e || window.event;
-	
-	    var message = 'Unsaved edits will be lost forever (seriously)!  Are you certain you wish to proceed?';
-	
-	    // For IE6-8 and Firefox prior to version 4
-	    if (e) {
-	      e.returnValue = message;
-	    }
-	
-	    // For Chrome, Safari, IE8+ and Opera 12+
-	    return message;
 	  }
 	});
 	
@@ -23988,6 +24125,21 @@
 	  return true;
 	}
 	
+	function warnBeforeUnload(e) {
+	  // If we haven't been passed the event get the window.event
+	  e = e || window.event;
+	
+	  var message = constants.confirmDiscardUnsavedEdits;
+	
+	  // For IE6-8 and Firefox prior to version 4
+	  if (e) {
+	    e.returnValue = message;
+	  }
+	
+	  // For Chrome, Safari, IE8+ and Opera 12+
+	  return message;
+	}
+	
 	exports.Hidden = Hidden;
 	exports.Blocked = Blocked;
 	exports.Input = Input;
@@ -24005,8 +24157,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MarginColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('MarginColumnComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 183);
 	
@@ -24216,8 +24368,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 174);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('FooterComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 175);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('FooterComponents.js');
 	
 	var exports = {};
 	

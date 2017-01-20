@@ -6,6 +6,10 @@ constants.acctTypeModerator = 'moderator';
 constants.acctTypeRegistered = 'registered';
 constants.acctTypeVisitor = 'visitor';
 
+constants.confirmDiscardUnsavedEdits = 'There are unsaved changes detected in your work.  These will be lost ' +
+  'forever if you continue ' +
+  '(seriously)!  Are you certain you wish to proceed?';
+
 // this maxAge value acconts for 2 weeks until expiry
 constants.cookieExpiry = {maxAge: 1209600000, httpOnly: true};
 constants.cookieNode = 'node_uid';

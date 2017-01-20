@@ -44,6 +44,50 @@ var Blocked = React.createClass({
 
 // Display input fields and simple directions so users know how to contribute
 var Input = React.createClass({
+  checkForEdits: function(e) {
+    logMgr.debug('Checking for edits . . .');
+    if(document.getElementById('cyoag-input-path').value.length == 0 &&
+       document.getElementById('cyoag-input-body').value.length == 0) {
+      // if no changes are detected, set editsPending false and onbeforeunload listener null
+      logMgr.debug('Path and body inputs were both length 0, so no edits are detected.');
+      this.props.context.setEditsPending(false);
+      window.onbeforeunload = null;
+    }
+    else {
+      // if changes detected, set editsPending true and onbeforeunload to a listener
+      logMgr.debug('Path or body input had length > 0, so edits were detected.');
+      this.props.context.setEditsPending(true);
+      window.onbeforeunload = warnBeforeUnload;
+    }
+  },
+  componentDidMount: function() {
+    var inputPathElement = document.getElementById('cyoag-input-path');
+    var inputBodyElement = document.getElementById('cyoag-input-body');
+
+    // all browsers excpet short bus IE
+    if(inputPathElement.addEventListener) {
+      // attempt to remove listeners from input elements to prevent duplicate listener firing
+      logMgr.debug('Removing existing event listeners to input fields for all browsers except O.G. IE . . .');
+      inputPathElement.removeEventListener('input', this.checkForEdits);
+      inputBodyElement.removeEventListener('input', this.checkForEdits);
+      // now add the listeners for changes to these input elements
+      inputPathElement.addEventListener('input', this.checkForEdits, false);
+      inputBodyElement.addEventListener('input', this.checkForEdits, false);
+      logMgr.debug('. . . then added them back on.');
+    }
+    // short bus IE
+    else {
+      // attempt to remove listeners from input elements to prevent duplicate listener firing
+      logMgr.debug('Removing existing event listeners to input fields for O.G. IE . . .');
+      inputPathElement.detachEvent('onpropertychange', this.checkForEdits);
+      inputBodyElement.detachEvent('onpropertychange', this.checkForEdits);
+      // now add the listeners for changes to these input elements
+      inputPathElement.attachEvent('onpropertychange', this.checkForEdits);
+      inputBodyElement.attachEvent('onpropertychange', this.checkForEdits);
+      logMgr.debug('. . . then added them back on.');
+    }
+
+  },
   getInitialState: function() {
     return {
       pathCharCount: 0,
@@ -81,6 +125,8 @@ var Input = React.createClass({
     }
 
     this.props.context.saveDraft(inputPath, inputBody);
+    this.props.context.setEditsPending(false);
+    window.onbeforeunload = null;
   },
   submit: function() {
     var inputPath = document.getElementById('cyoag-input-path').value;
@@ -88,6 +134,8 @@ var Input = React.createClass({
 
     if(validateInput(inputPath, inputBody, this.props.context.message)) {
       this.props.context.inputSubmit(inputPath, inputBody);
+      this.props.context.setEditsPending(false);
+      window.onbeforeunload = null;
     }
   },
   updateBodyCharCount: function() {
@@ -107,73 +155,54 @@ var Edit = React.createClass({
   cancel: function() {
     this.props.context.cancelEdit();
   },
-  checkForEdits: function() {
+  checkForEdits: function(e) {
     if(this.state.originalLastPath == document.getElementById('cyoag-input-path').value &&
        this.state.originalNodeSnippet == document.getElementById('cyoag-input-body').value) {
-      this.editDetected = false;
+      // if no changes are detected, set editsPending false and onbeforeunload listener null
+      this.props.context.setEditsPending(false);
       window.onbeforeunload = null;
     }
     else {
-      this.editDetected = true;
-      window.onbeforeunload = this.warnBeforeUnload;
+      // if changes detected, set editsPending true and onbeforeunload to a listener
+      this.props.context.setEditsPending(true);
+      window.onbeforeunload = warnBeforeUnload;
     }
   },
   componentDidMount: function() {
     var snippet = this.props.context.state.snippet;
-    document.getElementById('cyoag-input-path').value = snippet.lastPath;
-    document.getElementById('cyoag-input-body').value = snippet.nodeSnippet;
 
-    // strategy:
-    // record original snippet state for comparison
-    // create bool representation of whether a change has been made
-    // start listening for changes on textareas
-    //   on change, check whether modifications are present, set bool accordingly
-    //     if changes present, set window.onbefureunload to appropriate function var
-    //     else, set window.unbeforeunload = null
-    // start listening for clicks on any anchor tag or button element
-    //   if clicked while a modification is detected, show user confirmation
-    //     if confirmed:
-    //       cancel all anchor/button click listeners
-    //       cancel window.onbeforeunload (set null)
-    //       let the click go through
-    //     if user wants to stay, cancel/preventDefault the click event
+    var inputPathElement = document.getElementById('cyoag-input-path');
+    var inputBodyElement = document.getElementById('cyoag-input-body');
 
-    // strategy:
-    // record original snippet state for comparison (done in getInitialState at this component's state level)
-    // create bool representation of whether a change has been made (done in getInitialState at this component's property level)
-    // start listening for changes on textareas (cyoag-input-path and cyoag-input-body)
-    var pathInput = document.getElementById('cyoag-input-path');
-    var bodyInput = document.getElementById('cyoag-input-body');
+    // set the snippet contents as the initial input field contents
+    inputPathElement.value = snippet.lastPath;
+    inputBodyElement.value = snippet.nodeSnippet;
 
-    if(pathInput.addEventListener) {
-      pathInput.addEventListener('input', this.checkForEdits, false);
+    // all browsers excpet short bus IE
+    if(inputPathElement.addEventListener) {
+      // attempt to remove listeners from input elements to prevent duplicate listener firing
+      logMgr.debug('Removing existing event listeners to input fields for all browsers except O.G. IE . . .');
+      inputPathElement.removeEventListener('input', this.checkForEdits);
+      inputBodyElement.removeEventListener('input', this.checkForEdits);
+      // now add the listeners for changes to these input elements
+      inputPathElement.addEventListener('input', this.checkForEdits, false);
+      inputBodyElement.addEventListener('input', this.checkForEdits, false);
+      logMgr.debug('. . . then added them back on.');
     }
-    else if(pathInput.attachEvent) {
-      pathInput.attachEvent('onpropertychange', this.checkForEdits);
+    // short bus IE
+    else {
+      // attempt to remove listeners from input elements to prevent duplicate listener firing
+      logMgr.debug('Removing existing event listeners to input fields for O.G. IE . . .');
+      inputPathElement.detachEvent('onpropertychange', this.checkForEdits);
+      inputBodyElement.detachEvent('onpropertychange', this.checkForEdits);
+      // now add the listeners for changes to these input elements
+      inputPathElement.attachEvent('onpropertychange', this.checkForEdits);
+      inputBodyElement.attachEvent('onpropertychange', this.checkForEdits);
+      logMgr.debug('. . . then added them back on.');
     }
-
-    if(bodyInput.addEventListener) {
-      bodyInput.addEventListener('input', this.checkForEdits, false);
-    }
-    else if(bodyInput.attachEvent) {
-      bodyInput.attachEvent('onpropertychange', this.checkForEdits);
-    }
-
-    //   on change, set bool based on whether modifications exist (done in component's this.checkForEdits function)
-    //     if changes present, set window.onbefureunload to appropriate function var (done in this.checkForEdits)
-    //     else, set window.unbeforeunload = null (done in this.checkForEdits)
-
-    // start listening for clicks on any anchor tag or button element
-    //   if clicked while a modification is detected, show user confirmation
-    //     if confirmed:
-    //       cancel all anchor/button click listeners
-    //       cancel window.onbeforeunload (set null)
-    //       let the click go through
-    //     if user wants to stay, cancel/preventDefault the click event
   },
   getInitialState: function() {
     var snippet = this.props.context.state.snippet;
-    this.editDetected = false;
     return {
       pathCharCount: snippet.lastPath.length,
       bodyCharCount: snippet.nodeSnippet.length,
@@ -207,7 +236,10 @@ var Edit = React.createClass({
     var inputBody = document.getElementById('cyoag-input-body').value;
 
     if(validateInput(inputPath, inputBody, this.props.context.message)) {
-      this.props.context.editSubmit(inputPath, inputBody);
+      // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
+      this.props.context.submitEdits(inputPath, inputBody);
+      this.props.context.setEditsPending(false);
+      window.onbeforeunload = null;
     }
   },
   updateBodyCharCount: function() {
@@ -219,22 +251,6 @@ var Edit = React.createClass({
     this.setState({
       pathCharCount: document.getElementById('cyoag-input-path').value.length
     });
-  },
-  // borrowed from http://stackoverflow.com/questions/1119289/how-to-show-the-are-you-sure-you-want-to-navigate-away-from-this-page-when-ch
-  warnBeforeUnload: function(e) {
-    // If we haven't been passed the event get the window.event
-    e = e || window.event;
-
-    var message = 'Unsaved edits will be lost forever (seriously)!  Are you certain you wish to proceed?';
-
-    // For IE6-8 and Firefox prior to version 4
-    if (e)
-    {
-        e.returnValue = message;
-    }
-
-    // For Chrome, Safari, IE8+ and Opera 12+
-    return message;
   }
 });
 
@@ -392,6 +408,22 @@ function validateInput(inputPath, inputBody, message) {
   }
 
   return true;
+}
+
+function warnBeforeUnload(e) {
+  // If we haven't been passed the event get the window.event
+  e = e || window.event;
+
+  var message = constants.confirmDiscardUnsavedEdits;
+
+  // For IE6-8 and Firefox prior to version 4
+  if (e)
+  {
+      e.returnValue = message;
+  }
+
+  // For Chrome, Safari, IE8+ and Opera 12+
+  return message;
 }
 
 exports.Hidden = Hidden;
