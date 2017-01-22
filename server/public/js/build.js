@@ -52,7 +52,7 @@
 	
 	var MainComponent = __webpack_require__(/*! ./MainComponent */ 172);
 	
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('main.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('main.js');
 	
 	logMgr.verbose('Kicking off initial render!');
 	
@@ -21948,9 +21948,9 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var config = __webpack_require__(/*! ../../build-config */ 174);
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('MainComponent.js');
+	var config = __webpack_require__(/*! ../../build-config */ 173);
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainComponent.js');
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 177);
 	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 178);
@@ -21975,9 +21975,9 @@
 	  deleteChapter: deleteChapter,
 	  editChapter: editChapter,
 	  getInitialState: getDefaultStateObject,
-	  inputSubmit: inputSubmit,
 	  logoutRequest: logoutXhrHandler,
 	  message: function (msg) {
+	    logMgr.debug('incoming message object: ' + JSON.stringify(msg));
 	    this.setState({
 	      msg: msg.msg ? msg.msg : null,
 	      warning: msg.warning ? msg.warning : null,
@@ -21995,13 +21995,14 @@
 	    context.deleteChapter = this.deleteChapter;
 	    context.cancelEdit = this.cancelEdit;
 	    context.editChapter = this.editChapter;
-	    context.inputSubmit = this.inputSubmit;
 	    context.logoutRequest = this.logoutRequest;
 	    context.message = this.message;
 	    context.nameChange = this.nameChange;
 	    context.navigate = this.navigate;
 	    context.setEditsPending = this.setEditsPending;
 	    context.saveDraft = this.saveDraft;
+	    context.submitEdits = this.submitEdits;
+	    context.submitInput = this.submitInput;
 	    context.votify = this.votify;
 	
 	    var debugStateDisplay = function () {
@@ -22044,6 +22045,8 @@
 	    this.editsPending = b;
 	  },
 	  saveDraft: saveDraft,
+	  submitInput: submitInput,
+	  submitEdits: submitEdits,
 	  votify: votify
 	});
 	
@@ -22329,7 +22332,37 @@
 	  xhr.send(xhrPayload);
 	}
 	
-	function inputSubmit(path, body) {
+	function submitEdits(path, body) {
+	  var savedWindowPosition = getWindowPosition();
+	  logMgr.debug('User attempting to edit existing node . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Edit submission response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, constants.windowScrollTop);
+	    } else {
+	      logMgr.debug('Edit submission attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of edit submission attempt.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  var xhrPayload = JSON.stringify({ editTarget: properThis.state.nodeUid, updatedPath: path, updatedBody: body });
+	  xhr.send(xhrPayload);
+	}
+	
+	function submitInput(path, body) {
 	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to submit new node . . .');
 	  var xhr = new XMLHttpRequest();
@@ -22603,59 +22636,13 @@
 
 /***/ },
 /* 173 */
-/*!********************************!*\
-  !*** ./utils/browserLogger.js ***!
-  \********************************/
-/***/ function(module, exports, __webpack_require__) {
-
-	var DEBUG = __webpack_require__(/*! ../build-config */ 174).DEBUG;
-	var VERBOSE = __webpack_require__(/*! ../build-config */ 174).VERBOSE;
-	
-	module.exports = function(sourceName) {
-	  return {
-	    logSource: sourceName ? sourceName : 'Unknown source',
-	
-	    out: function(msg) {
-	      var output = msg + ' (' + this.logSource + ')';
-	      console.log(output);
-	    },
-	
-	    debug: function(msg) {
-	      if(DEBUG) {
-	        var output = "DEBUG: " + msg + ' (' + this.logSource + ')';
-	        console.log(output);
-	      }
-	    },
-	
-	    warn: function(warning) {
-	      var output = "! ! ! WARNING ! ! ! : " + warning + ' (' + this.logSource + ')';
-	      console.log(output);
-	    },
-	
-	    error: function(error) {
-	      var output = 'X X X ERROR X X X : ' + error + ' (' + this.logSource + ')';
-	      console.log(output);
-	    },
-	
-	    verbose: function(msg) {
-	      if(DEBUG && VERBOSE) {
-	        var output = "VERBOSE: " + msg + ' (' + this.logSource + ')';
-	        console.log(output);
-	      }
-	    }
-	  };
-	};
-
-
-/***/ },
-/* 174 */
 /*!*************************!*\
   !*** ./build-config.js ***!
   \*************************/
 /***/ function(module, exports, __webpack_require__) {
 
-	var constants = __webpack_require__(/*! ./constants */ 175);
-	var secrets = __webpack_require__(/*! ./secrets */ 176);
+	var constants = __webpack_require__(/*! ./constants */ 174);
+	var secrets = __webpack_require__(/*! ./secrets */ 175);
 	
 	var config = {};
 	
@@ -22695,7 +22682,7 @@
 
 
 /***/ },
-/* 175 */
+/* 174 */
 /*!**********************!*\
   !*** ./constants.js ***!
   \**********************/
@@ -22768,6 +22755,8 @@
 	constants.rootTrailingSnippet = '... by way of prologue.';
 	constants.rootLastPath = 'The writer takes up his pen.';
 	
+	constants.specialMessage_editSuccess = 'Edits submitted successfully!';
+	
 	constants.trailingSnippetLength = 200;
 	
 	constants.visitorName = 'Illustrious Visitor';
@@ -22782,7 +22771,7 @@
 
 
 /***/ },
-/* 176 */
+/* 175 */
 /*!********************!*\
   !*** ./secrets.js ***!
   \********************/
@@ -22819,6 +22808,52 @@
 
 
 /***/ },
+/* 176 */
+/*!********************************!*\
+  !*** ./utils/browserLogger.js ***!
+  \********************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var DEBUG = __webpack_require__(/*! ../build-config */ 173).DEBUG;
+	var VERBOSE = __webpack_require__(/*! ../build-config */ 173).VERBOSE;
+	
+	module.exports = function(sourceName) {
+	  return {
+	    logSource: sourceName ? sourceName : 'Unknown source',
+	
+	    out: function(msg) {
+	      var output = msg + ' (' + this.logSource + ')';
+	      console.log(output);
+	    },
+	
+	    debug: function(msg) {
+	      if(DEBUG) {
+	        var output = "DEBUG: " + msg + ' (' + this.logSource + ')';
+	        console.log(output);
+	      }
+	    },
+	
+	    warn: function(warning) {
+	      var output = "! ! ! WARNING ! ! ! : " + warning + ' (' + this.logSource + ')';
+	      console.log(output);
+	    },
+	
+	    error: function(error) {
+	      var output = 'X X X ERROR X X X : ' + error + ' (' + this.logSource + ')';
+	      console.log(output);
+	    },
+	
+	    verbose: function(msg) {
+	      if(DEBUG && VERBOSE) {
+	        var output = "VERBOSE: " + msg + ' (' + this.logSource + ')';
+	        console.log(output);
+	      }
+	    }
+	  };
+	};
+
+
+/***/ },
 /* 177 */
 /*!*********************************************!*\
   !*** ./build-source/js/HeaderComponents.js ***!
@@ -22828,8 +22863,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('HeaderComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('HeaderComponents.js');
 	
 	var exports = {};
 	
@@ -22895,8 +22930,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('MessagingComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MessagingComponents.js');
 	
 	var exports = {};
 	
@@ -22966,6 +23001,7 @@
 	    var modalObj = document.getElementById('cyoag-modal-message-container');
 	    if (modalObj) {
 	      modalObj.style.display = 'none';
+	      this.props.context.message({}); // send an empty message object to clear message state
 	    }
 	  },
 	  render: function () {
@@ -23038,8 +23074,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('MainColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainColumnComponents.js');
 	
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 180);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 182);
@@ -23102,8 +23138,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('NodeComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('NodeComponents.js');
 	var uidGen = __webpack_require__(/*! ../../utils/uid-gen */ 181);
 	
 	var exports = {};
@@ -23200,12 +23236,12 @@
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.editChapter },
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
 	          'Edit this chapter'
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.deleteChapter },
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
 	          'Delete this chapter'
 	        )
 	      );
@@ -23224,12 +23260,12 @@
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.editChapter },
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
 	          'Edit this chapter'
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.deleteChapter },
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
 	          'Delete this chapter'
 	        )
 	      );
@@ -23270,12 +23306,12 @@
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.editChapter },
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
 	          'Edit this chapter'
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button', onClick: context.deleteChapter },
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
 	          'Delete this chapter'
 	        )
 	      );
@@ -23347,8 +23383,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('VotificationComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('VotificationComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 183);
 	
@@ -23461,7 +23497,7 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('SocialLoginButtonComponents.js');
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('SocialLoginButtonComponents.js');
 	
 	var exports = {};
 	
@@ -23508,7 +23544,7 @@
 	  render: function () {
 	    return React.createElement(
 	      'button',
-	      { id: 'cyoag-logout-button', onClick: this.props.logoutRequest },
+	      { id: 'cyoag-logout-button', className: 'shaded-border-red', onClick: this.props.logoutRequest },
 	      'Log Out'
 	    );
 	  }
@@ -23543,8 +23579,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('PathComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23619,8 +23655,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('PathComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
 	
 	var exports = {};
 	
@@ -23771,12 +23807,12 @@
 	      ),
 	      React.createElement(
 	        'button',
-	        { id: 'cyoag-save-draft-submit', onClick: this.saveDraft },
+	        { id: 'cyoag-save-draft-submit', className: 'shaded-border-blue', onClick: this.saveDraft },
 	        'Save Draft'
 	      ),
 	      React.createElement(
 	        'button',
-	        { id: 'cyoag-input-submit', onClick: this.submit },
+	        { id: 'cyoag-input-submit', className: 'shaded-border-green', onClick: this.submit },
 	        'Submit'
 	      )
 	    );
@@ -23799,9 +23835,9 @@
 	    var inputBody = document.getElementById('cyoag-input-body').value;
 	
 	    if (validateInput(inputPath, inputBody, this.props.context.message)) {
-	      this.props.context.inputSubmit(inputPath, inputBody);
 	      this.props.context.setEditsPending(false);
 	      window.onbeforeunload = null;
+	      this.props.context.submitInput(inputPath, inputBody);
 	    }
 	  },
 	  updateBodyCharCount: function () {
@@ -23924,12 +23960,12 @@
 	      ),
 	      React.createElement(
 	        'button',
-	        { id: 'cyoag-input-cancel', className: 'cyoag-side-spaced-button', onClick: this.cancel },
+	        { id: 'cyoag-input-cancel', className: 'cyoag-side-spaced-button shaded-border-red', onClick: this.cancel },
 	        'Cancel'
 	      ),
 	      React.createElement(
 	        'button',
-	        { id: 'cyoag-input-submit', className: 'cyoag-side-spaced-button', onClick: this.submit },
+	        { id: 'cyoag-input-submit', className: 'cyoag-side-spaced-button shaded-border-green', onClick: this.submit },
 	        'Save changes'
 	      )
 	    );
@@ -23940,9 +23976,9 @@
 	
 	    if (validateInput(inputPath, inputBody, this.props.context.message)) {
 	      // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
-	      this.props.context.submitEdits(inputPath, inputBody);
 	      this.props.context.setEditsPending(false);
 	      window.onbeforeunload = null;
+	      this.props.context.submitEdits(inputPath, inputBody);
 	    }
 	  },
 	  updateBodyCharCount: function () {
@@ -24157,8 +24193,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('MarginColumnComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MarginColumnComponents.js');
 	
 	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 183);
 	
@@ -24290,7 +24326,7 @@
 	        { id: 'cyoag-name-change-ui' },
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-swap-name-change-button', onClick: this.swap },
+	          { id: 'cyoag-swap-name-change-button', className: 'shaded-border-blue', onClick: this.swap },
 	          'Customize Your Pen Name'
 	        )
 	      );
@@ -24302,12 +24338,12 @@
 	        React.createElement('br', null),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-swap-name-change-button', className: 'cyoag-side-spaced-button', onClick: this.swap },
+	          { id: 'cyoag-swap-name-change-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: this.swap },
 	          'Cancel'
 	        ),
 	        React.createElement(
 	          'button',
-	          { id: 'cyoag-submit-name-change-button', className: 'cyoag-side-spaced-button', onClick: this.submit },
+	          { id: 'cyoag-submit-name-change-button', className: 'cyoag-side-spaced-button shaded-border-green', onClick: this.submit },
 	          'Submit'
 	        )
 	      );
@@ -24368,8 +24404,8 @@
 	var React = __webpack_require__(/*! react */ 1);
 	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
 	
-	var constants = __webpack_require__(/*! ../../constants */ 175);
-	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 173)('FooterComponents.js');
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('FooterComponents.js');
 	
 	var exports = {};
 	

@@ -59,8 +59,8 @@ var ModificationsComponent = React.createClass({
       return (
         <div id='cyoag-moderator-and-owner-ui'>
           <p id='cyoag-modification-permitted' className='cyoag-note'>You are a moderator and the owner of this chapter, so you have modification privileges.</p>
-          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button' onClick={context.editChapter}>Edit this chapter</button>
-          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button' onClick={context.deleteChapter}>Delete this chapter</button>
+          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button shaded-border-orange' onClick={context.editChapter}>Edit this chapter</button>
+          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button shaded-border-red' onClick={context.deleteChapter}>Delete this chapter</button>
         </div>
       );
     }
@@ -69,8 +69,8 @@ var ModificationsComponent = React.createClass({
       return (
         <div id='cyoag-moderator-ui'>
           <p id='cyoag-modification-permitted' className='cyoag-note'>As a moderator, you have modification privileges. (Original content by user {context.state.snippet.authorName})</p>
-          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button' onClick={context.editChapter}>Edit this chapter</button>
-          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button' onClick={context.deleteChapter}>Delete this chapter</button>
+          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button shaded-border-orange' onClick={context.editChapter}>Edit this chapter</button>
+          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button shaded-border-red' onClick={context.deleteChapter}>Delete this chapter</button>
         </div>
       );
     }
@@ -96,8 +96,8 @@ var ModificationsComponent = React.createClass({
       return (
         <div id='cyoag-owner-ui'>
           <p id='cyoag-modification-permitted' className='cyoag-note'>You authored this chapter, and have modification privileges.</p>
-          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button' onClick={context.editChapter}>Edit this chapter</button>
-          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button' onClick={context.deleteChapter}>Delete this chapter</button>
+          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button shaded-border-orange' onClick={context.editChapter}>Edit this chapter</button>
+          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button shaded-border-red' onClick={context.deleteChapter}>Delete this chapter</button>
         </div>
       );
     }

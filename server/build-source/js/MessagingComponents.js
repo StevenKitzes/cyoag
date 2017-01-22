@@ -62,6 +62,7 @@ var Modal = React.createClass({
     var modalObj = document.getElementById('cyoag-modal-message-container');
     if(modalObj) {
       modalObj.style.display = 'none';
+      this.props.context.message({}); // send an empty message object to clear message state
     }
   },
   render: function() {

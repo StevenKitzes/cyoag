@@ -33,7 +33,7 @@ var TwitterButton = React.createClass({
 var LogoutButton = React.createClass({
   render: function() {
     return (
-      <button id='cyoag-logout-button' onClick={this.props.logoutRequest}>Log Out</button>
+      <button id='cyoag-logout-button' className='shaded-border-red' onClick={this.props.logoutRequest}>Log Out</button>
     );
   }
 });

@@ -83,7 +83,7 @@ var NameChangeComponent = React.createClass({
     if(this.state.nameChange == 'beg') {
       return (
         <div id='cyoag-name-change-ui'>
-          <button id='cyoag-swap-name-change-button' onClick={this.swap}>Customize Your Pen Name</button>
+          <button id='cyoag-swap-name-change-button' className='shaded-border-blue' onClick={this.swap}>Customize Your Pen Name</button>
         </div>
       );
     }
@@ -91,8 +91,8 @@ var NameChangeComponent = React.createClass({
       return (
         <div id='cyoag-name-change-ui'>
           <input id='cyoag-name-input' type='text' placeholder='New name'></input><br />
-          <button id='cyoag-swap-name-change-button' className='cyoag-side-spaced-button' onClick={this.swap}>Cancel</button>
-          <button id='cyoag-submit-name-change-button' className='cyoag-side-spaced-button' onClick={this.submit}>Submit</button>
+          <button id='cyoag-swap-name-change-button' className='cyoag-side-spaced-button shaded-border-red' onClick={this.swap}>Cancel</button>
+          <button id='cyoag-submit-name-change-button' className='cyoag-side-spaced-button shaded-border-green' onClick={this.submit}>Submit</button>
         </div>
       );
     }

@@ -26,9 +26,9 @@ var MainComponent = React.createClass({
   deleteChapter: deleteChapter,
   editChapter: editChapter,
   getInitialState: getDefaultStateObject,
-  inputSubmit: inputSubmit,
   logoutRequest: logoutXhrHandler,
   message: function(msg) {
+    logMgr.debug('incoming message object: ' + JSON.stringify(msg));
     this.setState({
       msg: msg.msg ? msg.msg : null,
       warning: msg.warning ? msg.warning : null,
@@ -46,13 +46,14 @@ var MainComponent = React.createClass({
     context.deleteChapter = this.deleteChapter;
     context.cancelEdit = this.cancelEdit;
     context.editChapter = this.editChapter;
-    context.inputSubmit = this.inputSubmit;
     context.logoutRequest = this.logoutRequest;
     context.message = this.message;
     context.nameChange = this.nameChange;
     context.navigate = this.navigate;
     context.setEditsPending = this.setEditsPending;
     context.saveDraft = this.saveDraft;
+    context.submitEdits = this.submitEdits;
+    context.submitInput = this.submitInput;
     context.votify = this.votify;
 
     var debugStateDisplay = (function(){
@@ -88,6 +89,8 @@ var MainComponent = React.createClass({
     this.editsPending = b;
   },
   saveDraft: saveDraft,
+  submitInput: submitInput,
+  submitEdits: submitEdits,
   votify: votify
 });
 
@@ -395,7 +398,38 @@ function nameChange(newName) {
   xhr.send(xhrPayload);
 }
 
-function inputSubmit(path, body) {
+function submitEdits(path, body) {
+  var savedWindowPosition = getWindowPosition();
+  logMgr.debug('User attempting to edit existing node . . .');
+  var xhr = new XMLHttpRequest();
+  // xmlHttp.onreadystatechange = () => {...}
+  var properThis = this;
+  xhr.onreadystatechange = function() {
+    if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
+      logMgr.debug('Status 200 (or 304)!');
+      logMgr.verbose('Edit submission response payload: ' + xhr.responseText);
+      var response = JSON.parse(xhr.responseText);
+      validateResponse(properThis, response, constants.windowScrollTop);
+    }
+    else {
+      logMgr.debug('Edit submission attempt yielded HTTP response status: ' + xhr.status);
+    }
+  }
+  xhr.open('POST', '/session');
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xhr.timeout = 5000;
+  xhr.ontimeout = function() {
+    xhr.abort();
+    properThis.setState({
+      error: 'Server response timed out; unable to detect result of edit submission attempt.',
+      windowScroll: savedWindowPosition
+    });
+  }
+  var xhrPayload = JSON.stringify({editTarget: properThis.state.nodeUid, updatedPath: path, updatedBody: body});
+  xhr.send(xhrPayload);
+}
+
+function submitInput(path, body) {
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to submit new node . . .');
   var xhr = new XMLHttpRequest();

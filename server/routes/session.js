@@ -148,6 +148,9 @@ router.post('/', function(req, res, next) {
             else if(req.body.hasOwnProperty('deleteTarget')) {
               require('../handlers/handleDeletionRequest')(req, res, connection, session_uid, userRow);
             }
+            else if(req.body.hasOwnProperty('editTarget')) {
+              require('../handlers/handleEditRequest')(req, res, connection, session_uid, userRow);
+            }
             else {
               // If no particular request was detected, simply surface data for user at current location
               logMgr.out('User made no specific request; surfacing chapter data for the current location of the user.');

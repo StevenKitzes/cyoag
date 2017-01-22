@@ -110,8 +110,8 @@ var Input = React.createClass({
             <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
           </div>
         </div>
-        <button id='cyoag-save-draft-submit' onClick={this.saveDraft}>Save Draft</button>
-        <button id='cyoag-input-submit' onClick={this.submit}>Submit</button>
+        <button id='cyoag-save-draft-submit' className='shaded-border-blue' onClick={this.saveDraft}>Save Draft</button>
+        <button id='cyoag-input-submit' className='shaded-border-green' onClick={this.submit}>Submit</button>
       </div>
     );
   },
@@ -133,9 +133,9 @@ var Input = React.createClass({
     var inputBody = document.getElementById('cyoag-input-body').value;
 
     if(validateInput(inputPath, inputBody, this.props.context.message)) {
-      this.props.context.inputSubmit(inputPath, inputBody);
       this.props.context.setEditsPending(false);
       window.onbeforeunload = null;
+      this.props.context.submitInput(inputPath, inputBody);
     }
   },
   updateBodyCharCount: function() {
@@ -226,8 +226,8 @@ var Edit = React.createClass({
             <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
           </div>
         </div>
-        <button id='cyoag-input-cancel' className='cyoag-side-spaced-button' onClick={this.cancel}>Cancel</button>
-        <button id='cyoag-input-submit' className='cyoag-side-spaced-button' onClick={this.submit}>Save changes</button>
+        <button id='cyoag-input-cancel' className='cyoag-side-spaced-button shaded-border-red' onClick={this.cancel}>Cancel</button>
+        <button id='cyoag-input-submit' className='cyoag-side-spaced-button shaded-border-green' onClick={this.submit}>Save changes</button>
       </div>
     );
   },
@@ -237,9 +237,9 @@ var Edit = React.createClass({
 
     if(validateInput(inputPath, inputBody, this.props.context.message)) {
       // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
-      this.props.context.submitEdits(inputPath, inputBody);
       this.props.context.setEditsPending(false);
       window.onbeforeunload = null;
+      this.props.context.submitEdits(inputPath, inputBody);
     }
   },
   updateBodyCharCount: function() {

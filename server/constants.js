@@ -65,6 +65,8 @@ constants.rootNodeUid = 'start';
 constants.rootTrailingSnippet = '... by way of prologue.';
 constants.rootLastPath = 'The writer takes up his pen.';
 
+constants.specialMessage_editSuccess = 'Edits submitted successfully!';
+
 constants.trailingSnippetLength = 200;
 
 constants.visitorName = 'Illustrious Visitor';
