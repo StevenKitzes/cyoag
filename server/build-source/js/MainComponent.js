@@ -329,6 +329,9 @@ function cancelEdit() {
     return;
   }
 
+  window.onbeforeunload = null;
+  this.editsPending = false;
+
   this.setState({
     editMode: false,
     windowScroll: getWindowPosition()
