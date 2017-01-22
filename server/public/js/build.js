@@ -21965,7 +21965,26 @@
 	  cancelEdit: cancelEdit,
 	  componentDidMount: mountXhrHandler,
 	  componentDidUpdate: function () {
-	    restoreScroll(this.state.windowScroll);
+	    if (this.state.editMode) {
+	      // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
+	      var box = document.getElementById('cyoag-input-container').getBoundingClientRect();
+	
+	      var body = document.body;
+	      var docEl = document.documentElement;
+	
+	      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+	      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+	
+	      var clientTop = docEl.clientTop || body.clientTop || 0;
+	      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+	
+	      var top = box.top + scrollTop - clientTop;
+	      var left = box.left + scrollLeft - clientLeft;
+	
+	      window.scrollTo(left, top);
+	    } else {
+	      restoreScroll(this.state.windowScroll);
+	    }
 	  },
 	  componentWillMount: function () {
 	    // this takes place before render
@@ -22029,7 +22048,7 @@
 	      'div',
 	      { id: 'cyoag-react-container' },
 	      React.createElement(HeaderComponents.Header, null),
-	      React.createElement(MessagingComponents.Banner, { context: context }),
+	      React.createElement(MessagingComponents.Banner, { error: this.state.error, warning: this.state.warning, msg: this.state.msg }),
 	      React.createElement(
 	        'div',
 	        { id: 'cyoag-columns' },
@@ -22038,7 +22057,7 @@
 	      ),
 	      React.createElement(FooterComponents.Footer, null),
 	      debugStateDisplay,
-	      React.createElement(MessagingComponents.Modal, { context: context })
+	      React.createElement(MessagingComponents.Modal, { error: this.state.error, warning: this.state.warning, msg: this.state.msg })
 	    );
 	  },
 	  setEditsPending: function (b) {
@@ -22949,28 +22968,30 @@
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
-	    var state = this.props.context.state;
+	    var error = this.props.error;
+	    var warning = this.props.warning;
+	    var msg = this.props.msg;
 	    var className, messageContent;
 	    var bannerObj = document.getElementById('cyoag-message-banner');
 	
-	    if (state.error) {
+	    if (error) {
 	      if (bannerObj) {
 	        bannerObj.style.display = 'block';
 	      }
 	      className = constants.messageErrorClass;
-	      messageContent = state.error;
-	    } else if (state.warning) {
+	      messageContent = error;
+	    } else if (warning) {
 	      if (bannerObj) {
 	        bannerObj.style.display = 'block';
 	      }
 	      className = constants.messageWarningClass;
-	      messageContent = state.warning;
-	    } else if (state.msg) {
+	      messageContent = warning;
+	    } else if (msg) {
 	      if (bannerObj) {
 	        bannerObj.style.display = 'block';
 	      }
 	      className = constants.messageRegularClass;
-	      messageContent = state.msg;
+	      messageContent = msg;
 	    } else {
 	      return React.createElement('div', { id: 'cyoag-message-banner', style: { display: 'none' } });
 	    }
@@ -23001,34 +23022,35 @@
 	    var modalObj = document.getElementById('cyoag-modal-message-container');
 	    if (modalObj) {
 	      modalObj.style.display = 'none';
-	      this.props.context.message({}); // send an empty message object to clear message state
 	    }
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
-	    var state = this.props.context.state;
+	    var error = this.props.error;
+	    var warning = this.props.warning;
+	    var msg = this.props.msg;
 	    var modalType, messageContent;
 	    var modalObj = document.getElementById('cyoag-modal-message-container');
 	
-	    if (state.error) {
+	    if (error) {
 	      if (modalObj) {
 	        modalObj.style.display = 'block';
 	      }
 	      modalType = constants.modalTypeError;
-	      messageContent = state.error;
-	    } else if (state.warning) {
+	      messageContent = error;
+	    } else if (warning) {
 	      if (modalObj) {
 	        modalObj.style.display = 'block';
 	      }
 	      modalType = constants.modalTypeWarning;
-	      messageContent = state.warning;
-	    } else if (state.msg) {
+	      messageContent = warning;
+	    } else if (msg) {
 	      if (modalObj) {
 	        modalObj.style.display = 'block';
 	      }
 	      modalType = constants.modalTypeMessage;
-	      messageContent = state.msg;
+	      messageContent = msg;
 	    } else {
 	      return React.createElement('div', { id: 'cyoag-message-modal', style: { display: 'none' } });
 	    }

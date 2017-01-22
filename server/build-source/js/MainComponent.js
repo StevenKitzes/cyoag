@@ -16,7 +16,27 @@ var MainComponent = React.createClass({
   cancelEdit: cancelEdit,
   componentDidMount: mountXhrHandler,
   componentDidUpdate: function() {
-    restoreScroll(this.state.windowScroll);
+    if(this.state.editMode) {
+      // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
+      var box = document.getElementById('cyoag-input-container').getBoundingClientRect();
+
+      var body = document.body;
+      var docEl = document.documentElement;
+
+      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+      var clientTop = docEl.clientTop || body.clientTop || 0;
+      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+      var top  = box.top +  scrollTop - clientTop;
+      var left = box.left + scrollLeft - clientLeft;
+
+      window.scrollTo(left, top);
+    }
+    else {
+      restoreScroll(this.state.windowScroll);
+    }
   },
   componentWillMount: function() {
     // this takes place before render
@@ -74,14 +94,14 @@ var MainComponent = React.createClass({
     return (
       <div id='cyoag-react-container'>
         <HeaderComponents.Header />
-        <MessagingComponents.Banner context={context} />
+        <MessagingComponents.Banner error={this.state.error} warning={this.state.warning} msg={this.state.msg} />
         <div id='cyoag-columns'>
           <MarginColumnComponents.MarginColumn context={context} />
           <MainColumnComponents.MainColumn context={context} />
         </div>
         <FooterComponents.Footer />
         {debugStateDisplay}
-        <MessagingComponents.Modal context={context} />
+        <MessagingComponents.Modal error={this.state.error} warning={this.state.warning} msg={this.state.msg} />
       </div>
     );
   },

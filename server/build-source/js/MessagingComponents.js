@@ -18,30 +18,32 @@ var Banner = React.createClass({
   render: function() {
     logMgr.verbose('Rendering...');
 
-    var state = this.props.context.state;
+    var error = this.props.error;
+    var warning = this.props.warning;
+    var msg = this.props.msg;
     var className, messageContent;
     var bannerObj = document.getElementById('cyoag-message-banner');
 
-    if(state.error) {
+    if(error) {
       if(bannerObj) {
         bannerObj.style.display = 'block';
       }
       className = constants.messageErrorClass;
-      messageContent = state.error;
+      messageContent = error;
     }
-    else if(state.warning) {
+    else if(warning) {
       if(bannerObj) {
         bannerObj.style.display = 'block';
       }
       className = constants.messageWarningClass;
-      messageContent = state.warning;
+      messageContent = warning;
     }
-    else if(state.msg) {
+    else if(msg) {
       if(bannerObj) {
         bannerObj.style.display = 'block';
       }
       className = constants.messageRegularClass;
-      messageContent = state.msg;
+      messageContent = msg;
     }
     else {
       return(<div id='cyoag-message-banner' style={{display: 'none'}}></div>);
@@ -62,36 +64,37 @@ var Modal = React.createClass({
     var modalObj = document.getElementById('cyoag-modal-message-container');
     if(modalObj) {
       modalObj.style.display = 'none';
-      this.props.context.message({}); // send an empty message object to clear message state
     }
   },
   render: function() {
     logMgr.verbose('Rendering...');
 
-    var state = this.props.context.state;
+    var error = this.props.error;
+    var warning = this.props.warning;
+    var msg = this.props.msg;
     var modalType, messageContent;
     var modalObj = document.getElementById('cyoag-modal-message-container');
 
-    if(state.error) {
+    if(error) {
       if(modalObj) {
         modalObj.style.display = 'block';
       }
       modalType = constants.modalTypeError;
-      messageContent = state.error;
+      messageContent = error;
     }
-    else if(state.warning) {
+    else if(warning) {
       if(modalObj) {
         modalObj.style.display = 'block';
       }
       modalType = constants.modalTypeWarning;
-      messageContent = state.warning;
+      messageContent = warning;
     }
-    else if(state.msg) {
+    else if(msg) {
       if(modalObj) {
         modalObj.style.display = 'block';
       }
       modalType = constants.modalTypeMessage;
-      messageContent = state.msg;
+      messageContent = msg;
     }
     else {
       return(<div id='cyoag-message-modal' style={{display: 'none'}}></div>);
