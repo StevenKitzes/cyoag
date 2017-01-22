@@ -23807,7 +23807,7 @@
 	      ),
 	      React.createElement(
 	        'button',
-	        { id: 'cyoag-save-draft-submit', className: 'shaded-border-blue', onClick: this.saveDraft },
+	        { id: 'cyoag-save-draft-submit', className: 'shaded-border-blue cyoag-hidden', onClick: this.saveDraft },
 	        'Save Draft'
 	      ),
 	      React.createElement(

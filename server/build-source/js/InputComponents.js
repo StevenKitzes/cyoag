@@ -110,7 +110,7 @@ var Input = React.createClass({
             <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
           </div>
         </div>
-        <button id='cyoag-save-draft-submit' className='shaded-border-blue' onClick={this.saveDraft}>Save Draft</button>
+        <button id='cyoag-save-draft-submit' className='shaded-border-blue cyoag-hidden' onClick={this.saveDraft}>Save Draft</button>
         <button id='cyoag-input-submit' className='shaded-border-green' onClick={this.submit}>Submit</button>
       </div>
     );
