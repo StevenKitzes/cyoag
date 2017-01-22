@@ -123,6 +123,8 @@ function checkPendingEdits(editsPending, altConfirmationMessage) {
   // if no edits are pending, return false
   if(!editsPending) {
     logMgr.verbose('But no edits were pending!');
+    // since no edits were actually pending, ensure window.onbeforeunload is null
+    window.onbeforeunload = null;
     return false;
   }
 
@@ -130,6 +132,9 @@ function checkPendingEdits(editsPending, altConfirmationMessage) {
   // if the user says they want to DISCARD saved edits
   if(confirm(confMsg)) {
     logMgr.verbose('User confirmed they are prepared to discard pending edits.');
+    // since user is discarding changes, ensure window.onbeforeunload is null and editsPending is false
+    this.editsPending = false;
+    window.onbeforeunload = null;
     return false;
   }
 
@@ -303,6 +308,7 @@ function deleteChapter() {
 }
 
 function editChapter() {
+  this.message({}); // clear any existing messages when swapping between editMode
   if(checkPendingEdits(this.editsPending, 'You already have work pending on a new chapter!  Do you want to proceed to ' +
     'discard this work, or cancel your request to edit the existing chapter?'))
   {
