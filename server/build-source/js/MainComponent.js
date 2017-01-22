@@ -13,17 +13,42 @@ var FooterComponents = require('./FooterComponents');
 
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
+  cancelEdit: cancelEdit,
   componentDidMount: mountXhrHandler,
   componentDidUpdate: function() {
-    var x = this.state.windowScroll.x, y = this.state.windowScroll.y;
-    logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
-    window.scrollTo(x, y);
+    if(this.state.editMode) {
+      // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
+      var box = document.getElementById('cyoag-input-container').getBoundingClientRect();
+
+      var body = document.body;
+      var docEl = document.documentElement;
+
+      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+
+      var clientTop = docEl.clientTop || body.clientTop || 0;
+      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+
+      var top  = box.top +  scrollTop - clientTop;
+      var left = box.left + scrollLeft - clientLeft;
+
+      window.scrollTo(left, top);
+    }
+    else {
+      restoreScroll(this.state.windowScroll);
+    }
+  },
+  componentWillMount: function() {
+    // this takes place before render
+    this.editsPending = false;
+    window.onbeforeunload = null;
   },
   deleteChapter: deleteChapter,
+  editChapter: editChapter,
   getInitialState: getDefaultStateObject,
-  inputSubmit: inputSubmit,
   logoutRequest: logoutXhrHandler,
   message: function(msg) {
+    logMgr.debug('incoming message object: ' + JSON.stringify(msg));
     this.setState({
       msg: msg.msg ? msg.msg : null,
       warning: msg.warning ? msg.warning : null,
@@ -39,12 +64,16 @@ var MainComponent = React.createClass({
     var context = {};
     context.state = this.state;
     context.deleteChapter = this.deleteChapter;
-    context.inputSubmit = this.inputSubmit;
+    context.cancelEdit = this.cancelEdit;
+    context.editChapter = this.editChapter;
     context.logoutRequest = this.logoutRequest;
     context.message = this.message;
     context.nameChange = this.nameChange;
     context.navigate = this.navigate;
+    context.setEditsPending = this.setEditsPending;
     context.saveDraft = this.saveDraft;
+    context.submitEdits = this.submitEdits;
+    context.submitInput = this.submitInput;
     context.votify = this.votify;
 
     var debugStateDisplay = (function(){
@@ -65,24 +94,64 @@ var MainComponent = React.createClass({
     return (
       <div id='cyoag-react-container'>
         <HeaderComponents.Header />
-        <MessagingComponents.Banner context={context} />
+        <MessagingComponents.Banner error={this.state.error} warning={this.state.warning} msg={this.state.msg} />
         <div id='cyoag-columns'>
           <MarginColumnComponents.MarginColumn context={context} />
           <MainColumnComponents.MainColumn context={context} />
         </div>
         <FooterComponents.Footer />
         {debugStateDisplay}
-        <MessagingComponents.Modal context={context} />
+        <MessagingComponents.Modal error={this.state.error} warning={this.state.warning} msg={this.state.msg} />
       </div>
     );
   },
+  setEditsPending: function(b) {
+    this.editsPending = b;
+  },
   saveDraft: saveDraft,
+  submitInput: submitInput,
+  submitEdits: submitEdits,
   votify: votify
 });
 
 module.exports = MainComponent;
 
+// returns true if user DOES want to RETAIN pending edits (and cancel requested action)
+// returns false if user wants to DISCARD pending edits (and continue with requested action) or if there are no pending edits
+function checkPendingEdits(editsPending, altConfirmationMessage) {
+  logMgr.verbose('Confirming whether user wants to discard pending edits.');
+  // if no edits are pending, return false
+  if(!editsPending) {
+    logMgr.verbose('But no edits were pending!');
+    // since no edits were actually pending, ensure window.onbeforeunload is null
+    window.onbeforeunload = null;
+    return false;
+  }
+
+  var confMsg = altConfirmationMessage ? altConfirmationMessage : constants.confirmDiscardUnsavedEdits;
+  // if the user says they want to DISCARD saved edits
+  if(confirm(confMsg)) {
+    logMgr.verbose('User confirmed they are prepared to discard pending edits.');
+    // since user is discarding changes, ensure window.onbeforeunload is null and editsPending is false
+    this.editsPending = false;
+    window.onbeforeunload = null;
+    return false;
+  }
+
+  // edits are pending, and the user does NOT want to discard them
+  logMgr.verbose('Edits are pending and the user does not want to discard them.');
+  return true;
+}
+
 function mountXhrHandler() {
+  if(checkPendingEdits(this.editsPending)) {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('Checking session status . . .');
   var xhr = new XMLHttpRequest();
@@ -113,6 +182,14 @@ function mountXhrHandler() {
 }
 
 function logoutXhrHandler() {
+  if(checkPendingEdits(this.editsPending)) {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('Logging out current user . . .');
   var xhr = new XMLHttpRequest();
@@ -143,11 +220,19 @@ function logoutXhrHandler() {
 }
 
 function navigateXhrHandler(nodeUid) {
-  if(nodeUid == null) {
-    logMgr.error('Missing node ID in navigation attempt.');
+  if(checkPendingEdits(this.editsPending)) {
     return;
   }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   var savedWindowPosition = getWindowPosition();
+  if(nodeUid == null) {
+    this.message({error: 'Missing node ID in navigation attempt.'});
+    return;
+  }
   logMgr.debug('User attempting to navigate story nodes . . .');
   var xhr = new XMLHttpRequest();
   // xmlHttp.onreadystatechange = () => {...}
@@ -178,6 +263,20 @@ function navigateXhrHandler(nodeUid) {
 }
 
 function deleteChapter() {
+  if(!confirm('Are you positive you want to delete this chapter?  This can only be undone by a CYOAG administrator ' +
+  '(not even by a moderator)!'))
+  {
+    return;
+  }
+
+  if(checkPendingEdits(this.editsPending)) {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to delete a story node . . .');
   var xhr = new XMLHttpRequest();
@@ -208,7 +307,47 @@ function deleteChapter() {
   xhr.send(xhrPayload);
 }
 
+function editChapter() {
+  this.message({}); // clear any existing messages when swapping between editMode
+  if(checkPendingEdits(this.editsPending, 'You already have work pending on a new chapter!  Do you want to proceed to ' +
+    'discard this work, or cancel your request to edit the existing chapter?'))
+  {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+  }
+
+  this.setState({
+    editMode: true,
+    windowScroll: getWindowPosition()
+  });
+}
+function cancelEdit() {
+  if(checkPendingEdits(this.editsPending)) {
+    return;
+  }
+
+  this.setState({
+    editMode: false,
+    windowScroll: getWindowPosition()
+  });
+}
+
 function votify(nodeUid, newVote) {
+  if(checkPendingEdits(this.editsPending,
+    'Voting can cause pending edits to be lost ... you might want to vote after your edits are submitted! ' +
+    'Do you still want to vote now (dangerous), or would you like to cancel your vote until you are done editing (safe)?'))
+  {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+    resetNewChapterInputs();  // don't keep unsaved changes lying around once listeners are disabled
+  }
+
   var savedWindowPosition = getWindowPosition();
   if(nodeUid == null || newVote == null) {
     logMgr.error('Relevant parameters missing in votification call.');
@@ -244,6 +383,17 @@ function votify(nodeUid, newVote) {
 }
 
 function nameChange(newName) {
+  if(checkPendingEdits(this.editsPending, 'Changing your name will trigger a page reload ... you might want to change your ' +
+    'name after submitting your edits!  Do you want to proceed with changing your name and discarding your unsaved work?'))
+  {
+    return;
+  }
+  else {
+    this.editsPending = false;
+    window.onbeforeunload = null;
+    resetNewChapterInputs();  // don't keep unsaved changes lying around once listeners are disabled
+  }
+
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to update their name . . .');
   var xhr = new XMLHttpRequest();
@@ -274,7 +424,38 @@ function nameChange(newName) {
   xhr.send(xhrPayload);
 }
 
-function inputSubmit(path, body) {
+function submitEdits(path, body) {
+  var savedWindowPosition = getWindowPosition();
+  logMgr.debug('User attempting to edit existing node . . .');
+  var xhr = new XMLHttpRequest();
+  // xmlHttp.onreadystatechange = () => {...}
+  var properThis = this;
+  xhr.onreadystatechange = function() {
+    if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
+      logMgr.debug('Status 200 (or 304)!');
+      logMgr.verbose('Edit submission response payload: ' + xhr.responseText);
+      var response = JSON.parse(xhr.responseText);
+      validateResponse(properThis, response, constants.windowScrollTop);
+    }
+    else {
+      logMgr.debug('Edit submission attempt yielded HTTP response status: ' + xhr.status);
+    }
+  }
+  xhr.open('POST', '/session');
+  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+  xhr.timeout = 5000;
+  xhr.ontimeout = function() {
+    xhr.abort();
+    properThis.setState({
+      error: 'Server response timed out; unable to detect result of edit submission attempt.',
+      windowScroll: savedWindowPosition
+    });
+  }
+  var xhrPayload = JSON.stringify({editTarget: properThis.state.nodeUid, updatedPath: path, updatedBody: body});
+  xhr.send(xhrPayload);
+}
+
+function submitInput(path, body) {
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to submit new node . . .');
   var xhr = new XMLHttpRequest();
@@ -446,6 +627,7 @@ function validateResponse(properThis, response, newWindowPosition) {
     snippet: response.snippet,
     paths: response.paths,
     inputBlocking: response.inputBlocking,
+    editMode: false,  // always reset this to false when taking in response from server
     msg: response.msg ? response.msg : null,
     warning: response.warning ? response.warning : null,
     error: response.error ? response.error : null,
@@ -490,6 +672,7 @@ function getDefaultStateObject() {
     },
     paths: [],
     inputBlocking: constants.inputBlockingHide,
+    editMode: false,
     msg: null,
     warning: null,
     error: null,
@@ -512,11 +695,23 @@ function getErrorStateObject(errorMessage) {
     },
     paths: [],
     inputBlocking: constants.inputBlockingHide,
+    editMode: false,
     msg: null,
     warning: null,
     error: errorMessage,
     windowScroll: constants.windowScrollTop
   };
+}
+
+function resetNewChapterInputs() {
+  var inputPathElement = document.getElementById('cyoag-input-path');
+  var inputBodyElement = document.getElementById('cyoag-input-body');
+  if(inputPathElement) {
+    inputPathElement.value = '';
+  }
+  if(inputBodyElement) {
+    inputBodyElement.value = '';
+  }
 }
 
 // this function returns a JSON object consisting of window scroll position as {x: #, y: #}
@@ -535,4 +730,10 @@ function getWindowPosition() {
   }
   logMgr.verbose('Got window scroll position: ' + JSON.stringify(pos));
   return pos;
+}
+
+function restoreScroll(scrollCoord) {
+  var x = scrollCoord.x, y = scrollCoord.y;
+  logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
+  window.scrollTo(x, y);
 }

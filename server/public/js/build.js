@@ -504,13 +504,825 @@ function(e,t,n){"use strict";function o(e){for(var t;(t=e._renderedNodeType)===r
 function(e,t,n){"use strict";var o=n(/*! ./ReactMount */155);e.exports=o.renderSubtreeIntoContainer},/*!******************************************!*\
   !*** ./build-source/js/MainComponent.js ***!
   \******************************************/
+<<<<<<< HEAD
 function(e,t,n){function o(){var e=m();b.debug("Checking session status . . .");var t=new XMLHttpRequest,n=this;t.onreadystatechange=function(){if(4!=t.readyState||200!=t.status&&304!=t.status)b.debug("Initial cookie check yielded HTTP response status: "+t.status);else{b.debug("Status 200 (or 304)!"),b.verbose("Cookie check response payload: "+t.responseText);var e=JSON.parse(t.responseText);p(n,e,y.windowScrollTop)}},t.open("POST","/session"),t.setRequestHeader("Content-Type","application/json;charset=UTF-8"),t.timeout=5e3,t.ontimeout=function(){t.abort(),n.setState({error:"Server response timed out; unable to detect your login status.",windowScroll:e})},t.send()}function r(){var e=m();b.debug("Logging out current user . . .");var t=new XMLHttpRequest,n=this;t.onreadystatechange=function(){if(4!=t.readyState||200!=t.status&&304!=t.status)b.debug("Logout attempt yielded HTTP response status: "+t.status);else{b.debug("Status 200 (or 304)!"),b.verbose("Logout response payload: "+t.responseText);var e=JSON.parse(t.responseText);p(n,e,y.windowScrollTop)}},t.open("GET","/session/logout"),t.setRequestHeader("Content-Type","application/json;charset=UTF-8"),t.timeout=5e3,t.ontimeout=function(){t.abort(),n.setState({error:"Server response timed out; unable to detect your login status.",windowScroll:e})},t.send()}function a(e){if(null==e)return void b.error("Missing node ID in navigation attempt.");var t=m();b.debug("User attempting to navigate story nodes . . .");var n=new XMLHttpRequest,o=this;n.onreadystatechange=function(){if(4!=n.readyState||200!=n.status&&304!=n.status)b.debug("Navigation attempt yielded HTTP response status: "+n.status);else{b.debug("Status 200 (or 304)!"),b.verbose("Navigation response payload: "+n.responseText);var e=JSON.parse(n.responseText);p(o,e,y.windowScrollTop)}},n.open("POST","/session"),n.setRequestHeader("Content-Type","application/json;charset=UTF-8"),n.timeout=5e3,n.ontimeout=function(){n.abort(),o.setState({error:"Server response timed out; unable to detect your login status.",windowScroll:t})};var r=JSON.stringify({navigate:e});n.send(r)}function i(){var e=m();b.debug("User attempting to delete a story node . . .");var t=new XMLHttpRequest,n=this;t.onreadystatechange=function(){if(4!=t.readyState||200!=t.status&&304!=t.status)b.debug("Deletion attempt yielded HTTP response status: "+t.status);else{b.debug("Status 200 (or 304)!"),b.verbose("Deletion response payload: "+t.responseText);var e=JSON.parse(t.responseText);p(n,e,y.windowScrollTop)}},t.open("POST","/session"),t.setRequestHeader("Content-Type","application/json;charset=UTF-8"),t.timeout=5e3,t.ontimeout=function(){t.abort(),n.setState({error:"Server response timed out; unable to detect result of deletion attempt.",windowScroll:e})};var o=JSON.stringify({deleteTarget:n.state.nodeUid});t.send(o)}function s(e,t){var n=m();if(null==e||null==t)return void b.error("Relevant parameters missing in votification call.");b.debug("User attempting to votify a story node . . .");var o=new XMLHttpRequest,r=this;o.onreadystatechange=function(){if(4!=o.readyState||200!=o.status&&304!=o.status)b.debug("Votification attempt yielded HTTP response status: "+o.status);else{b.debug("Status 200 (or 304)!"),b.verbose("Votification response payload: "+o.responseText);var e=JSON.parse(o.responseText);p(r,e,n)}},o.open("POST","/session"),o.setRequestHeader("Content-Type","application/json;charset=UTF-8"),o.timeout=5e3,o.ontimeout=function(){o.abort(),r.setState({error:"Server response timed out; unable to detect result of votification attempt.",windowScroll:n})};var a=JSON.stringify({votify:e,newVote:t});o.send(a)}function u(e){var t=m();b.debug("User attempting to update their name . . .");var n=new XMLHttpRequest,o=this;n.onreadystatechange=function(){if(4!=n.readyState||200!=n.status&&304!=n.status)b.debug("Name change attempt yielded HTTP response status: "+n.status);else{b.debug("Status 200 (or 304)!"),b.verbose("Name change response payload: "+n.responseText);var e=JSON.parse(n.responseText);p(o,e,t)}},n.open("POST","/session"),n.setRequestHeader("Content-Type","application/json;charset=UTF-8"),n.timeout=5e3,n.ontimeout=function(){n.abort(),o.setState({error:"Server response timed out; unable to detect result of name change attempt.",windowScroll:t})};var r=JSON.stringify({newName:e});n.send(r)}function l(e,t){var n=m();b.debug("User attempting to submit new node . . .");var o=new XMLHttpRequest,r=this;o.onreadystatechange=function(){if(4!=o.readyState||200!=o.status&&304!=o.status)b.debug("Node submission attempt yielded HTTP response status: "+o.status);else{b.debug("Status 200 (or 304)!"),b.verbose("Node submission response payload: "+o.responseText);var e=JSON.parse(o.responseText);p(r,e,y.windowScrollTop)}},o.open("POST","/session"),o.setRequestHeader("Content-Type","application/json;charset=UTF-8"),o.timeout=5e3,o.ontimeout=function(){o.abort(),r.setState({error:"Server response timed out; unable to detect result of node submission attempt.",windowScroll:n})};var a=JSON.stringify({newNodePath:e,newNodeBody:t});o.send(a)}function c(e,t){var n=m();b.debug("User attempting to save draft . . .");var o=new XMLHttpRequest,r=this;o.onreadystatechange=function(){if(4!=o.readyState||200!=o.status&&304!=o.status)b.debug("Draft salvation attempt yielded HTTP response status: "+o.status);else{b.debug("Status 200 (or 304)!"),b.verbose("Draft salvation response payload: "+o.responseText);var e=JSON.parse(o.responseText);p(r,e,y.windowScrollTop)}},o.open("POST","/session"),o.setRequestHeader("Content-Type","application/json;charset=UTF-8"),o.timeout=5e3,o.ontimeout=function(){o.abort(),r.setState({error:"Server response timed out; unable to verify that your draft was saved.",windowScroll:n})};var a=JSON.stringify({draftPath:e,draftBody:t});o.send(a)}function p(e,t,n){if(!d(e,t,n)){if(b.debug("Attempting to validate response from server . . ."),!t){var o="Got no valid response object from server whatsoever.";return b.out(o),void e.setState(h(o))}if(t.error)return b.out(t.error),void e.setState(h(t.error));if(!t.hasOwnProperty("nodeUid")){var o="Could not get story node data from server.";return b.out(o),void e.setState(h(o))}if(!t.hasOwnProperty("parentUid")){var o="Could not retrieve node lineage data from server.";return b.out(o),void e.setState(h(o))}if(!t.hasOwnProperty("acctType")){var o="Could not get user account type from server.";return b.out(o),void e.setState(h(o))}if(!t.hasOwnProperty("userName")){var o="Could not get user data from server.";return b.out(o),void e.setState(h(o))}if(!t.hasOwnProperty("votification")||t.votification!=y.votificationNone&&t.votification!=y.votificationUp&&t.votification!=y.votificationDown){var o="Could not retrieve votification status from the server.";return b.out(o),void e.setState(h(o))}if(!t.hasOwnProperty("paths")){var o="Could not retrieve pathing information from server.";return b.out(o),void e.setState(h(o))}if(!t.hasOwnProperty("snippet")){var o="Could not retrieve snippet data from server.";return b.out(o),void e.setState(h(o))}if(!(t.snippet.hasOwnProperty("trailingSnippet")&&t.snippet.hasOwnProperty("lastPath")&&t.snippet.hasOwnProperty("nodeSnippet")&&t.snippet.hasOwnProperty("authorName"))){var o="Some snippet details were missing in response from server.";return b.out(o),void e.setState(h(o))}if(!t.hasOwnProperty("inputBlocking")){var o="Could not retrieve input permissions from server.";return b.out(o),void e.setState(h(o))}if(!t.inputBlocking.hasOwnProperty("top")||!t.inputBlocking.hasOwnProperty("side")){var o="Path authorship details were missing in response from server.";return b.out(o),void e.setState(h(o))}b.verbose("Trying to set state after validation: "+JSON.stringify(t)),e.setState({nodeUid:t.nodeUid,parentUid:t.parentUid,userName:t.userName,acctType:t.acctType,votification:t.votification,snippet:t.snippet,paths:t.paths,inputBlocking:t.inputBlocking,msg:t.msg?t.msg:null,warning:t.warning?t.warning:null,error:t.error?t.error:null,windowScroll:n||y.windowScrollTop}),b.verbose("State was set successfully after validation!"),b.verbose("New state: "+JSON.stringify(e.state))}}function d(e,t,n){return!!t.messageOnly&&(b.verbose("Got message-only response."),e.setState({msg:null,warning:null,error:null}),e.setState({msg:t.msg?t.msg:null,warning:t.warning?t.warning:null,error:t.error?t.error:null,windowScroll:n||y.windowScrollTop}),!0)}function f(){return{nodeUid:y.defaultNodeUid,parentUid:y.defaultParentUid,userName:y.defaultUserName,acctType:y.acctTypeVisitor,votification:y.votificationNone,snippet:{trailingSnippet:y.defaultTrailingSnippet,lastPath:y.defaultLastPath,nodeSnippet:y.defaultNodeSnippet,authorName:y.displayNameUnknown},paths:[],inputBlocking:y.inputBlockingHide,msg:null,warning:null,error:null,windowScroll:y.windowScrollTop}}function h(e){return{nodeUid:y.errorNodeUid,parentUid:y.errorNodeUid,userName:y.errorUserName,acctType:y.acctTypeVisitor,votification:y.votificationNone,snippet:{trailingSnippet:y.errorTrailingSnippet,lastPath:y.errorLastPath,nodeSnippet:y.errorNodeSnippet+"  "+e,authorName:y.displayNameUnknown},paths:[],inputBlocking:y.inputBlockingHide,msg:null,warning:null,error:e,windowScroll:y.windowScrollTop}}function m(){var e=document.documentElement;b.verbose("window.pageXOffset: "+window.pageXOffset),b.verbose("window.pageYOffset: "+window.pageYOffset),b.verbose("doc.scrollLeft: "+e.scrollLeft),b.verbose("doc.scrollTop: "+e.scrollTop),b.verbose("doc.clientLeft: "+e.clientLeft),b.verbose("doc.clientTop: "+e.clientTop);var t={x:(window.pageXOffset||e.scrollLeft)-(e.clientLeft||0),y:(window.pageYOffset||e.scrollTop)-(e.clientTop||0)};return b.verbose("Got window scroll position: "+JSON.stringify(t)),t}var g=n(/*! react */1),v=(n(/*! react-dom */30),n(/*! ../../build-config */164)),y=n(/*! ../../constants */165),b=n(/*! ../../utils/browserLogger */167)("MainComponent.js"),C=n(/*! ./HeaderComponents */168),E=n(/*! ./MessagingComponents */169),_=n(/*! ./MainColumnComponents */170),w=n(/*! ./MarginColumnComponents */177),T=n(/*! ./FooterComponents */178),x=g.createClass({displayName:"MainComponent",componentDidMount:o,componentDidUpdate:function(){var e=this.state.windowScroll.x,t=this.state.windowScroll.y;b.verbose("Attempting to restore scroll position: "+e+", "+t),window.scrollTo(e,t)},deleteChapter:i,getInitialState:f,inputSubmit:l,logoutRequest:r,message:function(e){this.setState({msg:e.msg?e.msg:null,warning:e.warning?e.warning:null,error:e.error?e.error:null,windowScroll:m()})},nameChange:u,navigate:a,render:function(){b.verbose("Rendering...");var e={};e.state=this.state,e.deleteChapter=this.deleteChapter,e.inputSubmit=this.inputSubmit,e.logoutRequest=this.logoutRequest,e.message=this.message,e.nameChange=this.nameChange,e.navigate=this.navigate,e.saveDraft=this.saveDraft,e.votify=this.votify;var t=function(){return v.DEBUG?g.createElement("div",{id:"cyoag-debug-state-display"},g.createElement("br",null),g.createElement("hr",null),g.createElement("h4",null,"Debug mode enabled! Current app state:"),g.createElement("hr",null),JSON.stringify(e.state)):g.createElement("div",{id:"cyoag-debug-state-display"})}();return g.createElement("div",{id:"cyoag-react-container"},g.createElement(C.Header,null),g.createElement(E.Banner,{context:e}),g.createElement("div",{id:"cyoag-columns"},g.createElement(w.MarginColumn,{context:e}),g.createElement(_.MainColumn,{context:e})),g.createElement(T.Footer,null),t,g.createElement(E.Modal,{context:e}))},saveDraft:c,votify:s});e.exports=x},/*!*************************!*\
+=======
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var config = __webpack_require__(/*! ../../build-config */ 173);
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainComponent.js');
+	
+	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 177);
+	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 178);
+	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 179);
+	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 186);
+	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 187);
+	
+	// Hello World component: display a simple prop
+	var MainComponent = React.createClass({
+	  displayName: 'MainComponent',
+	
+	  cancelEdit: cancelEdit,
+	  componentDidMount: mountXhrHandler,
+	  componentDidUpdate: function () {
+	    if (this.state.editMode) {
+	      // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
+	      var box = document.getElementById('cyoag-input-container').getBoundingClientRect();
+	
+	      var body = document.body;
+	      var docEl = document.documentElement;
+	
+	      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+	      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+	
+	      var clientTop = docEl.clientTop || body.clientTop || 0;
+	      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+	
+	      var top = box.top + scrollTop - clientTop;
+	      var left = box.left + scrollLeft - clientLeft;
+	
+	      window.scrollTo(left, top);
+	    } else {
+	      restoreScroll(this.state.windowScroll);
+	    }
+	  },
+	  componentWillMount: function () {
+	    // this takes place before render
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  },
+	  deleteChapter: deleteChapter,
+	  editChapter: editChapter,
+	  getInitialState: getDefaultStateObject,
+	  logoutRequest: logoutXhrHandler,
+	  message: function (msg) {
+	    logMgr.debug('incoming message object: ' + JSON.stringify(msg));
+	    this.setState({
+	      msg: msg.msg ? msg.msg : null,
+	      warning: msg.warning ? msg.warning : null,
+	      error: msg.error ? msg.error : null,
+	      windowScroll: getWindowPosition()
+	    });
+	  },
+	  nameChange: nameChange,
+	  navigate: navigateXhrHandler,
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var context = {};
+	    context.state = this.state;
+	    context.deleteChapter = this.deleteChapter;
+	    context.cancelEdit = this.cancelEdit;
+	    context.editChapter = this.editChapter;
+	    context.logoutRequest = this.logoutRequest;
+	    context.message = this.message;
+	    context.nameChange = this.nameChange;
+	    context.navigate = this.navigate;
+	    context.setEditsPending = this.setEditsPending;
+	    context.saveDraft = this.saveDraft;
+	    context.submitEdits = this.submitEdits;
+	    context.submitInput = this.submitInput;
+	    context.votify = this.votify;
+	
+	    var debugStateDisplay = function () {
+	      if (config.DEBUG) {
+	        return React.createElement(
+	          'div',
+	          { id: 'cyoag-debug-state-display' },
+	          React.createElement('br', null),
+	          React.createElement('hr', null),
+	          React.createElement(
+	            'h4',
+	            null,
+	            'Debug mode enabled! Current app state:'
+	          ),
+	          React.createElement('hr', null),
+	          JSON.stringify(context.state)
+	        );
+	      } else {
+	        return React.createElement('div', { id: 'cyoag-debug-state-display' });
+	      }
+	    }();
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-react-container' },
+	      React.createElement(HeaderComponents.Header, null),
+	      React.createElement(MessagingComponents.Banner, { error: this.state.error, warning: this.state.warning, msg: this.state.msg }),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-columns' },
+	        React.createElement(MarginColumnComponents.MarginColumn, { context: context }),
+	        React.createElement(MainColumnComponents.MainColumn, { context: context })
+	      ),
+	      React.createElement(FooterComponents.Footer, null),
+	      debugStateDisplay,
+	      React.createElement(MessagingComponents.Modal, { error: this.state.error, warning: this.state.warning, msg: this.state.msg })
+	    );
+	  },
+	  setEditsPending: function (b) {
+	    this.editsPending = b;
+	  },
+	  saveDraft: saveDraft,
+	  submitInput: submitInput,
+	  submitEdits: submitEdits,
+	  votify: votify
+	});
+	
+	module.exports = MainComponent;
+	
+	// returns true if user DOES want to RETAIN pending edits (and cancel requested action)
+	// returns false if user wants to DISCARD pending edits (and continue with requested action) or if there are no pending edits
+	function checkPendingEdits(editsPending, altConfirmationMessage) {
+	  logMgr.verbose('Confirming whether user wants to discard pending edits.');
+	  // if no edits are pending, return false
+	  if (!editsPending) {
+	    logMgr.verbose('But no edits were pending!');
+	    // since no edits were actually pending, ensure window.onbeforeunload is null
+	    window.onbeforeunload = null;
+	    return false;
+	  }
+	
+	  var confMsg = altConfirmationMessage ? altConfirmationMessage : constants.confirmDiscardUnsavedEdits;
+	  // if the user says they want to DISCARD saved edits
+	  if (confirm(confMsg)) {
+	    logMgr.verbose('User confirmed they are prepared to discard pending edits.');
+	    // since user is discarding changes, ensure window.onbeforeunload is null and editsPending is false
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	    return false;
+	  }
+	
+	  // edits are pending, and the user does NOT want to discard them
+	  logMgr.verbose('Edits are pending and the user does not want to discard them.');
+	  return true;
+	}
+	
+	function mountXhrHandler() {
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
+	  var savedWindowPosition = getWindowPosition();
+	  logMgr.debug('Checking session status . . .');
+	  var xhr = new XMLHttpRequest();
+	  var properThis = this;
+	  // xmlHttp.onreadystatechange = () => {...}
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Cookie check response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, constants.windowScrollTop);
+	    } else {
+	      logMgr.debug('Initial cookie check yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect your login status.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  xhr.send();
+	}
+	
+	function logoutXhrHandler() {
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
+	  var savedWindowPosition = getWindowPosition();
+	  logMgr.debug('Logging out current user . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Logout response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, constants.windowScrollTop);
+	    } else {
+	      logMgr.debug('Logout attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('GET', '/session/logout');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect your login status.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  xhr.send();
+	}
+	
+	function navigateXhrHandler(nodeUid) {
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
+	  var savedWindowPosition = getWindowPosition();
+	  if (nodeUid == null) {
+	    this.message({ error: 'Missing node ID in navigation attempt.' });
+	    return;
+	  }
+	  logMgr.debug('User attempting to navigate story nodes . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Navigation response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, constants.windowScrollTop);
+	    } else {
+	      logMgr.debug('Navigation attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect your login status.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  var xhrPayload = JSON.stringify({ navigate: nodeUid });
+	  xhr.send(xhrPayload);
+	}
+	
+	function deleteChapter() {
+	  if (!confirm('Are you positive you want to delete this chapter?  This can only be undone by a CYOAG administrator ' + '(not even by a moderator)!')) {
+	    return;
+	  }
+	
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
+	  var savedWindowPosition = getWindowPosition();
+	  logMgr.debug('User attempting to delete a story node . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Deletion response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, constants.windowScrollTop);
+	    } else {
+	      logMgr.debug('Deletion attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of deletion attempt.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  var xhrPayload = JSON.stringify({ deleteTarget: properThis.state.nodeUid });
+	  xhr.send(xhrPayload);
+	}
+	
+	function editChapter() {
+	  this.message({}); // clear any existing messages when swapping between editMode
+	  if (checkPendingEdits(this.editsPending, 'You already have work pending on a new chapter!  Do you want to proceed to ' + 'discard this work, or cancel your request to edit the existing chapter?')) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	  }
+	
+	  this.setState({
+	    editMode: true,
+	    windowScroll: getWindowPosition()
+	  });
+	}
+	function cancelEdit() {
+	  if (checkPendingEdits(this.editsPending)) {
+	    return;
+	  }
+	
+	  this.setState({
+	    editMode: false,
+	    windowScroll: getWindowPosition()
+	  });
+	}
+	
+	function votify(nodeUid, newVote) {
+	  if (checkPendingEdits(this.editsPending, 'Voting can cause pending edits to be lost ... you might want to vote after your edits are submitted! ' + 'Do you still want to vote now (dangerous), or would you like to cancel your vote until you are done editing (safe)?')) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	    resetNewChapterInputs(); // don't keep unsaved changes lying around once listeners are disabled
+	  }
+	
+	  var savedWindowPosition = getWindowPosition();
+	  if (nodeUid == null || newVote == null) {
+	    logMgr.error('Relevant parameters missing in votification call.');
+	    return;
+	  }
+	  logMgr.debug('User attempting to votify a story node . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Votification response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, savedWindowPosition);
+	    } else {
+	      logMgr.debug('Votification attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of votification attempt.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  var xhrPayload = JSON.stringify({ votify: nodeUid, newVote: newVote });
+	  xhr.send(xhrPayload);
+	}
+	
+	function nameChange(newName) {
+	  if (checkPendingEdits(this.editsPending, 'Changing your name will trigger a page reload ... you might want to change your ' + 'name after submitting your edits!  Do you want to proceed with changing your name and discarding your unsaved work?')) {
+	    return;
+	  } else {
+	    this.editsPending = false;
+	    window.onbeforeunload = null;
+	    resetNewChapterInputs(); // don't keep unsaved changes lying around once listeners are disabled
+	  }
+	
+	  var savedWindowPosition = getWindowPosition();
+	  logMgr.debug('User attempting to update their name . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Name change response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, savedWindowPosition);
+	    } else {
+	      logMgr.debug('Name change attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of name change attempt.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  var xhrPayload = JSON.stringify({ newName: newName });
+	  xhr.send(xhrPayload);
+	}
+	
+	function submitEdits(path, body) {
+	  var savedWindowPosition = getWindowPosition();
+	  logMgr.debug('User attempting to edit existing node . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Edit submission response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, constants.windowScrollTop);
+	    } else {
+	      logMgr.debug('Edit submission attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of edit submission attempt.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  var xhrPayload = JSON.stringify({ editTarget: properThis.state.nodeUid, updatedPath: path, updatedBody: body });
+	  xhr.send(xhrPayload);
+	}
+	
+	function submitInput(path, body) {
+	  var savedWindowPosition = getWindowPosition();
+	  logMgr.debug('User attempting to submit new node . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Node submission response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, constants.windowScrollTop);
+	    } else {
+	      logMgr.debug('Node submission attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to detect result of node submission attempt.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  var xhrPayload = JSON.stringify({ newNodePath: path, newNodeBody: body });
+	  xhr.send(xhrPayload);
+	}
+	
+	function saveDraft(path, body) {
+	  var savedWindowPosition = getWindowPosition();
+	  logMgr.debug('User attempting to save draft . . .');
+	  var xhr = new XMLHttpRequest();
+	  // xmlHttp.onreadystatechange = () => {...}
+	  var properThis = this;
+	  xhr.onreadystatechange = function () {
+	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      logMgr.debug('Status 200 (or 304)!');
+	      logMgr.verbose('Draft salvation response payload: ' + xhr.responseText);
+	      var response = JSON.parse(xhr.responseText);
+	      validateResponse(properThis, response, constants.windowScrollTop);
+	    } else {
+	      logMgr.debug('Draft salvation attempt yielded HTTP response status: ' + xhr.status);
+	    }
+	  };
+	  xhr.open('POST', '/session');
+	  xhr.setRequestHeader('Content-Type', 'application/json;charset=UTF-8');
+	  xhr.timeout = 5000;
+	  xhr.ontimeout = function () {
+	    xhr.abort();
+	    properThis.setState({
+	      error: 'Server response timed out; unable to verify that your draft was saved.',
+	      windowScroll: savedWindowPosition
+	    });
+	  };
+	  var xhrPayload = JSON.stringify({ draftPath: path, draftBody: body });
+	  xhr.send(xhrPayload);
+	}
+	
+	// scrollTop tells us whether we want to scroll the window to the top after validating and initializing a React re-render
+	function validateResponse(properThis, response, newWindowPosition) {
+	  if (validateMessageResponse(properThis, response, newWindowPosition)) {
+	    return;
+	  }
+	
+	  logMgr.debug('Attempting to validate response from server . . .');
+	  if (!response) {
+	    // wow... if you don't even get a response, something is nightmarishly wrong
+	    var errorMessage = 'Got no valid response object from server whatsoever.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (response.error) {
+	    // set an error state based on the returned error
+	    logMgr.out(response.error);
+	    properThis.setState(getErrorStateObject(response.error));
+	    return;
+	  }
+	  if (!response.hasOwnProperty('nodeUid')) {
+	    // can't even determine where we are; set error state, display error content
+	    var errorMessage = 'Could not get story node data from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.hasOwnProperty('parentUid')) {
+	    // can't determine current node's parent; set error state, display error content
+	    var errorMessage = 'Could not retrieve node lineage data from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.hasOwnProperty('acctType')) {
+	    // can't determine account type; set err, display err content
+	    var errorMessage = 'Could not get user account type from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.hasOwnProperty('userName')) {
+	    // can't figure out user's name; set err, display err content
+	    var errorMessage = 'Could not get user data from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.hasOwnProperty('votification') || response.votification != constants.votificationNone && response.votification != constants.votificationUp && response.votification != constants.votificationDown) {
+	    // can't determine votification status; set err, display err content
+	    var errorMessage = 'Could not retrieve votification status from the server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.hasOwnProperty('paths')) {
+	    // no paths given, set error state and display error content
+	    var errorMessage = 'Could not retrieve pathing information from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.hasOwnProperty('snippet')) {
+	    // no snippet to display, set error state and display error content
+	    var errorMessage = 'Could not retrieve snippet data from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.snippet.hasOwnProperty('trailingSnippet') || !response.snippet.hasOwnProperty('lastPath') || !response.snippet.hasOwnProperty('nodeSnippet') || !response.snippet.hasOwnProperty('authorName')) {
+	    // snippet information missing, set error state and display error content
+	    var errorMessage = 'Some snippet details were missing in response from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.hasOwnProperty('inputBlocking')) {
+	    // no verification of current node's authorship, set error state and display error content
+	    var errorMessage = 'Could not retrieve input permissions from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  if (!response.inputBlocking.hasOwnProperty('top') || !response.inputBlocking.hasOwnProperty('side')) {
+	    // path authorship information missing, set error state and display error content
+	    var errorMessage = 'Path authorship details were missing in response from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
+	  logMgr.verbose('Trying to set state after validation: ' + JSON.stringify(response));
+	  properThis.setState({
+	    nodeUid: response.nodeUid,
+	    parentUid: response.parentUid,
+	    userName: response.userName,
+	    acctType: response.acctType,
+	    votification: response.votification,
+	    snippet: response.snippet,
+	    paths: response.paths,
+	    inputBlocking: response.inputBlocking,
+	    editMode: false, // always reset this to false when taking in response from server
+	    msg: response.msg ? response.msg : null,
+	    warning: response.warning ? response.warning : null,
+	    error: response.error ? response.error : null,
+	    windowScroll: newWindowPosition || constants.windowScrollTop
+	  });
+	  logMgr.verbose('State was set successfully after validation!');
+	  logMgr.verbose('New state: ' + JSON.stringify(properThis.state));
+	}
+	
+	// don't do a full response validation if we are told to expect only an alert message
+	function validateMessageResponse(context, response, newWindowPosition) {
+	  if (response.messageOnly) {
+	    logMgr.verbose('Got message-only response.');
+	    context.setState({
+	      msg: null,
+	      warning: null,
+	      error: null
+	    });
+	    context.setState({
+	      msg: response.msg ? response.msg : null,
+	      warning: response.warning ? response.warning : null,
+	      error: response.error ? response.error : null,
+	      windowScroll: newWindowPosition || constants.windowScrollTop
+	    });
+	    return true;
+	  }
+	  return false;
+	}
+	
+	function getDefaultStateObject() {
+	  return {
+	    nodeUid: constants.defaultNodeUid,
+	    parentUid: constants.defaultParentUid,
+	    userName: constants.defaultUserName,
+	    acctType: constants.acctTypeVisitor,
+	    votification: constants.votificationNone,
+	    snippet: {
+	      trailingSnippet: constants.defaultTrailingSnippet,
+	      lastPath: constants.defaultLastPath,
+	      nodeSnippet: constants.defaultNodeSnippet,
+	      authorName: constants.displayNameUnknown
+	    },
+	    paths: [],
+	    inputBlocking: constants.inputBlockingHide,
+	    editMode: false,
+	    msg: null,
+	    warning: null,
+	    error: null,
+	    windowScroll: constants.windowScrollTop
+	  };
+	}
+	
+	function getErrorStateObject(errorMessage) {
+	  return {
+	    nodeUid: constants.errorNodeUid,
+	    parentUid: constants.errorNodeUid,
+	    userName: constants.errorUserName,
+	    acctType: constants.acctTypeVisitor,
+	    votification: constants.votificationNone,
+	    snippet: {
+	      trailingSnippet: constants.errorTrailingSnippet,
+	      lastPath: constants.errorLastPath,
+	      nodeSnippet: constants.errorNodeSnippet + '  ' + errorMessage,
+	      authorName: constants.displayNameUnknown
+	    },
+	    paths: [],
+	    inputBlocking: constants.inputBlockingHide,
+	    editMode: false,
+	    msg: null,
+	    warning: null,
+	    error: errorMessage,
+	    windowScroll: constants.windowScrollTop
+	  };
+	}
+	
+	function resetNewChapterInputs() {
+	  var inputPathElement = document.getElementById('cyoag-input-path');
+	  var inputBodyElement = document.getElementById('cyoag-input-body');
+	  if (inputPathElement) {
+	    inputPathElement.value = '';
+	  }
+	  if (inputBodyElement) {
+	    inputBodyElement.value = '';
+	  }
+	}
+	
+	// this function returns a JSON object consisting of window scroll position as {x: #, y: #}
+	function getWindowPosition() {
+	  // modified from http://stackoverflow.com/questions/3464876/javascript-get-window-x-y-position-for-scroll
+	  var doc = document.documentElement;
+	  logMgr.verbose('window.pageXOffset: ' + window.pageXOffset);
+	  logMgr.verbose('window.pageYOffset: ' + window.pageYOffset);
+	  logMgr.verbose('doc.scrollLeft: ' + doc.scrollLeft);
+	  logMgr.verbose('doc.scrollTop: ' + doc.scrollTop);
+	  logMgr.verbose('doc.clientLeft: ' + doc.clientLeft);
+	  logMgr.verbose('doc.clientTop: ' + doc.clientTop);
+	  var pos = {
+	    x: (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0),
+	    y: (window.pageYOffset || doc.scrollTop) - (doc.clientTop || 0)
+	  };
+	  logMgr.verbose('Got window scroll position: ' + JSON.stringify(pos));
+	  return pos;
+	}
+	
+	function restoreScroll(scrollCoord) {
+	  var x = scrollCoord.x,
+	      y = scrollCoord.y;
+	  logMgr.verbose('Attempting to restore scroll position: ' + x + ', ' + y);
+	  window.scrollTo(x, y);
+	}
+
+/***/ },
+/* 173 */
+/*!*************************!*\
+>>>>>>> edit-post
   !*** ./build-config.js ***!
   \*************************/
 function(e,t,n){var o=n(/*! ./constants */165),r=n(/*! ./secrets */166),a={};switch(a.DEBUG=!0,a.VERBOSE=!0,a.env=o.envProd,a.env){case o.envLocal:a.hostDomain=o.hostDomainLocal,a.httpPort=3e3,a.httpsPrivKeyLocation=r.httpsPrivKeyLocation_local,a.httpsFullChainLocation=r.httpsFullChainLocation_local,a.httpsChainLocation=r.httpsChainLocation_local;break;case o.envProd:a.hostDomain=o.hostDomainProd,a.httpPort=80,a.httpsPrivKeyLocation=r.httpsPrivKeyLocation,a.httpsFullChainLocation=r.httpsFullChainLocation,a.httpsChainLocation=r.httpsChainLocation,a.DEBUG=!1,a.VERBOSE=!1;break;default:a.hostDomain=o.hostDomainLocal,a.httpPort=3e3,a.httpsPrivKeyLocation=r.httpsPrivKeyLocation_local,a.httpsFullChainLocation=r.httpsFullChainLocation_local,a.httpsChainLocation=r.httpsChainLocation_local}e.exports=a},/*!**********************!*\
   !*** ./constants.js ***!
   \**********************/
+<<<<<<< HEAD
 function(e,t){var n={};n.acctTypeBanned="banned",n.acctTypeDeleted="deleted",n.acctTypeModerator="moderator",n.acctTypeRegistered="registered",n.acctTypeVisitor="visitor",n.cookieExpiry={maxAge:12096e5,httpOnly:!0},n.cookieNode="node_uid",n.cookieSession="session_uid",n.defaultNodeUid="default",n.defaultParentUid="00000000000000-0000000000-00000000000000",n.defaultUserName="Visitor",n.defaultTrailingSnippet="... and then the user sat down in front of the keyboard, and had to make a choice.",n.defaultLastPath="The user visits CYOAG.",n.defaultNodeSnippet="You have come to CYOAG, a unique Create Your Own Adventure Game experience!  Here you will enjoy the results of collaborative efforts by writers from all across the world to write one story of many paths and branches, together! (The CYOAG experience is still loading.)",n.displayNameBanned="[-banned-]",n.displayNameDeleted="[-deleted-]",n.displayNameUnknown="[-unknown-]",n.emptyString="",n.envLocal="local",n.envProd="prod",n.errorNodeUid="error",n.errorUserName="Visitor",n.errorTrailingSnippet="... and it had been a long night, and the CYOAG development team was really tired.",n.errorLastPath="The developer makes a horrible mistake.",n.errorNodeSnippet="It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, you might ask ... ?  Well, let me tell you!",n.hostDomainLocal="http://localhost.cyoag.com:3000/",n.hostDomainProd="https://cyoag.com/",n.inputBlockingHide="hide",n.messageRegularClass="cyoag-regular-message",n.messageWarningClass="cyoag-warning-message",n.messageErrorClass="cyoag-error-message",n.modalTypeMessage="cyoag-modal-type-message",n.modalTypeWarning="cyoag-modal-type-warning",n.modalTypeError="cyoag-modal-type-error",n.nodeStatusDeleted="deleted",n.nodeStatusVisible="visible",n.portLocal=3e3,n.portProd=80,n.portHttps=443,n.rootNodeUid="start",n.rootTrailingSnippet="... by way of prologue.",n.rootLastPath="The writer takes up his pen.",n.trailingSnippetLength=200,n.visitorName="Illustrious Visitor",n.votificationNone="none",n.votificationUp="up",n.votificationDown="down",n.windowScrollTop={x:0,y:0},e.exports=n},/*!********************!*\
+=======
+/***/ function(module, exports) {
+
+	var constants = {}
+	
+	constants.acctTypeBanned = 'banned';
+	constants.acctTypeDeleted = 'deleted';
+	constants.acctTypeModerator = 'moderator';
+	constants.acctTypeRegistered = 'registered';
+	constants.acctTypeVisitor = 'visitor';
+	
+	constants.confirmDiscardUnsavedEdits = 'There are unsaved changes detected in your work.  These will be lost ' +
+	  'forever if you continue ' +
+	  '(seriously)!  Are you certain you wish to proceed?';
+	
+	// this maxAge value acconts for 2 weeks until expiry
+	constants.cookieExpiry = {maxAge: 1209600000, httpOnly: true};
+	constants.cookieNode = 'node_uid';
+	constants.cookieSession = 'session_uid';
+	
+	constants.defaultNodeUid = 'default';
+	constants.defaultParentUid = '00000000000000-0000000000-00000000000000';
+	constants.defaultUserName = 'Visitor';
+	constants.defaultTrailingSnippet = '... and then the user sat down in front of the keyboard, and had to make a choice.';
+	constants.defaultLastPath = 'The user visits CYOAG.';
+	constants.defaultNodeSnippet = 'You have come to CYOAG, a unique Create Your Own Adventure Game experience!  Here you will enjoy ' +
+	  'the results of collaborative efforts by writers from all across the world to write one story of many paths and branches, together! ' +
+	  '(The CYOAG experience is still loading.)';
+	
+	constants.displayNameBanned = '[-banned-]';
+	constants.displayNameDeleted = '[-deleted-]';
+	constants.displayNameUnknown = '[-unknown-]';
+	
+	constants.emptyString = '';
+	
+	constants.envLocal = 'local';
+	constants.envProd = 'prod';
+	
+	constants.errorNodeUid = 'error';
+	constants.errorUserName = 'Visitor';
+	constants.errorTrailingSnippet = '... and it had been a long night, and the CYOAG development team was really tired.';
+	constants.errorLastPath = 'The developer makes a horrible mistake.';
+	constants.errorNodeSnippet = 'It looks like the CYOAG developers have done something wrong and led you here.  What did they do wrong, ' +
+	  'you might ask ... ?  Well, let me tell you!';
+	
+	constants.hostDomainLocal = 'http://localhost.cyoag.com:3000/';
+	constants.hostDomainProd = 'https://cyoag.com/';
+	
+	constants.inputBlockingHide = 'hide';
+	
+	constants.messageRegularClass = 'cyoag-regular-message';
+	constants.messageWarningClass = 'cyoag-warning-message';
+	constants.messageErrorClass = 'cyoag-error-message';
+	
+	constants.modalTypeMessage = 'cyoag-modal-type-message';
+	constants.modalTypeWarning = 'cyoag-modal-type-warning';
+	constants.modalTypeError = 'cyoag-modal-type-error';
+	
+	constants.nodeStatusDeleted = 'deleted';
+	constants.nodeStatusVisible = 'visible';
+	
+	constants.portLocal = 3000;
+	constants.portProd = 80;
+	constants.portHttps = 443;
+	
+	constants.rootNodeUid = 'start';
+	
+	constants.rootTrailingSnippet = '... by way of prologue.';
+	constants.rootLastPath = 'The writer takes up his pen.';
+	
+	constants.specialMessage_editSuccess = 'Edits submitted successfully!';
+	
+	constants.trailingSnippetLength = 200;
+	
+	constants.visitorName = 'Illustrious Visitor';
+	
+	constants.votificationNone = 'none';
+	constants.votificationUp = 'up';
+	constants.votificationDown = 'down';
+	
+	constants.windowScrollTop = {x:0,y:0};
+	
+	module.exports = constants;
+
+
+/***/ },
+/* 175 */
+/*!********************!*\
+>>>>>>> edit-post
   !*** ./secrets.js ***!
   \********************/
 function(e,t){var n={};n.SQL_USER="cyoag",n.SQL_PASS="^cy0cy0Acer",n.FB_APP_ID="1186913218035172",n.FB_APP_SECRET="c035050ae6fd804546324a10aa49b304",n.TW_KEY="uvhrxDCLSVNlyLGgHGwCBzxqT",n.TW_SECRET="M5WEIkyStvKQ2zkJbXZyxoc1g9FIV7MphTimpJmNJWgW0rzVgy",n.captchaSecretKey="6Ld4NhAUAAAAACAsPRLbmUQQlZPW7j6VtRKMhALP",n.emailAcct="cyoag.steve",n.emailPass="^g0cy0Acer",n.httpsPrivKeyLocation="/etc/letsencrypt/live/cyoag.com/privkey.pem",n.httpsFullChainLocation="/etc/letsencrypt/live/cyoag.com/fullchain.pem",n.httpsChainLocation="/etc/letsencrypt/live/cyoag.com/chain.pem",n.httpsPrivKeyLocation_local="./digital-ocean/server.key",n.httpsFullChainLocation_local="./digital-ocean/server.crt",n.httpsChainLocation_local="./digital-ocean/server.crt",e.exports=n},/*!********************************!*\
@@ -522,6 +1334,7 @@ function(e,t,n){var o=n(/*! ../build-config */164).DEBUG,r=n(/*! ../build-config
 function(e,t,n){var o=n(/*! react */1),r=(n(/*! react-dom */30),n(/*! ../../constants */165),n(/*! ../../utils/browserLogger */167)("HeaderComponents.js")),t={},a=o.createClass({displayName:"Header",render:function(){return r.verbose("Rendering..."),o.createElement("div",{id:"cyoag-header-container"},o.createElement("h1",{id:"cyoag-header-title"},"Welcome to CYOAG!"),o.createElement("p",{id:"cyoag-header-subtitle"},"Choose Your Own Adventure Game"),o.createElement("a",{className:"cyoag-link cyoag-button",href:"about.html"},"What is CYOAG?")," | ",o.createElement("a",{className:"cyoag-link cyoag-button",href:"usage.html"},"Usage and Copyright")," | ",o.createElement("a",{className:"cyoag-link cyoag-button",href:"steve.html"},"About the Creator")," | ",o.createElement("a",{className:"cyoag-link cyoag-button",href:"https://github.com/stevenkitzes/cyoag"},"Project on GitHub"),o.createElement("hr",null))}});t.Header=a,e.exports=t},/*!************************************************!*\
   !*** ./build-source/js/MessagingComponents.js ***!
   \************************************************/
+<<<<<<< HEAD
 function(e,t,n){var o=n(/*! react */1),r=(n(/*! react-dom */30),n(/*! ../../constants */165)),a=n(/*! ../../utils/browserLogger */167)("MessagingComponents.js"),t={},i=o.createClass({displayName:"Banner",closeBanner:function(e){e.preventDefault();var t=document.getElementById("cyoag-message-banner");t&&(t.style.display="none")},render:function(){a.verbose("Rendering...");var e,t,n=this.props.context.state,i=document.getElementById("cyoag-message-banner");if(n.error)i&&(i.style.display="block"),e=r.messageErrorClass,t=n.error;else if(n.warning)i&&(i.style.display="block"),e=r.messageWarningClass,t=n.warning;else{if(!n.msg)return o.createElement("div",{id:"cyoag-message-banner",style:{display:"none"}});i&&(i.style.display="block"),e=r.messageRegularClass,t=n.msg}return o.createElement("div",{onClick:this.closeBanner,id:"cyoag-message-banner",title:"Click to dismiss this message."},o.createElement("p",{className:e},o.createElement("a",{id:"cyoag-message-banner-x",href:"#"},"x"),t))}}),s=o.createClass({displayName:"Modal",closeModal:function(e){e.preventDefault();var t=document.getElementById("cyoag-modal-message-container");t&&(t.style.display="none")},render:function(){a.verbose("Rendering...");var e,t,n=this.props.context.state,i=document.getElementById("cyoag-modal-message-container");if(n.error)i&&(i.style.display="block"),e=r.modalTypeError,t=n.error;else if(n.warning)i&&(i.style.display="block"),e=r.modalTypeWarning,t=n.warning;else{if(!n.msg)return o.createElement("div",{id:"cyoag-message-modal",style:{display:"none"}});i&&(i.style.display="block"),e=r.modalTypeMessage,t=n.msg}return o.createElement("div",{onClick:this.closeModal,id:"cyoag-modal-message-container",title:"Click to dismiss."},o.createElement("div",{id:"cyoag-modal-message-overlay"}),o.createElement("div",{id:"cyoag-message-modal",className:e},o.createElement("p",{className:"cyoag-modal-message"},t),o.createElement("a",{className:"cyoag-side-padded-link",href:"#"},o.createElement("div",{className:"cyoag-modal-message-button"},"Click to Acknowledge"))))}});t.Banner=i,t.Modal=s,e.exports=t},/*!*************************************************!*\
   !*** ./build-source/js/MainColumnComponents.js ***!
   \*************************************************/
@@ -529,11 +1342,418 @@ function(e,t,n){var o=n(/*! react */1),r=(n(/*! react-dom */30),n(/*! ../../cons
   !*** ./build-source/js/NodeComponents.js ***!
   \*******************************************/
 function(e,t,n){var o=n(/*! react */1),r=(n(/*! react-dom */30),n(/*! ../../constants */165)),a=n(/*! ../../utils/browserLogger */167)("NodeComponents.js"),i=n(/*! ../../utils/uid-gen */172),t={},s=o.createClass({displayName:"Node",navigate:function(){a.debug("^ ^ ^ ^ ^ Navigating to parent."),this.props.context.navigate(this.props.context.state.parentUid)},render:function(){a.verbose("Rendering...");var e=this.props.context,t=e.state.snippet,n="node-"+e.state.parentUid;return o.createElement("div",{id:"cyoag-node-container"},o.createElement("a",{id:n,className:"cyoag-trailing-snippet-link cyoag-link",href:"#",onMouseMove:this.locateTooltip},o.createElement("div",{className:"cyoag-path-item cyoag-trailing-snippet",onClick:this.navigate},t.trailingSnippet.split("\n").map(function(e){return o.createElement("p",{key:i(),className:"cyoag-snippet-paragraph"},e)})),o.createElement("div",{id:"cyoag-tooltip-regress"},"Back whence you came . . . ?")),o.createElement("p",{id:"cyoag-last-path"},t.lastPath),o.createElement("div",{id:"cyoag-node-snippet"},t.nodeSnippet.split("\n").map(function(e){return o.createElement("p",{key:i(),className:"cyoag-snippet-paragraph"},e)})),o.createElement(u,{context:e}))},locateTooltip:function(e){var t=document.querySelector("#cyoag-tooltip-regress");t.style.top=e.clientY+pageYOffset+"px",t.style.left=e.clientX+pageXOffset+"px"}}),u=o.createClass({displayName:"NodeOwnerUi",render:function(){var e=this.props.context,t=e.state.inputBlocking.top,n=e.state.acctType==r.acctTypeModerator,a=e.state.paths,i=a.length;return n&&t?o.createElement("div",{id:"cyoag-moderator-and-owner-ui"},o.createElement("p",{id:"cyoag-modification-permitted",className:"cyoag-note"},"You are a moderator and the owner of this chapter, so you have modification privileges."),o.createElement("button",{id:"cyoag-delete-chapter-button",onClick:e.deleteChapter},"Delete this chapter")):n?o.createElement("div",{id:"cyoag-moderator-ui"},o.createElement("p",{id:"cyoag-modification-permitted",className:"cyoag-note"},"As a moderator, you have modification privileges."),o.createElement("button",{id:"cyoag-delete-chapter-button",onClick:e.deleteChapter},"Delete this chapter")):t?i>0?o.createElement("div",{id:"cyoag-owner-ui"},o.createElement("p",{id:"cyoag-deletion-forbidden",className:"cyoag-note"},"You authored this chapter, but it cannot be modified because another chapter has already been added to it, or a draft is pending on it.")):o.createElement("div",{id:"cyoag-owner-ui"},o.createElement("p",{id:"cyoag-modification-permitted",className:"cyoag-note"},"You authored this chapter, and have modification privileges."),o.createElement("button",{id:"cyoag-delete-chapter-button",onClick:e.deleteChapter},"Delete this chapter")):o.createElement("div",{id:"cyoag-owner-ui"},o.createElement("p",{id:"cyoag-author-attribution",className:"cyoag-note"},"Contribution by user ",e.state.snippet.authorName))}});t.Node=s,e.exports=t},/*!**************************!*\
+=======
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MessagingComponents.js');
+	
+	var exports = {};
+	
+	// a banner to display alerts of various severity to the user
+	var Banner = React.createClass({
+	  displayName: 'Banner',
+	
+	  closeBanner: function (e) {
+	    e.preventDefault();
+	    var bannerObj = document.getElementById('cyoag-message-banner');
+	    if (bannerObj) {
+	      bannerObj.style.display = 'none';
+	    }
+	  },
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var error = this.props.error;
+	    var warning = this.props.warning;
+	    var msg = this.props.msg;
+	    var className, messageContent;
+	    var bannerObj = document.getElementById('cyoag-message-banner');
+	
+	    if (error) {
+	      if (bannerObj) {
+	        bannerObj.style.display = 'block';
+	      }
+	      className = constants.messageErrorClass;
+	      messageContent = error;
+	    } else if (warning) {
+	      if (bannerObj) {
+	        bannerObj.style.display = 'block';
+	      }
+	      className = constants.messageWarningClass;
+	      messageContent = warning;
+	    } else if (msg) {
+	      if (bannerObj) {
+	        bannerObj.style.display = 'block';
+	      }
+	      className = constants.messageRegularClass;
+	      messageContent = msg;
+	    } else {
+	      return React.createElement('div', { id: 'cyoag-message-banner', style: { display: 'none' } });
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { onClick: this.closeBanner, id: 'cyoag-message-banner', title: 'Click to dismiss this message.' },
+	      React.createElement(
+	        'p',
+	        { className: className },
+	        React.createElement(
+	          'a',
+	          { id: 'cyoag-message-banner-x' },
+	          'x'
+	        ),
+	        messageContent
+	      )
+	    );
+	  }
+	});
+	
+	// a modal alert to demand user attention to alerts of various severity to the user
+	var Modal = React.createClass({
+	  displayName: 'Modal',
+	
+	  closeModal: function (e) {
+	    e.preventDefault();
+	    var modalObj = document.getElementById('cyoag-modal-message-container');
+	    if (modalObj) {
+	      modalObj.style.display = 'none';
+	    }
+	  },
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var error = this.props.error;
+	    var warning = this.props.warning;
+	    var msg = this.props.msg;
+	    var modalType, messageContent;
+	    var modalObj = document.getElementById('cyoag-modal-message-container');
+	
+	    if (error) {
+	      if (modalObj) {
+	        modalObj.style.display = 'block';
+	      }
+	      modalType = constants.modalTypeError;
+	      messageContent = error;
+	    } else if (warning) {
+	      if (modalObj) {
+	        modalObj.style.display = 'block';
+	      }
+	      modalType = constants.modalTypeWarning;
+	      messageContent = warning;
+	    } else if (msg) {
+	      if (modalObj) {
+	        modalObj.style.display = 'block';
+	      }
+	      modalType = constants.modalTypeMessage;
+	      messageContent = msg;
+	    } else {
+	      return React.createElement('div', { id: 'cyoag-message-modal', style: { display: 'none' } });
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { onClick: this.closeModal, id: 'cyoag-modal-message-container', title: 'Click to dismiss.' },
+	      React.createElement('div', { id: 'cyoag-modal-message-overlay' }),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-message-modal', className: modalType },
+	        React.createElement(
+	          'p',
+	          { className: 'cyoag-modal-message' },
+	          messageContent
+	        ),
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-side-padded-link' },
+	          React.createElement(
+	            'div',
+	            { className: 'cyoag-modal-message-button' },
+	            'Click to Acknowledge'
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	exports.Banner = Banner;
+	exports.Modal = Modal;
+	
+	module.exports = exports;
+
+/***/ },
+/* 179 */
+/*!*************************************************!*\
+  !*** ./build-source/js/MainColumnComponents.js ***!
+  \*************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainColumnComponents.js');
+	
+	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 180);
+	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 182);
+	var PathComponents = __webpack_require__(/*! ./PathComponents */ 184);
+	var InputComponents = __webpack_require__(/*! ./InputComponents */ 185);
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var MainColumn = React.createClass({
+	  displayName: 'MainColumn',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var context = this.props.context;
+	
+	    var votificationComponent;
+	    if (context.state.editMode) {
+	      votificationComponent = React.createElement(VotificationComponents.Hidden, null);
+	    } else if (context.state.acctType != constants.acctTypeVisitor) {
+	      votificationComponent = React.createElement(VotificationComponents.Votification, { context: context });
+	    } else {
+	      votificationComponent = React.createElement(VotificationComponents.BegLogin, { context: context });
+	    }
+	
+	    var inputComponent;
+	    if (context.state.acctType == constants.acctTypeVisitor || context.state.inputBlocking == constants.inputBlockingHide) {
+	      inputComponent = React.createElement(InputComponents.Hidden, null);
+	    } else if (context.state.editMode) {
+	      inputComponent = React.createElement(InputComponents.Edit, { context: context });
+	    } else if (context.state.inputBlocking.top || context.state.inputBlocking.side) {
+	      inputComponent = React.createElement(InputComponents.Blocked, { blocking: context.state.inputBlocking });
+	    } else {
+	      inputComponent = React.createElement(InputComponents.Input, { context: context });
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-main-column' },
+	      React.createElement(NodeComponents.Node, { context: context }),
+	      votificationComponent,
+	      React.createElement(PathComponents.Paths, { context: context }),
+	      inputComponent
+	    );
+	  }
+	});
+	
+	exports.MainColumn = MainColumn;
+	
+	module.exports = exports;
+
+/***/ },
+/* 180 */
+/*!*******************************************!*\
+  !*** ./build-source/js/NodeComponents.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('NodeComponents.js');
+	var uidGen = __webpack_require__(/*! ../../utils/uid-gen */ 181);
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var Node = React.createClass({
+	  displayName: 'Node',
+	
+	  navigate: function () {
+	    logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
+	    this.props.context.navigate(this.props.context.state.parentUid);
+	  },
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var context = this.props.context;
+	    var snippet = context.state.snippet;
+	
+	    var trailingSnippetId = 'node-' + context.state.parentUid;
+	    var modificationsComponent = context.state.editMode ? React.createElement('div', { id: 'cyoag-modification-container' }) : React.createElement(
+	      'div',
+	      { id: 'cyoag-modification-container' },
+	      React.createElement(ModificationsComponent, { context: context })
+	    );
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-node-container' },
+	      React.createElement(
+	        'a',
+	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-link', onMouseMove: this.locateTooltip },
+	        React.createElement(
+	          'div',
+	          { className: 'cyoag-path-item cyoag-trailing-snippet', onClick: this.navigate },
+	          snippet.trailingSnippet.split("\n").map(function (i) {
+	            return React.createElement(
+	              'p',
+	              { key: uidGen(), className: 'cyoag-snippet-paragraph' },
+	              i
+	            );
+	          })
+	        ),
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-tooltip-regress' },
+	          'Back whence you came . . . ?'
+	        )
+	      ),
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-last-path' },
+	        snippet.lastPath
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-node-snippet' },
+	        snippet.nodeSnippet.split("\n").map(function (i) {
+	          return React.createElement(
+	            'p',
+	            { key: uidGen(), className: 'cyoag-snippet-paragraph' },
+	            i
+	          );
+	        })
+	      ),
+	      modificationsComponent
+	    );
+	  },
+	  locateTooltip: function (mouseEvent) {
+	    var tooltip = document.querySelector('#cyoag-tooltip-regress');
+	    tooltip.style.top = mouseEvent.clientY + pageYOffset + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+	    tooltip.style.left = mouseEvent.clientX + pageXOffset + 'px';
+	  }
+	});
+	
+	var ModificationsComponent = React.createClass({
+	  displayName: 'ModificationsComponent',
+	
+	  render: function () {
+	    var context = this.props.context;
+	    var userIsOwner = context.state.inputBlocking.top;
+	    var userIsModerator = context.state.acctType == constants.acctTypeModerator;
+	    var paths = context.state.paths;
+	    var pathCount = paths.length;
+	
+	    if (userIsModerator && userIsOwner) {
+	      // if the user is moderator and owner, they can do whatever they want with this node
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-moderator-and-owner-ui' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
+	          'You are a moderator and the owner of this chapter, so you have modification privileges.'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
+	          'Edit this chapter'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
+	          'Delete this chapter'
+	        )
+	      );
+	    }
+	    if (userIsModerator) {
+	      // if the user is a moderator they can modify no matter what
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-moderator-ui' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
+	          'As a moderator, you have modification privileges. (Original content by user ',
+	          context.state.snippet.authorName,
+	          ')'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
+	          'Edit this chapter'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
+	          'Delete this chapter'
+	        )
+	      );
+	    }
+	    if (!userIsOwner) {
+	      // if the user is not the owner, just display who the owner is
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-owner-ui' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-author-attribution', className: 'cyoag-note' },
+	          'Contribution by user ',
+	          context.state.snippet.authorName
+	        )
+	      );
+	    }
+	    if (pathCount > 0) {
+	      // if the user is the owner but someone already appended to this chapter, let the owner know
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-owner-ui' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-deletion-forbidden', className: 'cyoag-note' },
+	          'You authored this chapter, but it cannot be modified because another chapter has already been added to it, or a draft is pending on it.'
+	        )
+	      );
+	    } else {
+	      // if the user is the author and modification is permitted
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-owner-ui' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
+	          'You authored this chapter, and have modification privileges.'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
+	          'Edit this chapter'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
+	          'Delete this chapter'
+	        )
+	      );
+	    }
+	  }
+	});
+	
+	exports.Node = Node;
+	
+	module.exports = exports;
+
+/***/ },
+/* 181 */
+/*!**************************!*\
+>>>>>>> edit-post
   !*** ./utils/uid-gen.js ***!
   \**************************/
 function(e,t){function n(e,t){return Math.floor(Math.random()*(t-e))+e}function o(){for(var e=[],t=5+n(5,11),o=t+n(5,11),a=o+n(5,11),i=0;i<40;i++)if(i==t||i==o||i==a)e.push("-");else{var s=n(0,62);e.push(r.charAt(s))}var u=e.join("");return console.log("Made uid of length "+u.length+": "+u),u}var r="0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";e.exports=o},/*!***************************************************!*\
   !*** ./build-source/js/VotificationComponents.js ***!
   \***************************************************/
+<<<<<<< HEAD
 function(e,t,n){var o=n(/*! react */1),r=(n(/*! react-dom */30),n(/*! ../../constants */165)),a=n(/*! ../../utils/browserLogger */167)("VotificationComponents.js"),t=(n(/*! ./SocialLoginButtonComponents */174),{}),i=o.createClass({displayName:"BegLogin",render:function(){a.verbose("Rendering...");var e=this.props.context;if(e.state.acctType==r.acctTypeVisitor)return o.createElement("div",{id:"cyoag-votification-container"},o.createElement("h4",null,"Register an account to save your position, contribute your own story snippets, and gain voting rights!"))}}),s=o.createClass({displayName:"Votification",render:function(){a.verbose("Rendering...");var e,t,n,i,s=this.props.context;switch(s.state.votification){case"up":e="images/upLit.png",t="images/down.png",n=r.votificationNone,i=r.votificationDown;break;case"down":e="images/up.png",t="images/downLit.png",n=r.votificationUp,i=r.votificationNone;break;default:e="images/up.png",t="images/down.png",n=r.votificationUp,i=r.votificationDown}var u=function(){a.verbose("Client trying to upvote "+s.state.nodeUid),s.votify(s.state.nodeUid,n)},l=function(){a.verbose("Client trying to downvote "+s.state.nodeUid),s.votify(s.state.nodeUid,i)};return o.createElement("div",{id:"cyoag-votification-container"},o.createElement("h4",{id:"cyoag-votification-prompt"},"How did you like this chapter?"),o.createElement("a",{href:"#"},o.createElement("img",{id:"cyoag-upvote-button",onClick:u,src:e})),o.createElement("a",{href:"#"},o.createElement("img",{id:"cyoag-downvote-button",onClick:l,src:t})))}});t.BegLogin=i,t.Votification=s,e.exports=t},/*!********************************************************!*\
   !*** ./build-source/js/SocialLoginButtonComponents.js ***!
   \********************************************************/
@@ -547,6 +1767,1027 @@ function(e,t,n){function o(e,t,n){var o="",r=/\S*[\s]{3,}\S*/g;if(r.test(e)){for
   !*** ./build-source/js/MarginColumnComponents.js ***!
   \***************************************************/
 function(e,t,n){var o=n(/*! react */1),r=(n(/*! react-dom */30),n(/*! ../../constants */165)),a=n(/*! ../../utils/browserLogger */167)("MarginColumnComponents.js"),i=n(/*! ./SocialLoginButtonComponents */174),t={},s=o.createClass({displayName:"MarginColumn",render:function(){a.verbose("Rendering...");var e,t=this.props.context;return e=t.state.acctType!=r.acctTypeVisitor?o.createElement(l,{context:t,logoutRequest:t.logoutRequest}):o.createElement(u,{context:t}),o.createElement("div",{id:"cyoag-margin-column"},e)}}),u=o.createClass({displayName:"MarginLogin",render:function(){return o.createElement("div",{id:"cyoag-margin-login-container"},o.createElement("h4",null,"Login with:"),o.createElement(i.FacebookButton,{context:this.props.context})," ",o.createElement(i.TwitterButton,{context:this.props.context}),o.createElement("label",{id:"cyoag-tos-label"},"Agree to ",o.createElement("a",{className:"cyoag-link",href:"tos.html"},"Terms and Conditions"),": ",o.createElement("input",{id:"cyoag-tos-checkbox",type:"checkbox"})),o.createElement("a",{href:"priv-pol.html"},o.createElement("div",{id:"cyoag-social-note-container"},o.createElement("img",{id:"cyoag-info-badge",src:"images/info-gray.png"}),o.createElement("div",{id:"cyoag-social-note-column"},o.createElement("p",{id:"cyoag-social-note",className:"cyoag-note-green"},"Learn about social media account integration in the CYOAG Privacy Policy!")))))}}),l=o.createClass({displayName:"MarginLogout",render:function(){var e=this.props.context,t=e.state.userName;return t=t.replace("-","‑"),o.createElement("div",{id:"cyoag-margin-login-container"},o.createElement("h4",null,"Logged in!"),o.createElement("p",null,"Welcome, ",t,"!"),o.createElement(c,{context:e}),o.createElement(i.LogoutButton,{logoutRequest:this.props.logoutRequest}))}}),c=o.createClass({displayName:"NameChangeComponent",componentDidUpdate:function(){var e=document.getElementById("cyoag-name-input");e&&e.focus()},getInitialState:function(){return{nameChange:"beg"}},render:function(){this.props.context;return"beg"==this.state.nameChange?o.createElement("div",{id:"cyoag-name-change-ui"},o.createElement("button",{id:"cyoag-swap-name-change-button",onClick:this.swap},"Customize Your Pen Name")):"ui"==this.state.nameChange?o.createElement("div",{id:"cyoag-name-change-ui"},o.createElement("input",{id:"cyoag-name-input",type:"text",placeholder:"New name"}),o.createElement("button",{id:"cyoag-submit-name-change-button",onClick:this.submit},"Submit")):o.createElement("div",{id:"cyoag-name-change-ui"})},submit:function(){if(this.validate()){var e=document.getElementById("cyoag-name-input").value;this.props.context.nameChange(e),this.swap()}},swap:function(){"beg"==this.state.nameChange?this.setState({nameChange:"ui"}):"ui"==this.state.nameChange&&this.setState({nameChange:"beg"})},validate:function(){var e=document.getElementById("cyoag-name-input").value,t=this.props.context;return e.length<3?(t.message({warning:"User names cannot be shorter than 3 characters."}),!1):e.length>16?(t.message({warning:"User names cannot be longer than 16 characters."}),!1):e.match(/-{2,}/)?(t.message({warning:"User names cannot contain consecutive dashes."}),!1):!e.match(/[^a-zA-Z0-9-]/)||(t.message({warning:"User names may only contain letters and numbers."}),!1)}});t.MarginColumn=s,e.exports=t},/*!*********************************************!*\
+=======
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('VotificationComponents.js');
+	
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 183);
+	
+	var exports = {};
+	
+	var BegLogin = React.createClass({
+	  displayName: 'BegLogin',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	    var context = this.props.context;
+	
+	    if (context.state.acctType == constants.acctTypeVisitor) {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-votification-container' },
+	        React.createElement(
+	          'h4',
+	          null,
+	          'Register an account to save your position, contribute your own story snippets, and gain voting rights!'
+	        )
+	      );
+	    }
+	  }
+	});
+	
+	var Votification = React.createClass({
+	  displayName: 'Votification',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	    var context = this.props.context;
+	    var upImgPath, downImgPath;
+	    var upClickResult, downClickResult;
+	
+	    switch (context.state.votification) {
+	      case 'up':
+	        upImgPath = 'images/upLit.png';
+	        downImgPath = 'images/down.png';
+	        upClickResult = constants.votificationNone;
+	        downClickResult = constants.votificationDown;
+	        break;
+	      case 'down':
+	        upImgPath = 'images/up.png';
+	        downImgPath = 'images/downLit.png';
+	        upClickResult = constants.votificationUp;
+	        downClickResult = constants.votificationNone;
+	        break;
+	      default:
+	        upImgPath = 'images/up.png';
+	        downImgPath = 'images/down.png';
+	        upClickResult = constants.votificationUp;
+	        downClickResult = constants.votificationDown;
+	        break;
+	    }
+	
+	    var voteUp = function () {
+	      logMgr.verbose('Client trying to upvote ' + context.state.nodeUid);
+	      context.votify(context.state.nodeUid, upClickResult);
+	    };
+	    var voteDown = function () {
+	      logMgr.verbose('Client trying to downvote ' + context.state.nodeUid);
+	      context.votify(context.state.nodeUid, downClickResult);
+	    };
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-votification-container' },
+	      React.createElement(
+	        'h4',
+	        { id: 'cyoag-votification-prompt' },
+	        'How did you like this chapter?'
+	      ),
+	      React.createElement(
+	        'a',
+	        null,
+	        React.createElement('img', { id: 'cyoag-upvote-button', onClick: voteUp, src: upImgPath })
+	      ),
+	      React.createElement(
+	        'a',
+	        null,
+	        React.createElement('img', { id: 'cyoag-downvote-button', onClick: voteDown, src: downImgPath })
+	      )
+	    );
+	  }
+	});
+	
+	var Hidden = React.createClass({
+	  displayName: 'Hidden',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	    return React.createElement('div', { id: 'cyoag-votification-container', className: 'cyoag-hidden' });
+	  }
+	});
+	
+	exports.BegLogin = BegLogin;
+	exports.Votification = Votification;
+	exports.Hidden = Hidden;
+	
+	module.exports = exports;
+
+/***/ },
+/* 183 */
+/*!********************************************************!*\
+  !*** ./build-source/js/SocialLoginButtonComponents.js ***!
+  \********************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('SocialLoginButtonComponents.js');
+	
+	var exports = {};
+	
+	// Facebook login button component
+	var FacebookButton = React.createClass({
+	  displayName: 'FacebookButton',
+	
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { className: 'cyoag-fb-login cyoag-inline-block' },
+	      React.createElement(
+	        'a',
+	        { className: 'cyoag-side-padded-link cyoag-button', onClick: this.validateTos, href: '/fb/login' },
+	        'Facebook'
+	      )
+	    );
+	  },
+	  validateTos: validateTos
+	});
+	
+	// Twitter login button component
+	var TwitterButton = React.createClass({
+	  displayName: 'TwitterButton',
+	
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { className: 'cyoag-tw-button cyoag-inline-block' },
+	      React.createElement(
+	        'a',
+	        { className: 'cyoag-side-padded-link cyoag-button', onClick: this.validateTos, href: '/tw/login' },
+	        'Twitter'
+	      )
+	    );
+	  },
+	  validateTos: validateTos
+	});
+	
+	// Logout button component
+	var LogoutButton = React.createClass({
+	  displayName: 'LogoutButton',
+	
+	  render: function () {
+	    return React.createElement(
+	      'button',
+	      { id: 'cyoag-logout-button', className: 'shaded-border-red', onClick: this.props.logoutRequest },
+	      'Log Out'
+	    );
+	  }
+	});
+	
+	function validateTos(e) {
+	  if (!document.getElementById('cyoag-tos-checkbox').checked) {
+	    if (e.preventDefault) {
+	      e.preventDefault();
+	    }
+	    if (e.stopPropagation) {
+	      e.stopPropagation();
+	    }
+	    this.props.context.message({ warning: 'You must accept the Terms and Conditions to register or login with your account.' });
+	    return false;
+	  }
+	}
+	
+	exports.FacebookButton = FacebookButton;
+	exports.TwitterButton = TwitterButton;
+	exports.LogoutButton = LogoutButton;
+	
+	module.exports = exports;
+
+/***/ },
+/* 184 */
+/*!*******************************************!*\
+  !*** ./build-source/js/PathComponents.js ***!
+  \*******************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
+	
+	var exports = {};
+	
+	// Dynamically generated paths if available component
+	var Paths = React.createClass({
+	  displayName: 'Paths',
+	
+	  navigate: function (navElementUid) {
+	    var destinationUid = navElementUid.substring(5);
+	    this.props.context.navigate(destinationUid);
+	  },
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var properThis = this;
+	    var context = this.props.context;
+	    var paths = context.state.paths;
+	
+	    if (paths.length == 0) {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-path-list' },
+	        'No paths yet lead from this chapter.'
+	      );
+	    } else {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-path-list' },
+	        React.createElement(
+	          'p',
+	          { className: 'italics sans-serif' },
+	          'What happens next . . . ?'
+	        ),
+	        paths.map(function (item) {
+	          var pathUid = 'node-' + item.pathUid;
+	          return React.createElement(
+	            'a',
+	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-link', onMouseMove: properThis.locateTooltip.bind(null, pathUid) },
+	            React.createElement(
+	              'div',
+	              { className: 'cyoag-path-item', onClick: properThis.navigate.bind(null, pathUid) },
+	              item.pathSnippet
+	            ),
+	            React.createElement(
+	              'div',
+	              { className: 'cyoag-tooltip-progress' },
+	              'Choose wisely . . .'
+	            )
+	          );
+	        })
+	      );
+	    }
+	  },
+	  locateTooltip: function (hoverTargetId, mouseEvent) {
+	    var tooltip = document.querySelector('#' + hoverTargetId + ' .cyoag-tooltip-progress');
+	    tooltip.style.top = mouseEvent.clientY + pageYOffset + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+	    tooltip.style.left = mouseEvent.clientX + pageXOffset + 'px';
+	  }
+	});
+	
+	exports.Paths = Paths;
+	
+	module.exports = exports;
+
+/***/ },
+/* 185 */
+/*!********************************************!*\
+  !*** ./build-source/js/InputComponents.js ***!
+  \********************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
+	
+	var exports = {};
+	
+	// Display an empty div when prompted
+	var Hidden = React.createClass({
+	  displayName: 'Hidden',
+	
+	  render: function () {
+	    return React.createElement('div', { id: 'cyoag-input-container', className: 'cyoag-hidden' });
+	  }
+	});
+	
+	// Display an appropriate message when the user is forbidden by rules from input
+	var Blocked = React.createClass({
+	  displayName: 'Blocked',
+	
+	  render: function () {
+	    if (this.props.blocking.top && this.props.blocking.side) {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-input-container' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-input-blocked-message' },
+	          'You may not add paths to your own chapters, or chapters that you have already added paths to!'
+	        )
+	      );
+	    } else if (this.props.blocking.top) {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-input-container' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-input-blocked-message' },
+	          'You may not add paths to your own chapters!'
+	        )
+	      );
+	    } else {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-input-container' },
+	        React.createElement(
+	          'p',
+	          { id: 'cyoag-input-blocked-message' },
+	          'You may not add multiple paths to the same chapter!'
+	        )
+	      );
+	    }
+	  }
+	});
+	
+	// Display input fields and simple directions so users know how to contribute
+	var Input = React.createClass({
+	  displayName: 'Input',
+	
+	  checkForEdits: function (e) {
+	    logMgr.debug('Checking for edits . . .');
+	    if (document.getElementById('cyoag-input-path').value.length == 0 && document.getElementById('cyoag-input-body').value.length == 0) {
+	      // if no changes are detected, set editsPending false and onbeforeunload listener null
+	      logMgr.debug('Path and body inputs were both length 0, so no edits are detected.');
+	      this.props.context.setEditsPending(false);
+	      window.onbeforeunload = null;
+	    } else {
+	      // if changes detected, set editsPending true and onbeforeunload to a listener
+	      logMgr.debug('Path or body input had length > 0, so edits were detected.');
+	      this.props.context.setEditsPending(true);
+	      window.onbeforeunload = warnBeforeUnload;
+	    }
+	  },
+	  componentDidMount: function () {
+	    var inputPathElement = document.getElementById('cyoag-input-path');
+	    var inputBodyElement = document.getElementById('cyoag-input-body');
+	
+	    // all browsers excpet short bus IE
+	    if (inputPathElement.addEventListener) {
+	      // attempt to remove listeners from input elements to prevent duplicate listener firing
+	      logMgr.debug('Removing existing event listeners to input fields for all browsers except O.G. IE . . .');
+	      inputPathElement.removeEventListener('input', this.checkForEdits);
+	      inputBodyElement.removeEventListener('input', this.checkForEdits);
+	      // now add the listeners for changes to these input elements
+	      inputPathElement.addEventListener('input', this.checkForEdits, false);
+	      inputBodyElement.addEventListener('input', this.checkForEdits, false);
+	      logMgr.debug('. . . then added them back on.');
+	    }
+	    // short bus IE
+	    else {
+	        // attempt to remove listeners from input elements to prevent duplicate listener firing
+	        logMgr.debug('Removing existing event listeners to input fields for O.G. IE . . .');
+	        inputPathElement.detachEvent('onpropertychange', this.checkForEdits);
+	        inputBodyElement.detachEvent('onpropertychange', this.checkForEdits);
+	        // now add the listeners for changes to these input elements
+	        inputPathElement.attachEvent('onpropertychange', this.checkForEdits);
+	        inputBodyElement.attachEvent('onpropertychange', this.checkForEdits);
+	        logMgr.debug('. . . then added them back on.');
+	      }
+	  },
+	  getInitialState: function () {
+	    return {
+	      pathCharCount: 0,
+	      bodyCharCount: 0
+	    };
+	  },
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-input-container' },
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-input-cta' },
+	        React.createElement(
+	          'em',
+	          null,
+	          'Want to add your own content following this chapter?'
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-input-path-container' },
+	        'Enter the path teaser for your new chapter:',
+	        React.createElement('br', null),
+	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', onKeyUp: this.updatePathCharCount, placeholder: 'Path snippet - minimum 4 characters, maximum 100 characters.' }),
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-path-char-hint' },
+	          React.createElement(PathHint, { count: this.state.pathCharCount })
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-input-body-container' },
+	        'Enter the body of your new chapter:',
+	        React.createElement('br', null),
+	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', onKeyUp: this.updateBodyCharCount, placeholder: 'Chapter content - minimum 1000 characters, maximum 5000 characters.' }),
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-input-body-hints-container' },
+	          React.createElement(
+	            'div',
+	            { id: 'cyoag-body-char-hint' },
+	            React.createElement(BodyHint, { count: this.state.bodyCharCount })
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'cyoag-resize-input-hint cyoag-note' },
+	            'Drag to resize! ^'
+	          )
+	        )
+	      ),
+	      React.createElement(
+	        'button',
+	        { id: 'cyoag-save-draft-submit', className: 'shaded-border-blue cyoag-hidden', onClick: this.saveDraft },
+	        'Save Draft'
+	      ),
+	      React.createElement(
+	        'button',
+	        { id: 'cyoag-input-submit', className: 'shaded-border-green', onClick: this.submit },
+	        'Submit'
+	      )
+	    );
+	  },
+	  saveDraft: function () {
+	    var inputPath = document.getElementById('cyoag-input-path').value || '';
+	    var inputBody = document.getElementById('cyoag-input-body').value || '';
+	
+	    if (inputBody.length > 2500) {
+	      this.props.context.message({ warning: "Sorry, drafts of over 2,500 characters are not permitted." });
+	      return;
+	    }
+	
+	    this.props.context.saveDraft(inputPath, inputBody);
+	    this.props.context.setEditsPending(false);
+	    window.onbeforeunload = null;
+	  },
+	  submit: function () {
+	    var inputPath = document.getElementById('cyoag-input-path').value;
+	    var inputBody = document.getElementById('cyoag-input-body').value;
+	
+	    if (validateInput(inputPath, inputBody, this.props.context.message)) {
+	      this.props.context.setEditsPending(false);
+	      window.onbeforeunload = null;
+	      this.props.context.submitInput(inputPath, inputBody);
+	    }
+	  },
+	  updateBodyCharCount: function () {
+	    this.setState({
+	      bodyCharCount: document.getElementById('cyoag-input-body').value.length
+	    });
+	  },
+	  updatePathCharCount: function () {
+	    this.setState({
+	      pathCharCount: document.getElementById('cyoag-input-path').value.length
+	    });
+	  }
+	});
+	
+	// Display input fields with hints so users can edit an existing post
+	var Edit = React.createClass({
+	  displayName: 'Edit',
+	
+	  cancel: function () {
+	    this.props.context.cancelEdit();
+	  },
+	  checkForEdits: function (e) {
+	    if (this.state.originalLastPath == document.getElementById('cyoag-input-path').value && this.state.originalNodeSnippet == document.getElementById('cyoag-input-body').value) {
+	      // if no changes are detected, set editsPending false and onbeforeunload listener null
+	      this.props.context.setEditsPending(false);
+	      window.onbeforeunload = null;
+	    } else {
+	      // if changes detected, set editsPending true and onbeforeunload to a listener
+	      this.props.context.setEditsPending(true);
+	      window.onbeforeunload = warnBeforeUnload;
+	    }
+	  },
+	  componentDidMount: function () {
+	    var snippet = this.props.context.state.snippet;
+	
+	    var inputPathElement = document.getElementById('cyoag-input-path');
+	    var inputBodyElement = document.getElementById('cyoag-input-body');
+	
+	    // set the snippet contents as the initial input field contents
+	    inputPathElement.value = snippet.lastPath;
+	    inputBodyElement.value = snippet.nodeSnippet;
+	
+	    // all browsers excpet short bus IE
+	    if (inputPathElement.addEventListener) {
+	      // attempt to remove listeners from input elements to prevent duplicate listener firing
+	      logMgr.debug('Removing existing event listeners to input fields for all browsers except O.G. IE . . .');
+	      inputPathElement.removeEventListener('input', this.checkForEdits);
+	      inputBodyElement.removeEventListener('input', this.checkForEdits);
+	      // now add the listeners for changes to these input elements
+	      inputPathElement.addEventListener('input', this.checkForEdits, false);
+	      inputBodyElement.addEventListener('input', this.checkForEdits, false);
+	      logMgr.debug('. . . then added them back on.');
+	    }
+	    // short bus IE
+	    else {
+	        // attempt to remove listeners from input elements to prevent duplicate listener firing
+	        logMgr.debug('Removing existing event listeners to input fields for O.G. IE . . .');
+	        inputPathElement.detachEvent('onpropertychange', this.checkForEdits);
+	        inputBodyElement.detachEvent('onpropertychange', this.checkForEdits);
+	        // now add the listeners for changes to these input elements
+	        inputPathElement.attachEvent('onpropertychange', this.checkForEdits);
+	        inputBodyElement.attachEvent('onpropertychange', this.checkForEdits);
+	        logMgr.debug('. . . then added them back on.');
+	      }
+	  },
+	  getInitialState: function () {
+	    var snippet = this.props.context.state.snippet;
+	    return {
+	      pathCharCount: snippet.lastPath.length,
+	      bodyCharCount: snippet.nodeSnippet.length,
+	      originalLastPath: snippet.lastPath,
+	      originalNodeSnippet: snippet.nodeSnippet
+	    };
+	  },
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-input-container' },
+	      React.createElement(
+	        'p',
+	        { id: 'cyoag-input-cta' },
+	        React.createElement(
+	          'em',
+	          null,
+	          'Editing chapter'
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-input-path-container' },
+	        'Path teaser for this chapter:',
+	        React.createElement('br', null),
+	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', onKeyUp: this.updatePathCharCount, placeholder: 'Path snippet - minimum 4 characters, maximum 100 characters.' }),
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-path-char-hint' },
+	          React.createElement(PathHint, { count: this.state.pathCharCount })
+	        )
+	      ),
+	      React.createElement(
+	        'div',
+	        { id: 'cyoag-input-body-container' },
+	        'Body content for this chapter:',
+	        React.createElement('br', null),
+	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', onKeyUp: this.updateBodyCharCount, placeholder: 'Chapter content - minimum 1000 characters, maximum 5000 characters.' }),
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-input-body-hints-container' },
+	          React.createElement(
+	            'div',
+	            { id: 'cyoag-body-char-hint' },
+	            React.createElement(BodyHint, { count: this.state.bodyCharCount })
+	          ),
+	          React.createElement(
+	            'div',
+	            { className: 'cyoag-resize-input-hint cyoag-note' },
+	            'Drag to resize! ^'
+	          )
+	        )
+	      ),
+	      React.createElement(
+	        'button',
+	        { id: 'cyoag-input-cancel', className: 'cyoag-side-spaced-button shaded-border-red', onClick: this.cancel },
+	        'Cancel'
+	      ),
+	      React.createElement(
+	        'button',
+	        { id: 'cyoag-input-submit', className: 'cyoag-side-spaced-button shaded-border-green', onClick: this.submit },
+	        'Save changes'
+	      )
+	    );
+	  },
+	  submit: function () {
+	    var inputPath = document.getElementById('cyoag-input-path').value;
+	    var inputBody = document.getElementById('cyoag-input-body').value;
+	
+	    if (validateInput(inputPath, inputBody, this.props.context.message)) {
+	      // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
+	      this.props.context.setEditsPending(false);
+	      window.onbeforeunload = null;
+	      this.props.context.submitEdits(inputPath, inputBody);
+	    }
+	  },
+	  updateBodyCharCount: function () {
+	    this.setState({
+	      bodyCharCount: document.getElementById('cyoag-input-body').value.length
+	    });
+	  },
+	  updatePathCharCount: function () {
+	    this.setState({
+	      pathCharCount: document.getElementById('cyoag-input-path').value.length
+	    });
+	  }
+	});
+	
+	var PathHint = React.createClass({
+	  displayName: 'PathHint',
+	
+	  render: function () {
+	    var count = this.props.count;
+	
+	    if (count < 4) {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-red' },
+	        'Too few characters: ',
+	        count
+	      );
+	    }
+	
+	    if (count > 100) {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-red' },
+	        'Too many characters: ',
+	        count
+	      );
+	    }
+	
+	    return React.createElement(
+	      'span',
+	      { className: 'cyoag-note-green' },
+	      'Characters: ',
+	      count
+	    );
+	  }
+	});
+	
+	var BodyHint = React.createClass({
+	  displayName: 'BodyHint',
+	
+	  render: function () {
+	    var count = this.props.count;
+	
+	    if (count < 500) {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-red' },
+	        'Too few characters: ',
+	        count
+	      );
+	    }
+	
+	    if (count > 2500) {
+	      return React.createElement(
+	        'span',
+	        { className: 'cyoag-note-red' },
+	        'Too many characters: ',
+	        count
+	      );
+	    }
+	
+	    return React.createElement(
+	      'span',
+	      { className: 'cyoag-note-green' },
+	      'Characters: ',
+	      count
+	    );
+	  }
+	});
+	
+	function validateInput(inputPath, inputBody, message) {
+	  var warningMsg = '';
+	
+	  var whiteSpaceRegex = /\S*[\s]{3,}\S*/g;
+	
+	  // check new path content for too many consecutive white space chars
+	  if (whiteSpaceRegex.test(inputPath)) {
+	    var matches = inputPath.match(whiteSpaceRegex);
+	    var problems = 'Found the following problems: ';
+	    for (var i = 0; i < matches.length; i++) {
+	      if (/\S*[\s]{3,}\S*/.test(matches[i])) {
+	        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+	      }
+	    }
+	    message({ error: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' + 'white space characters are forbidden in path teasers.  Please correct any errors and try again!  ' + problems });
+	    return false;
+	  }
+	
+	  // check new body content for too many consecutive white space chars
+	  if (whiteSpaceRegex.test(inputBody)) {
+	    var matches = inputBody.match(whiteSpaceRegex);
+	    var problems = 'Found the following problems: ';
+	    for (var i = 0; i < matches.length; i++) {
+	      if (/\S*[\s]{3,}\S*/.test(matches[i])) {
+	        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+	      }
+	    }
+	    message({ error: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' + 'white space characters are forbidden in chapter body content.  Please correct any errors and try again!  ' + problems });
+	    return false;
+	  }
+	
+	  var startingWhiteSpaceRegex = /^\s/;
+	  var endingWhiteSpaceRegex = /\s$/;
+	
+	  // check new path or body for starting white space
+	  if (startingWhiteSpaceRegex.test(inputPath)) {
+	    message({ error: 'Path teasers may not begin with white space.  Please try again!' });
+	    return false;
+	  } else if (startingWhiteSpaceRegex.test(inputBody)) {
+	    message({ error: 'Chapter body content may not begin with white space.  Please try again!' });
+	    return false;
+	  }
+	
+	  // check new path or body for ending white space
+	  if (endingWhiteSpaceRegex.test(inputPath)) {
+	    message({ error: 'Path teasers may not end with white space.  Please try again!' });
+	    return false;
+	  } else if (endingWhiteSpaceRegex.test(inputBody)) {
+	    message({ error: 'Chapter body content may not end with white space.  Please try again!' });
+	    return false;
+	  }
+	
+	  var repeatCharRegex = /\S*(.)\1{3,}\S*/g;
+	
+	  // check new path content for too many consecutive same characters
+	  if (repeatCharRegex.test(inputPath)) {
+	    var matches = inputPath.match(repeatCharRegex);
+	    var problems = 'Found the following problems: ';
+	    for (var i = 0; i < matches.length; i++) {
+	      if (/(.)\1{3,}/.test(matches[i])) {
+	        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+	      }
+	    }
+	    message({ error: 'Consecutive sets of 4 or more of the same character are forbidden in path teasers.  ' + 'Please correct any errors and try again!  ' + problems });
+	    return false;
+	  }
+	
+	  // check new body content for too many consecutive same characters
+	  if (repeatCharRegex.test(inputBody)) {
+	    var matches = inputBody.match(repeatCharRegex);
+	    var problems = 'Found the following problems: ';
+	    for (var i = 0; i < matches.length; i++) {
+	      if (/(.)\1{3,}/.test(matches[i])) {
+	        problems += matches[i].replace(/\s/g, ' _ ') + '; ';
+	      }
+	    }
+	    message({ error: 'Consecutive sets of 4 or more of the same character are forbidden in chapter body content.  ' + 'Please correct any errors and try again!  ' + problems });
+	    return false;
+	  }
+	
+	  // check input path length restrictions
+	  if (inputPath.length < 4) {
+	    warningMsg += 'Your path teaser must be at least 4 characters long. ';
+	  } else if (inputPath.length > 100) {
+	    warningMsg += 'Your path teaser may not exceed 100 characters. ';
+	  }
+	
+	  // check input body length restrictions
+	  if (inputBody.length < 500) {
+	    warningMsg += 'Chapter body content must be at least 500 characters long. ';
+	  } else if (inputBody.length > 2500) {
+	    warningMsg += 'Chapter body content may not exceed 2,500 characters. ';
+	  }
+	
+	  if (warningMsg) {
+	    message({ warning: warningMsg });
+	    return false;
+	  }
+	
+	  return true;
+	}
+	
+	function warnBeforeUnload(e) {
+	  // If we haven't been passed the event get the window.event
+	  e = e || window.event;
+	
+	  var message = constants.confirmDiscardUnsavedEdits;
+	
+	  // For IE6-8 and Firefox prior to version 4
+	  if (e) {
+	    e.returnValue = message;
+	  }
+	
+	  // For Chrome, Safari, IE8+ and Opera 12+
+	  return message;
+	}
+	
+	exports.Hidden = Hidden;
+	exports.Blocked = Blocked;
+	exports.Input = Input;
+	exports.Edit = Edit;
+	
+	module.exports = exports;
+
+/***/ },
+/* 186 */
+/*!***************************************************!*\
+  !*** ./build-source/js/MarginColumnComponents.js ***!
+  \***************************************************/
+/***/ function(module, exports, __webpack_require__) {
+
+	var React = __webpack_require__(/*! react */ 1);
+	var ReactDOM = __webpack_require__(/*! react-dom */ 34);
+	
+	var constants = __webpack_require__(/*! ../../constants */ 174);
+	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MarginColumnComponents.js');
+	
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 183);
+	
+	var exports = {};
+	
+	var MarginColumn = React.createClass({
+	  displayName: 'MarginColumn',
+	
+	  render: function () {
+	    logMgr.verbose('Rendering...');
+	
+	    var context = this.props.context;
+	    var loginComponent;
+	
+	    if (context.state.acctType != constants.acctTypeVisitor) {
+	      loginComponent = React.createElement(MarginLogout, { context: context, logoutRequest: context.logoutRequest });
+	    } else {
+	      loginComponent = React.createElement(MarginLogin, { context: context });
+	    }
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-margin-column' },
+	      loginComponent
+	    );
+	  }
+	});
+	
+	// Margin login button set component
+	var MarginLogin = React.createClass({
+	  displayName: 'MarginLogin',
+	
+	  render: function () {
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-margin-login-container' },
+	      React.createElement(
+	        'h4',
+	        null,
+	        'Login with:'
+	      ),
+	      React.createElement(SocialLoginButtonComponents.FacebookButton, { context: this.props.context }),
+	      ' ',
+	      React.createElement(SocialLoginButtonComponents.TwitterButton, { context: this.props.context }),
+	      React.createElement(
+	        'label',
+	        { id: 'cyoag-tos-label' },
+	        'Agree to ',
+	        React.createElement(
+	          'a',
+	          { className: 'cyoag-link', href: 'tos.html' },
+	          'Terms and Conditions'
+	        ),
+	        ': ',
+	        React.createElement('input', { id: 'cyoag-tos-checkbox', type: 'checkbox' })
+	      ),
+	      React.createElement(
+	        'a',
+	        { href: 'priv-pol.html' },
+	        React.createElement(
+	          'div',
+	          { id: 'cyoag-social-note-container' },
+	          React.createElement('img', { id: 'cyoag-info-badge', src: 'images/info-gray.png' }),
+	          React.createElement(
+	            'div',
+	            { id: 'cyoag-social-note-column' },
+	            React.createElement(
+	              'p',
+	              { id: 'cyoag-social-note', className: 'cyoag-note-green' },
+	              'Learn about social media account integration in the CYOAG Privacy Policy!'
+	            )
+	          )
+	        )
+	      )
+	    );
+	  }
+	});
+	
+	// Margin logout button set component
+	var MarginLogout = React.createClass({
+	  displayName: 'MarginLogout',
+	
+	  render: function () {
+	    var context = this.props.context;
+	    var htmlUserName = context.state.userName;
+	    htmlUserName = htmlUserName.replace('-', '\u2011'); // replace hyphen with unicode non-breaking dash
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-margin-login-container' },
+	      React.createElement(
+	        'h4',
+	        null,
+	        'Logged in!'
+	      ),
+	      React.createElement(
+	        'p',
+	        null,
+	        'Welcome, ',
+	        htmlUserName,
+	        '!'
+	      ),
+	      React.createElement(NameChangeComponent, { context: context }),
+	      React.createElement(SocialLoginButtonComponents.LogoutButton, { logoutRequest: this.props.logoutRequest })
+	    );
+	  }
+	});
+	
+	// Component to provide UI for and control user name changes
+	var NameChangeComponent = React.createClass({
+	  displayName: 'NameChangeComponent',
+	
+	  componentDidUpdate: function () {
+	    var input = document.getElementById('cyoag-name-input');
+	    if (input) {
+	      input.focus();
+	    }
+	  },
+	  getInitialState: function () {
+	    return {
+	      nameChange: 'beg'
+	    };
+	  },
+	  render: function () {
+	    var context = this.props.context;
+	
+	    if (this.state.nameChange == 'beg') {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-name-change-ui' },
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-swap-name-change-button', className: 'shaded-border-blue', onClick: this.swap },
+	          'Customize Your Pen Name'
+	        )
+	      );
+	    } else if (this.state.nameChange == 'ui') {
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-name-change-ui' },
+	        React.createElement('input', { id: 'cyoag-name-input', type: 'text', placeholder: 'New name' }),
+	        React.createElement('br', null),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-swap-name-change-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: this.swap },
+	          'Cancel'
+	        ),
+	        React.createElement(
+	          'button',
+	          { id: 'cyoag-submit-name-change-button', className: 'cyoag-side-spaced-button shaded-border-green', onClick: this.submit },
+	          'Submit'
+	        )
+	      );
+	    }
+	
+	    return React.createElement('div', { id: 'cyoag-name-change-ui' });
+	  },
+	  submit: function () {
+	    if (!this.validate()) {
+	      return;
+	    }
+	    var newName = document.getElementById('cyoag-name-input').value;
+	    this.props.context.nameChange(newName);
+	    this.swap();
+	  },
+	  swap: function () {
+	    if (this.state.nameChange == 'beg') {
+	      this.setState({
+	        nameChange: 'ui'
+	      });
+	    } else if (this.state.nameChange == 'ui') {
+	      this.setState({
+	        nameChange: 'beg'
+	      });
+	    }
+	  },
+	  validate: function () {
+	    var newName = document.getElementById('cyoag-name-input').value;
+	    var context = this.props.context;
+	    if (newName.length < 3) {
+	      context.message({ warning: "User names cannot be shorter than 3 characters." });
+	      return false;
+	    } else if (newName.length > 16) {
+	      context.message({ warning: "User names cannot be longer than 16 characters." });
+	      return false;
+	    } else if (newName.match(/-{2,}/)) {
+	      context.message({ warning: "User names cannot contain consecutive dashes." });
+	      return false;
+	    } else if (newName.match(/[^a-zA-Z0-9-]/)) {
+	      context.message({ warning: "User names may only contain letters and numbers." });
+	      return false;
+	    }
+	    return true;
+	  }
+	});
+	
+	exports.MarginColumn = MarginColumn;
+	
+	module.exports = exports;
+
+/***/ },
+/* 187 */
+/*!*********************************************!*\
+>>>>>>> edit-post
   !*** ./build-source/js/FooterComponents.js ***!
   \*********************************************/
 function(e,t,n){var o=n(/*! react */1),r=(n(/*! react-dom */30),n(/*! ../../constants */165),n(/*! ../../utils/browserLogger */167)("FooterComponents.js")),t={},a=o.createClass({displayName:"Footer",render:function(){return r.verbose("Rendering..."),o.createElement("div",{id:"cyoag-footer-container"},o.createElement("hr",null),o.createElement("p",{className:"cyoag-note"},"Your use of this site implies your understanding of and consent to abide by the CYOAG ",o.createElement("a",{className:"cyoag-link",href:"tos.html"},"Terms, Conditions, and User Agreement")," and ",o.createElement("a",{className:"cyoag-link",href:"priv-pol.html"},"Privacy Policy"),".  All software written to support the CYOAG project is protected under the ",o.createElement("a",{className:"cyoag-link",href:"http://www.gnu.org/licenses/gpl.html"},"GNU GPL v3.0")," license.  For additional information, please see the ",o.createElement("a",{className:"cyoag-link",href:"usage.html"},"CYOAG Usage and Copyright")," page."))}});t.Footer=a,e.exports=t}]);

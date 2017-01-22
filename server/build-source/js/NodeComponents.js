@@ -20,10 +20,14 @@ var Node = React.createClass({
     var snippet = context.state.snippet;
 
     var trailingSnippetId = 'node-' + context.state.parentUid;
+    var modificationsComponent =
+      context.state.editMode ?
+        <div id='cyoag-modification-container'></div> :
+        <div id='cyoag-modification-container'><ModificationsComponent context={context} /></div>;
 
     return(
       <div id='cyoag-node-container'>
-        <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-link' href='#' onMouseMove={this.locateTooltip}>
+        <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-link' onMouseMove={this.locateTooltip}>
           <div className='cyoag-path-item cyoag-trailing-snippet' onClick={this.navigate}>
             {snippet.trailingSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}
           </div>
@@ -31,7 +35,7 @@ var Node = React.createClass({
         </a>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
         <div id='cyoag-node-snippet'>{snippet.nodeSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}</div>
-        <NodeOwnerUi context={context} />
+        {modificationsComponent}
       </div>
     );
   },
@@ -42,7 +46,7 @@ var Node = React.createClass({
   }
 });
 
-var NodeOwnerUi = React.createClass({
+var ModificationsComponent = React.createClass({
   render: function() {
     var context = this.props.context;
     var userIsOwner = context.state.inputBlocking.top;
@@ -55,16 +59,18 @@ var NodeOwnerUi = React.createClass({
       return (
         <div id='cyoag-moderator-and-owner-ui'>
           <p id='cyoag-modification-permitted' className='cyoag-note'>You are a moderator and the owner of this chapter, so you have modification privileges.</p>
-          <button id='cyoag-delete-chapter-button' onClick={context.deleteChapter}>Delete this chapter</button>
+          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button shaded-border-orange' onClick={context.editChapter}>Edit this chapter</button>
+          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button shaded-border-red' onClick={context.deleteChapter}>Delete this chapter</button>
         </div>
       );
     }
     if(userIsModerator) {
-      // if the user is a moderator they can delete no matter what
+      // if the user is a moderator they can modify no matter what
       return (
         <div id='cyoag-moderator-ui'>
-          <p id='cyoag-modification-permitted' className='cyoag-note'>As a moderator, you have modification privileges.</p>
-          <button id='cyoag-delete-chapter-button' onClick={context.deleteChapter}>Delete this chapter</button>
+          <p id='cyoag-modification-permitted' className='cyoag-note'>As a moderator, you have modification privileges. (Original content by user {context.state.snippet.authorName})</p>
+          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button shaded-border-orange' onClick={context.editChapter}>Edit this chapter</button>
+          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button shaded-border-red' onClick={context.deleteChapter}>Delete this chapter</button>
         </div>
       );
     }
@@ -90,7 +96,8 @@ var NodeOwnerUi = React.createClass({
       return (
         <div id='cyoag-owner-ui'>
           <p id='cyoag-modification-permitted' className='cyoag-note'>You authored this chapter, and have modification privileges.</p>
-          <button id='cyoag-delete-chapter-button' onClick={context.deleteChapter}>Delete this chapter</button>
+          <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button shaded-border-orange' onClick={context.editChapter}>Edit this chapter</button>
+          <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button shaded-border-red' onClick={context.deleteChapter}>Delete this chapter</button>
         </div>
       );
     }

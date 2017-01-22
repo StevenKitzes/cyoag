@@ -44,6 +44,50 @@ var Blocked = React.createClass({
 
 // Display input fields and simple directions so users know how to contribute
 var Input = React.createClass({
+  checkForEdits: function(e) {
+    logMgr.debug('Checking for edits . . .');
+    if(document.getElementById('cyoag-input-path').value.length == 0 &&
+       document.getElementById('cyoag-input-body').value.length == 0) {
+      // if no changes are detected, set editsPending false and onbeforeunload listener null
+      logMgr.debug('Path and body inputs were both length 0, so no edits are detected.');
+      this.props.context.setEditsPending(false);
+      window.onbeforeunload = null;
+    }
+    else {
+      // if changes detected, set editsPending true and onbeforeunload to a listener
+      logMgr.debug('Path or body input had length > 0, so edits were detected.');
+      this.props.context.setEditsPending(true);
+      window.onbeforeunload = warnBeforeUnload;
+    }
+  },
+  componentDidMount: function() {
+    var inputPathElement = document.getElementById('cyoag-input-path');
+    var inputBodyElement = document.getElementById('cyoag-input-body');
+
+    // all browsers excpet short bus IE
+    if(inputPathElement.addEventListener) {
+      // attempt to remove listeners from input elements to prevent duplicate listener firing
+      logMgr.debug('Removing existing event listeners to input fields for all browsers except O.G. IE . . .');
+      inputPathElement.removeEventListener('input', this.checkForEdits);
+      inputBodyElement.removeEventListener('input', this.checkForEdits);
+      // now add the listeners for changes to these input elements
+      inputPathElement.addEventListener('input', this.checkForEdits, false);
+      inputBodyElement.addEventListener('input', this.checkForEdits, false);
+      logMgr.debug('. . . then added them back on.');
+    }
+    // short bus IE
+    else {
+      // attempt to remove listeners from input elements to prevent duplicate listener firing
+      logMgr.debug('Removing existing event listeners to input fields for O.G. IE . . .');
+      inputPathElement.detachEvent('onpropertychange', this.checkForEdits);
+      inputBodyElement.detachEvent('onpropertychange', this.checkForEdits);
+      // now add the listeners for changes to these input elements
+      inputPathElement.attachEvent('onpropertychange', this.checkForEdits);
+      inputBodyElement.attachEvent('onpropertychange', this.checkForEdits);
+      logMgr.debug('. . . then added them back on.');
+    }
+
+  },
   getInitialState: function() {
     return {
       pathCharCount: 0,
@@ -66,8 +110,8 @@ var Input = React.createClass({
             <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
           </div>
         </div>
-        <button id='cyoag-save-draft-submit' onClick={this.saveDraft}>Save Draft</button>
-        <button id='cyoag-input-submit' onClick={this.submit}>Submit</button>
+        <button id='cyoag-save-draft-submit' className='shaded-border-blue cyoag-hidden' onClick={this.saveDraft}>Save Draft</button>
+        <button id='cyoag-input-submit' className='shaded-border-green' onClick={this.submit}>Submit</button>
       </div>
     );
   },
@@ -81,13 +125,121 @@ var Input = React.createClass({
     }
 
     this.props.context.saveDraft(inputPath, inputBody);
+    this.props.context.setEditsPending(false);
+    window.onbeforeunload = null;
   },
   submit: function() {
     var inputPath = document.getElementById('cyoag-input-path').value;
     var inputBody = document.getElementById('cyoag-input-body').value;
 
     if(validateInput(inputPath, inputBody, this.props.context.message)) {
-      this.props.context.inputSubmit(inputPath, inputBody);
+      this.props.context.setEditsPending(false);
+      window.onbeforeunload = null;
+      this.props.context.submitInput(inputPath, inputBody);
+    }
+  },
+  updateBodyCharCount: function() {
+    this.setState({
+      bodyCharCount: document.getElementById('cyoag-input-body').value.length
+    });
+  },
+  updatePathCharCount: function() {
+    this.setState({
+      pathCharCount: document.getElementById('cyoag-input-path').value.length
+    });
+  }
+});
+
+// Display input fields with hints so users can edit an existing post
+var Edit = React.createClass({
+  cancel: function() {
+    this.props.context.cancelEdit();
+  },
+  checkForEdits: function(e) {
+    if(this.state.originalLastPath == document.getElementById('cyoag-input-path').value &&
+       this.state.originalNodeSnippet == document.getElementById('cyoag-input-body').value) {
+      // if no changes are detected, set editsPending false and onbeforeunload listener null
+      this.props.context.setEditsPending(false);
+      window.onbeforeunload = null;
+    }
+    else {
+      // if changes detected, set editsPending true and onbeforeunload to a listener
+      this.props.context.setEditsPending(true);
+      window.onbeforeunload = warnBeforeUnload;
+    }
+  },
+  componentDidMount: function() {
+    var snippet = this.props.context.state.snippet;
+
+    var inputPathElement = document.getElementById('cyoag-input-path');
+    var inputBodyElement = document.getElementById('cyoag-input-body');
+
+    // set the snippet contents as the initial input field contents
+    inputPathElement.value = snippet.lastPath;
+    inputBodyElement.value = snippet.nodeSnippet;
+
+    // all browsers excpet short bus IE
+    if(inputPathElement.addEventListener) {
+      // attempt to remove listeners from input elements to prevent duplicate listener firing
+      logMgr.debug('Removing existing event listeners to input fields for all browsers except O.G. IE . . .');
+      inputPathElement.removeEventListener('input', this.checkForEdits);
+      inputBodyElement.removeEventListener('input', this.checkForEdits);
+      // now add the listeners for changes to these input elements
+      inputPathElement.addEventListener('input', this.checkForEdits, false);
+      inputBodyElement.addEventListener('input', this.checkForEdits, false);
+      logMgr.debug('. . . then added them back on.');
+    }
+    // short bus IE
+    else {
+      // attempt to remove listeners from input elements to prevent duplicate listener firing
+      logMgr.debug('Removing existing event listeners to input fields for O.G. IE . . .');
+      inputPathElement.detachEvent('onpropertychange', this.checkForEdits);
+      inputBodyElement.detachEvent('onpropertychange', this.checkForEdits);
+      // now add the listeners for changes to these input elements
+      inputPathElement.attachEvent('onpropertychange', this.checkForEdits);
+      inputBodyElement.attachEvent('onpropertychange', this.checkForEdits);
+      logMgr.debug('. . . then added them back on.');
+    }
+  },
+  getInitialState: function() {
+    var snippet = this.props.context.state.snippet;
+    return {
+      pathCharCount: snippet.lastPath.length,
+      bodyCharCount: snippet.nodeSnippet.length,
+      originalLastPath: snippet.lastPath,
+      originalNodeSnippet: snippet.nodeSnippet
+    };
+  },
+  render: function() {
+    return (
+      <div id='cyoag-input-container'>
+        <p id='cyoag-input-cta'><em>Editing chapter</em></p>
+        <div id='cyoag-input-path-container'>
+          Path teaser for this chapter:<br />
+          <textarea id='cyoag-input-path' type='text' onKeyUp={this.updatePathCharCount} placeholder='Path snippet - minimum 4 characters, maximum 100 characters.'></textarea>
+          <div id='cyoag-path-char-hint'><PathHint count={this.state.pathCharCount} /></div>
+        </div>
+        <div id='cyoag-input-body-container'>
+          Body content for this chapter:<br />
+          <textarea id='cyoag-input-body' type='text' onKeyUp={this.updateBodyCharCount} placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
+          <div id='cyoag-input-body-hints-container'>
+            <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
+          </div>
+        </div>
+        <button id='cyoag-input-cancel' className='cyoag-side-spaced-button shaded-border-red' onClick={this.cancel}>Cancel</button>
+        <button id='cyoag-input-submit' className='cyoag-side-spaced-button shaded-border-green' onClick={this.submit}>Save changes</button>
+      </div>
+    );
+  },
+  submit: function() {
+    var inputPath = document.getElementById('cyoag-input-path').value;
+    var inputBody = document.getElementById('cyoag-input-body').value;
+
+    if(validateInput(inputPath, inputBody, this.props.context.message)) {
+      // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
+      this.props.context.setEditsPending(false);
+      window.onbeforeunload = null;
+      this.props.context.submitEdits(inputPath, inputBody);
     }
   },
   updateBodyCharCount: function() {
@@ -118,11 +270,9 @@ var PathHint = React.createClass({
       );
     }
 
-    else {
-      return (
-        <span className='cyoag-note-green'>Characters: {count}</span>
-      );
-    }
+    return (
+      <span className='cyoag-note-green'>Characters: {count}</span>
+    );
   }
 });
 
@@ -142,11 +292,9 @@ var BodyHint = React.createClass({
       );
     }
 
-    else {
-      return (
-        <span className='cyoag-note-green'>Characters: {count}</span>
-      );
-    }
+    return (
+      <span className='cyoag-note-green'>Characters: {count}</span>
+    );
   }
 });
 
@@ -262,8 +410,25 @@ function validateInput(inputPath, inputBody, message) {
   return true;
 }
 
+function warnBeforeUnload(e) {
+  // If we haven't been passed the event get the window.event
+  e = e || window.event;
+
+  var message = constants.confirmDiscardUnsavedEdits;
+
+  // For IE6-8 and Firefox prior to version 4
+  if (e)
+  {
+      e.returnValue = message;
+  }
+
+  // For Chrome, Safari, IE8+ and Opera 12+
+  return message;
+}
+
 exports.Hidden = Hidden;
 exports.Blocked = Blocked;
 exports.Input = Input;
+exports.Edit = Edit;
 
 module.exports = exports;

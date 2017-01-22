@@ -14,6 +14,7 @@ var Paths = React.createClass({
   },
   render: function() {
     logMgr.verbose('Rendering...');
+
     var properThis = this;
     var context = this.props.context;
     var paths = context.state.paths;
@@ -30,7 +31,7 @@ var Paths = React.createClass({
           {paths.map(function(item) {
             var pathUid = 'node-' + item.pathUid;
             return (
-              <a id={pathUid} key={pathUid} className='cyoag-path-item-link cyoag-link' href='#' onMouseMove={properThis.locateTooltip.bind(null, pathUid)}>
+              <a id={pathUid} key={pathUid} className='cyoag-path-item-link cyoag-link' onMouseMove={properThis.locateTooltip.bind(null, pathUid)}>
                 <div className='cyoag-path-item' onClick={properThis.navigate.bind(null, pathUid)}>{item.pathSnippet}</div>
                 <div className='cyoag-tooltip-progress'>Choose wisely . . .</div>
               </a>

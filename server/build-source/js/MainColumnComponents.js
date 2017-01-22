@@ -19,7 +19,10 @@ var MainColumn = React.createClass({
     var context = this.props.context;
 
     var votificationComponent;
-    if(context.state.acctType != constants.acctTypeVisitor) {
+    if(context.state.editMode) {
+      votificationComponent = <VotificationComponents.Hidden />;
+    }
+    else if(context.state.acctType != constants.acctTypeVisitor) {
       votificationComponent = <VotificationComponents.Votification context={context} />;
     }
     else {
@@ -29,6 +32,9 @@ var MainColumn = React.createClass({
     var inputComponent;
     if(context.state.acctType == constants.acctTypeVisitor || context.state.inputBlocking == constants.inputBlockingHide) {
       inputComponent = <InputComponents.Hidden />
+    }
+    else if(context.state.editMode) {
+      inputComponent = <InputComponents.Edit context={context} />
     }
     else if(context.state.inputBlocking.top || context.state.inputBlocking.side) {
       inputComponent = <InputComponents.Blocked blocking={context.state.inputBlocking} />

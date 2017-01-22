@@ -1,17 +1,18 @@
-var generateGuid = require('../utils/uid-gen');
+var constants = require('../constants');
 var logMgr = require('../utils/serverLogger')('handleNewNodeRequest.js', true);
 var responder = require('../responder');
 
 var navigate = require('./handleNavRequest');
 
 module.exports = function(req, res, connection, session_uid, userRow) {
-  var inputPath = req.body.newNodePath;
-  var inputBody = req.body.newNodeBody;
-  var user_uid = userRow['uid'];
-  var user_position = userRow['node_uid'];
+  var targetNode = req.body.editTarget;
+  var updatedPath = req.body.updatedPath;
+  var updatedBody = req.body.updatedBody;
+  var user_uid = userRow.user_uid;
+  var user_position = userRow.node_uid;
 
-  logMgr.out('User ' + user_uid + ' requested to create a new node from position ' + user_position + ' with inputPath "' +
-    inputPath + '..." and inputBody "' + inputBody.split(0, 50) + '..."');
+  logMgr.out('User ' + user_uid + ' requested to edit an existing node at position ' + targetNode + ' with updatedPath "' +
+    updatedPath + '..." and updatedBody "' + updatedBody.split(0, 50) + '..."');
 
   if(!user_position) {
     responder.respondError(res, 'Unable to establish link between existing chapter and new chapter.');
@@ -19,8 +20,15 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     return;
   }
 
-  if(!inputPath || !inputBody) {
+  if(!updatedPath || !updatedBody) {
     responder.respondError(res, 'Crucial data was missing from the chapter authoring request.');
+    connection.release();
+    return;
+  }
+
+  if(targetNode != user_position) {
+    responder.respondError(res, 'User was not detected at the location of the node being edited.');
+    logMgr.debug('targetNode: ' + targetNode + ' user_position: ' + user_position)
     connection.release();
     return;
   }
@@ -33,8 +41,8 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   var whiteSpaceRegex = /\S*[\s]{3,}\S*/g;
 
   // check new path content for too many consecutive white space chars
-  if(whiteSpaceRegex.test(inputPath)) {
-    var matches = inputPath.match(whiteSpaceRegex);
+  if(whiteSpaceRegex.test(updatedPath)) {
+    var matches = updatedPath.match(whiteSpaceRegex);
     var problems = 'Found the following problems: ';
     for(var i = 0; i < matches.length; i++) {
       if(/\S*[\s]{3,}\S*/.test(matches[i])) {
@@ -49,8 +57,8 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   }
 
   // check new body content for too many consecutive white space chars
-  if(whiteSpaceRegex.test(inputBody)) {
-    var matches = inputBody.match(whiteSpaceRegex);
+  if(whiteSpaceRegex.test(updatedBody)) {
+    var matches = updatedBody.match(whiteSpaceRegex);
     var problems = 'Found the following problems: ';
     for(var i = 0; i < matches.length; i++) {
       if(/\S*[\s]{3,}\S*/.test(matches[i])) {
@@ -68,24 +76,24 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   var endingWhiteSpaceRegex = /\s$/;
 
   // check new path or body for starting white space
-  if(startingWhiteSpaceRegex.test(inputPath)) {
+  if(startingWhiteSpaceRegex.test(updatedPath)) {
     responder.respondMsgOnly(res, {warning: 'Path teasers may not begin with white space.  Please try again!'});
     connection.release();
     return;
   }
-  else if(startingWhiteSpaceRegex.test(inputBody)) {
+  else if(startingWhiteSpaceRegex.test(updatedBody)) {
     responder.respondMsgOnly(res, {warning: 'Story content may not begin with white space.  Please try again!'});
     connection.release();
     return;
   }
 
   // check new path or body for ending white space
-  if(endingWhiteSpaceRegex.test(inputPath)) {
+  if(endingWhiteSpaceRegex.test(updatedPath)) {
     responder.respondMsgOnly(res, {warning: 'Path teasers may not end with white space.  Please try again!'});
     connection.release();
     return;
   }
-  else if(endingWhiteSpaceRegex.test(inputBody)) {
+  else if(endingWhiteSpaceRegex.test(updatedBody)) {
     responder.respondMsgOnly(res, {warning: 'Story content may not end with white space.  Please try again!'});
     connection.release();
     return;
@@ -94,8 +102,8 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   var repeatCharRegex = /\S*(.)\1{3,}\S*/g;
 
   // check new path content for too many consecutive same characters
-  if(repeatCharRegex.test(inputPath)) {
-    var matches = inputPath.match(repeatCharRegex);
+  if(repeatCharRegex.test(updatedPath)) {
+    var matches = updatedPath.match(repeatCharRegex);
     var problems = 'Found the following problems: ';
     for(var i = 0; i < matches.length; i++) {
       if(/(.)\1{3,}/.test(matches[i])) {
@@ -109,8 +117,8 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   }
 
   // check new body content for too many consecutive same characters
-  if(repeatCharRegex.test(inputBody)) {
-    var matches = inputBody.match(repeatCharRegex);
+  if(repeatCharRegex.test(updatedBody)) {
+    var matches = updatedBody.match(repeatCharRegex);
     var problems = 'Found the following problems: ';
     for(var i = 0; i < matches.length; i++) {
       if(/(.)\1{3,}/.test(matches[i])) {
@@ -124,18 +132,18 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   }
 
   // check input path length restrictions
-  if(inputPath.length < 4) {
+  if(updatedPath.length < 4) {
     warningMsg += 'Your path teaser must be at least 4 characters long. ';
   }
-  else if(inputPath.length > 100) {
+  else if(updatedPath.length > 100) {
     warningMsg += 'Your path teaser may not exceed 100 characters. ';
   }
 
   // check input body length restrictions
-  if(inputBody.length < 500) {
+  if(updatedBody.length < 500) {
     warningMsg += 'Your chapter content must be at least 500 characters long. ';
   }
-  else if(inputBody.length > 2500) {
+  else if(updatedBody.length > 2500) {
     warningMsg += 'Your chapter content may not exceed 2,500 characters. ';
   }
 
@@ -149,11 +157,11 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   // INPUT VALIDATION
   //
 
-  // ensure user did not author the current node, that current node exists, and that it is not status deleted
-  var query = 'SELECT status, author_uid, parent_uid FROM nodes WHERE uid=?;';
+  // ensure user DID author the current node (or is a moderator), that current node exists, that it is not status deleted
+  var query = 'SELECT status, author_uid FROM nodes WHERE uid=?;';
   connection.query(query, [user_position], function(err, rows) {
     if(err) {
-      responder.respondError(res, 'Database error validating user permission to post new content at this position.');
+      responder.respondError(res, 'Database error validating positioning and authorization to edit this chapter.');
       connection.release();
       return;
     }
@@ -161,63 +169,36 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     if(rows.length < 1) {
       // no rows returned; current node didn't even exist!  No idea where user is; send them to start
       req.body.navigate = constants.rootNodeUid;
-      navigate(req, res, connection, session_uid, userRow, {error: 'Attempted to append to a chapter that does not exist!  You are being sent back to the beginning of the story.'});
+      navigate(req, res, connection, session_uid, userRow, {error: 'Attempted to edit a chapter that does not exist!  You are being sent back to the beginning of the story.'});
       return;
     }
 
     if(rows[0].status != constants.nodeStatusVisible) {
-      // not a valid node to append new story nodes to
+      // not a valid node to edit
       req.body.navigate = rows[0].parent_uid;
-      navigate(req, res, connection, session_uid, userRow, {error: 'Attempted to append to a chapter that appears not to exist.  It may have been deleted while you were writing (possibly by a moderator).  You are being sent to the nearest safe chapter.'});
+      navigate(req, res, connection, session_uid, userRow, {error: 'Attempted to edit a chapter that appears not exist.  It may have been deleted while you were writing (possibly by a moderator).  You are being sent to the nearest undeleted chapter.'});
       return;
     }
 
-    if(rows[0].author_uid == user_uid) {
-      // user wrote the chapter at the current node, so they are top-blocked!
-      responder.respondMsgOnly(res, {warning: "You are not allowed to post new chapters following chapters you wrote!"});
+    if(rows[0].author_uid != user_uid && userRow.acct_type != constants.acctTypeModerator) {
+      // user was not the original author, nor a moderator, so they are forbidden to edit here
+      responder.respondMsgOnly(res, {warning: "Only a chapter's original author (or a moderator) is permitted to edit that chapter!"});
       connection.release();
       return;
     }
 
-    // also ensure user did not already author any nodes following this node
-    query = 'SELECT author_uid FROM nodes WHERE parent_uid=?;';
-    connection.query(query, [user_position], function(err, rows) {
+    // if all these checks were good, we should be fine committing the edit!
+    query = 'UPDATE nodes SET path_snippet=?, node_snippet=? WHERE uid=?;';
+    connection.query(query, [updatedPath, updatedBody, user_position], function(err, rows) {
       if(err) {
-        responder.respondError(res, 'Database error validating user permission to post new content at this position.');
+        responder.respondError(res, 'Database error committing edits.');
         connection.release();
         return;
       }
 
-      for(var i = 0; i < rows.length; i++) {
-        if(rows[i].author_uid == user_uid) {
-          responder.respondMsgOnly(res, {warning: "You are not allowed to post multiple chapters following the same chapter!"});
-          connection.release();
-          return;
-        }
-      }
-
-      // validate parent still exists
-      // insert new chapter!!
-      query =
-        'START TRANSACTION; ' +
-          'INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet, votification, status) ' +
-          'SELECT ?, positions.node_uid, positions.user_uid, ?, ?, ?, ? ' +
-            'FROM positions ' +
-            'WHERE positions.user_uid=?;' +
-          'UPDATE positions SET node_uid=? WHERE user_uid=?; ' +
-        'COMMIT;';
-      var newNodeUid = generateGuid();
-      connection.query(query, [newNodeUid, inputPath, inputBody, 0, constants.nodeStatusVisible, user_uid, newNodeUid, user_uid], function(err, rows) {
-        if(err) {
-          responder.respondError(res, 'Database error saving new chapter information.');
-          connection.release();
-          return;
-        }
-
-        responder.respond(res, session_uid);
-        connection.release();
-        return;
-      });
+      responder.respond(res, session_uid, {msg: constants.specialMessage_editSuccess});
+      connection.release();
+      return;
     });
   });
 }
