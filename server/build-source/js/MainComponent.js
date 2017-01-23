@@ -330,6 +330,9 @@ function cancelEdit() {
     return;
   }
 
+  // if cancel is confirmed with no unsaved changes (or unsaved changes discarded) make sure any messaging is cleared!
+  this.message({});
+
   window.onbeforeunload = null;
   this.editsPending = false;
 
