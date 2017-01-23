@@ -23190,11 +23190,6 @@
 	    var snippet = context.state.snippet;
 	
 	    var trailingSnippetId = 'node-' + context.state.parentUid;
-	    var modificationsComponent = context.state.editMode ? React.createElement('div', { id: 'cyoag-modification-container' }) : React.createElement(
-	      'div',
-	      { id: 'cyoag-modification-container' },
-	      React.createElement(ModificationsComponent, { context: context })
-	    );
 	
 	    return React.createElement(
 	      'div',
@@ -23235,7 +23230,7 @@
 	          );
 	        })
 	      ),
-	      modificationsComponent
+	      React.createElement(ModificationsAndOptionsComponent, { context: context })
 	    );
 	  },
 	  locateTooltip: function (mouseEvent) {
@@ -23245,108 +23240,121 @@
 	  }
 	});
 	
-	var ModificationsComponent = React.createClass({
-	  displayName: 'ModificationsComponent',
+	var ModificationsAndOptionsComponent = React.createClass({
+	  displayName: 'ModificationsAndOptionsComponent',
 	
 	  render: function () {
 	    var context = this.props.context;
+	    var editMode = this.props.context.state.editMode;
 	    var userIsOwner = context.state.inputBlocking.top;
 	    var userIsModerator = context.state.acctType == constants.acctTypeModerator;
 	    var paths = context.state.paths;
 	    var pathCount = paths.length;
 	
+	    var modsAndOptsMsgElement;
+	    var genLinkButtonElement = React.createElement(
+	      'button',
+	      { id: 'cyoag-generate-link-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue', onClick: this.generateLink },
+	      React.createElement(
+	        'span',
+	        null,
+	        'Generate link'
+	      ),
+	      ' ',
+	      React.createElement('img', { className: 'cyoag-question-icon', src: 'images/questionIcon.png' }),
+	      React.createElement(
+	        'span',
+	        { className: 'cyoag-button-tooltip' },
+	        'Generate a link to this chapter so that you can share it easily!'
+	      )
+	    );
+	    var fullTrajectoryButtonElement = React.createElement(
+	      'button',
+	      { id: 'cyoag-full-trajectory-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue', onClick: this.fullTrajectory },
+	      'Full trajectory ',
+	      React.createElement('img', { className: 'cyoag-question-icon', src: 'images/questionIcon.png' }),
+	      React.createElement(
+	        'span',
+	        { className: 'cyoag-button-tooltip' },
+	        'See the complete story trajectory leading to this chapter!'
+	      )
+	    );
+	    var allByAuthorButtonElement = React.createElement(
+	      'button',
+	      { id: 'cyoag-all-by-author-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue', onClick: this.allByAuthor },
+	      'All by ',
+	      context.state.snippet.authorName,
+	      ' ',
+	      React.createElement('img', { className: 'cyoag-question-icon', src: 'images/questionIcon.png' }),
+	      React.createElement(
+	        'span',
+	        { className: 'cyoag-button-tooltip' },
+	        'See all chapters written by this author!!'
+	      )
+	    );
+	    var editButtonElement = React.createElement(
+	      'button',
+	      { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-orange', onClick: context.editChapter },
+	      'Edit chapter'
+	    );
+	    var deleteButtonElement = React.createElement(
+	      'button',
+	      { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-red', onClick: context.deleteChapter },
+	      'Delete chapter'
+	    );
+	
 	    if (userIsModerator && userIsOwner) {
 	      // if the user is moderator and owner, they can do whatever they want with this node
-	      return React.createElement(
-	        'div',
-	        { id: 'cyoag-moderator-and-owner-ui' },
-	        React.createElement(
-	          'p',
-	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
-	          'You are a moderator and the owner of this chapter, so you have modification privileges.'
-	        ),
-	        React.createElement(
-	          'button',
-	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
-	          'Edit this chapter'
-	        ),
-	        React.createElement(
-	          'button',
-	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
-	          'Delete this chapter'
-	        )
+	      modsAndOptsMsgElement = React.createElement(
+	        'p',
+	        { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
+	        'You are a moderator and the owner of this chapter, so you have modification privileges.'
 	      );
-	    }
-	    if (userIsModerator) {
+	    } else if (userIsModerator) {
 	      // if the user is a moderator they can modify no matter what
-	      return React.createElement(
-	        'div',
-	        { id: 'cyoag-moderator-ui' },
-	        React.createElement(
-	          'p',
-	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
-	          'As a moderator, you have modification privileges. (Original content by user ',
-	          context.state.snippet.authorName,
-	          ')'
-	        ),
-	        React.createElement(
-	          'button',
-	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
-	          'Edit this chapter'
-	        ),
-	        React.createElement(
-	          'button',
-	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
-	          'Delete this chapter'
-	        )
+	      modsAndOptsMsgElement = React.createElement(
+	        'p',
+	        { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
+	        'As a moderator, you have modification privileges. (Original content by user ',
+	        context.state.snippet.authorName,
+	        ')'
 	      );
-	    }
-	    if (!userIsOwner) {
+	    } else if (!userIsOwner) {
 	      // if the user is not the owner, just display who the owner is
-	      return React.createElement(
-	        'div',
-	        { id: 'cyoag-owner-ui' },
-	        React.createElement(
-	          'p',
-	          { id: 'cyoag-author-attribution', className: 'cyoag-note' },
-	          'Contribution by user ',
-	          context.state.snippet.authorName
-	        )
+	      modsAndOptsMsgElement = React.createElement(
+	        'p',
+	        { id: 'cyoag-author-attribution', className: 'cyoag-note' },
+	        'Contribution by user ',
+	        context.state.snippet.authorName
 	      );
-	    }
-	    if (pathCount > 0) {
+	    } else if (pathCount > 0) {
 	      // if the user is the owner but someone already appended to this chapter, let the owner know
-	      return React.createElement(
-	        'div',
-	        { id: 'cyoag-owner-ui' },
-	        React.createElement(
-	          'p',
-	          { id: 'cyoag-deletion-forbidden', className: 'cyoag-note' },
-	          'You authored this chapter, but it cannot be modified because another chapter has already been added to it, or a draft is pending on it.'
-	        )
+	      modsAndOptsMsgElement = React.createElement(
+	        'p',
+	        { id: 'cyoag-deletion-forbidden', className: 'cyoag-note' },
+	        'You authored this chapter, but it cannot be modified or deleted because another chapter has already been added to it, or a draft is pending on it.'
 	      );
 	    } else {
 	      // if the user is the author and modification is permitted
-	      return React.createElement(
-	        'div',
-	        { id: 'cyoag-owner-ui' },
-	        React.createElement(
-	          'p',
-	          { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
-	          'You authored this chapter, and have modification privileges.'
-	        ),
-	        React.createElement(
-	          'button',
-	          { id: 'cyoag-edit-chapter-button', className: 'cyoag-side-spaced-button shaded-border-orange', onClick: context.editChapter },
-	          'Edit this chapter'
-	        ),
-	        React.createElement(
-	          'button',
-	          { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button shaded-border-red', onClick: context.deleteChapter },
-	          'Delete this chapter'
-	        )
+	      modsAndOptsMsgElement = React.createElement(
+	        'p',
+	        { id: 'cyoag-modification-permitted', className: 'cyoag-note' },
+	        'You authored this chapter, and have modification privileges.'
 	      );
 	    }
+	
+	    var showModButtons = userIsModerator || userIsOwner && pathCount < 1;
+	
+	    return React.createElement(
+	      'div',
+	      { id: 'cyoag-mods-and-opts-container' },
+	      editMode ? React.createElement('div', { className: 'cyoag-hidden' }) : modsAndOptsMsgElement,
+	      genLinkButtonElement,
+	      fullTrajectoryButtonElement,
+	      allByAuthorButtonElement,
+	      editMode || !showModButtons ? React.createElement('div', { className: 'cyoag-hidden' }) : editButtonElement,
+	      editMode || !showModButtons ? React.createElement('div', { className: 'cyoag-hidden' }) : deleteButtonElement
+	    );
 	  }
 	});
 	
