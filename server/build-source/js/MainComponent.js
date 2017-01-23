@@ -132,9 +132,10 @@ function checkPendingEdits(editsPending, altConfirmationMessage) {
   // if the user says they want to DISCARD saved edits
   if(confirm(confMsg)) {
     logMgr.verbose('User confirmed they are prepared to discard pending edits.');
-    // since user is discarding changes, ensure window.onbeforeunload is null and editsPending is false
+    // since user is discarding changes, ensure window.onbeforeunload is null, editsPending is false, and messages are cleared
     this.editsPending = false;
     window.onbeforeunload = null;
+    this.message({});
     return false;
   }
 
