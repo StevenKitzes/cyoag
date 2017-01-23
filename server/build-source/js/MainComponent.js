@@ -118,7 +118,7 @@ module.exports = MainComponent;
 
 // returns true if user DOES want to RETAIN pending edits (and cancel requested action)
 // returns false if user wants to DISCARD pending edits (and continue with requested action) or if there are no pending edits
-function checkPendingEdits(editsPending, altConfirmationMessage) {
+function checkPendingEdits(editsPending, context, altConfirmationMessage) {
   logMgr.verbose('Confirming whether user wants to discard pending edits.');
   // if no edits are pending, return false
   if(!editsPending) {
@@ -133,9 +133,9 @@ function checkPendingEdits(editsPending, altConfirmationMessage) {
   if(confirm(confMsg)) {
     logMgr.verbose('User confirmed they are prepared to discard pending edits.');
     // since user is discarding changes, ensure window.onbeforeunload is null, editsPending is false, and messages are cleared
-    this.editsPending = false;
+    context.editsPending = false;
     window.onbeforeunload = null;
-    this.message({});
+    context.message({});
     return false;
   }
 
@@ -145,7 +145,7 @@ function checkPendingEdits(editsPending, altConfirmationMessage) {
 }
 
 function mountXhrHandler() {
-  if(checkPendingEdits(this.editsPending)) {
+  if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
   else {
@@ -183,7 +183,7 @@ function mountXhrHandler() {
 }
 
 function logoutXhrHandler() {
-  if(checkPendingEdits(this.editsPending)) {
+  if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
   else {
@@ -221,7 +221,7 @@ function logoutXhrHandler() {
 }
 
 function navigateXhrHandler(nodeUid) {
-  if(checkPendingEdits(this.editsPending)) {
+  if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
   else {
@@ -270,7 +270,7 @@ function deleteChapter() {
     return;
   }
 
-  if(checkPendingEdits(this.editsPending)) {
+  if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
   else {
@@ -310,7 +310,7 @@ function deleteChapter() {
 
 function editChapter() {
   this.message({}); // clear any existing messages when swapping between editMode
-  if(checkPendingEdits(this.editsPending, 'You already have work pending on a new chapter!  Do you want to proceed to ' +
+  if(checkPendingEdits(this.editsPending, this, 'You already have work pending on a new chapter!  Do you want to proceed to ' +
     'discard this work, or cancel your request to edit the existing chapter?'))
   {
     return;
@@ -326,7 +326,7 @@ function editChapter() {
   });
 }
 function cancelEdit() {
-  if(checkPendingEdits(this.editsPending)) {
+  if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
 
@@ -340,7 +340,7 @@ function cancelEdit() {
 }
 
 function votify(nodeUid, newVote) {
-  if(checkPendingEdits(this.editsPending,
+  if(checkPendingEdits(this.editsPending, this,
     'Voting can cause pending edits to be lost ... you might want to vote after your edits are submitted! ' +
     'Do you still want to vote now (dangerous), or would you like to cancel your vote until you are done editing (safe)?'))
   {
@@ -387,7 +387,7 @@ function votify(nodeUid, newVote) {
 }
 
 function nameChange(newName) {
-  if(checkPendingEdits(this.editsPending, 'Changing your name will trigger a page reload ... you might want to change your ' +
+  if(checkPendingEdits(this.editsPending, this, 'Changing your name will trigger a page reload ... you might want to change your ' +
     'name after submitting your edits!  Do you want to proceed with changing your name and discarding your unsaved work?'))
   {
     return;
