@@ -22181,6 +22181,10 @@
 	  var properThis = this;
 	  xhr.onreadystatechange = function () {
 	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+	      if (location.href.indexOf('?') > -1 && !properThis.state.messageOnly && !properThis.state.msg && !properThis.state.warning && !properThis.state.error) {
+	        location.href = config.hostDomain;
+	        return;
+	      }
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Navigation response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
@@ -22933,7 +22937,7 @@
 	      React.createElement(
 	        'p',
 	        { id: 'cyoag-header-subtitle' },
-	        'Choose Your Own Adventure Game'
+	        'Create Your Own Adventure Game'
 	      ),
 	      React.createElement(
 	        'a',
@@ -23380,7 +23384,7 @@
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-generate-link-ui', className: 'cyoag-hidden' },
-	      React.createElement('textarea', { id: 'cyoag-generated-link-textarea', value: config.hostDomain.substring(0, config.hostDomain.length - 1) + '?id=' + this.props.nodeUid })
+	      React.createElement('textarea', { readOnly: true, id: 'cyoag-generated-link-textarea', value: config.hostDomain.substring(0, config.hostDomain.length - 1) + '?id=' + this.props.nodeUid })
 	    );
 	  }
 	});

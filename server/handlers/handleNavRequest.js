@@ -56,6 +56,14 @@ module.exports = function(req, res, connection, session_uid, userRow, forwardedM
           return;
         }
 
+        // if no rows were returned, this node doesn't exist in the DB... respond with message
+        if(rows.length < 1) {
+          logMgr.error('A user tried to navigate to a non-existent chapter. Chapter UID does not exist in the database.');
+          responder.respondMsgOnly(res, {error: 'Navigation was attempted to a chapter that does not appear to exist in the database! We will just let you stay where you are for now.'});
+          connection.release();
+          return;
+        }
+
         // if destination was already a safe node, we can just respond to the client now
         if(rows[0].status == constants.nodeStatusVisible) {
           logMgr.out('Nav request targeted a safe node.  Already repositioned.  Building response.');

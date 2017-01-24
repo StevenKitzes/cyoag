@@ -65,6 +65,11 @@ var Modal = React.createClass({
     if(modalObj) {
       modalObj.style.display = 'none';
     }
+    // if we are done with messages but there are still artifacts in the URL, re-nav to base page to clear them
+    if(location.href.indexOf('?') > -1) {
+      location.href = config.hostDomain;
+      return;
+    }
   },
   render: function() {
     logMgr.verbose('Rendering...');

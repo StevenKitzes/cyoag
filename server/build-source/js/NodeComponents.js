@@ -126,7 +126,7 @@ var GenerateLinkUi = React.createClass({
   render: function () {
     return (
       <div id='cyoag-generate-link-ui' className='cyoag-hidden'>
-        <textarea id='cyoag-generated-link-textarea' value={config.hostDomain.substring(0,config.hostDomain.length-1) + '?id=' + this.props.nodeUid} />
+        <textarea readOnly id='cyoag-generated-link-textarea' value={config.hostDomain.substring(0,config.hostDomain.length-1) + '?id=' + this.props.nodeUid} />
       </div>
     );
   }
