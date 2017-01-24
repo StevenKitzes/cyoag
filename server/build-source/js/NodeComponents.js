@@ -1,14 +1,19 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var config = require('../../build-config');
 var constants = require('../../constants');
 var logMgr = require('../../utils/browserLogger')('NodeComponents.js');
+var scrollToElementId = require('../../utils/scrollToElementId');
 var uidGen = require('../../utils/uid-gen');
 
 var exports = {};
 
 // Facebook login button component
 var Node = React.createClass({
+  componentWillUpdate: function() {
+    document.getElementById('cyoag-generate-link-ui').classList.add('cyoag-hidden');
+  },
   navigate: function() {
     logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
     this.props.context.navigate(this.props.context.state.parentUid);
@@ -32,6 +37,7 @@ var Node = React.createClass({
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
         <div id='cyoag-node-snippet'>{snippet.nodeSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}</div>
         <ModificationsAndOptionsComponent context={context} />
+        <GenerateLinkUi nodeUid={context.state.nodeUid} />
       </div>
     );
   },
@@ -52,7 +58,7 @@ var ModificationsAndOptionsComponent = React.createClass({
     var pathCount = paths.length;
 
     var modsAndOptsMsgElement;
-    var genLinkButtonElement = <button id='cyoag-generate-link-button' className='cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue' onClick={this.generateLink}>
+    var genLinkButtonElement = <button id='cyoag-generate-link-button' className='cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue' onClick={this.showGeneratedLink}>
       <span>Generate link</span> <img className='cyoag-question-icon' src='images/questionIcon.png' />
       <span className='cyoag-button-tooltip'>Generate a link to this chapter so that you can share it easily!</span>
     </button>;
@@ -71,26 +77,29 @@ var ModificationsAndOptionsComponent = React.createClass({
       Delete chapter
     </button>;
 
+    var modsAndOptsMsg;
     if(userIsModerator && userIsOwner) {
       // if the user is moderator and owner, they can do whatever they want with this node
-      modsAndOptsMsgElement = <p id='cyoag-modification-permitted' className='cyoag-note'>You are a moderator and the owner of this chapter, so you have modification privileges.</p>;
+      modsAndOptsMsg = 'You are a moderator and the owner of this chapter, so you have modification privileges.';
     }
     else if(userIsModerator) {
       // if the user is a moderator they can modify no matter what
-      modsAndOptsMsgElement = <p id='cyoag-modification-permitted' className='cyoag-note'>As a moderator, you have modification privileges. (Original content by user {context.state.snippet.authorName})</p>;
+      modsAndOptsMsg = 'As a moderator, you have modification privileges. (Original content by user ' + context.state.snippet.authorName + '.)';
     }
     else if(!userIsOwner) {
       // if the user is not the owner, just display who the owner is
-      modsAndOptsMsgElement = <p id='cyoag-author-attribution' className='cyoag-note'>Contribution by user {context.state.snippet.authorName}</p>;
+      modsAndOptsMsg = 'Contribution by user ' + context.state.snippet.authorName + '.';
     }
     else if(pathCount > 0) {
       // if the user is the owner but someone already appended to this chapter, let the owner know
-      modsAndOptsMsgElement = <p id='cyoag-deletion-forbidden' className='cyoag-note'>You authored this chapter, but it cannot be modified or deleted because another chapter has already been added to it, or a draft is pending on it.</p>;
+      modsAndOptsMsg = 'You authored this chapter, but it cannot be modified or deleted because another chapter has already been added to it, or a draft is pending on it.';
     }
     else {
       // if the user is the author and modification is permitted
-      modsAndOptsMsgElement = <p id='cyoag-modification-permitted' className='cyoag-note'>You authored this chapter, and have modification privileges.</p>;
+      modsAndOptsMsg = 'You authored this chapter, and have modification privileges.';
     }
+
+    modsAndOptsMsgElement = <p id='cyoag-mods-and-opts-message' className='cyoag-note'>{modsAndOptsMsg}</p>;
 
     var showModButtons = userIsModerator || (userIsOwner && pathCount < 1);
 
@@ -102,6 +111,22 @@ var ModificationsAndOptionsComponent = React.createClass({
         {allByAuthorButtonElement}
         {editMode || !showModButtons ? <div className='cyoag-hidden' /> : editButtonElement}
         {editMode || !showModButtons ? <div className='cyoag-hidden' /> : deleteButtonElement}
+      </div>
+    );
+  },
+  showGeneratedLink: function() {
+    var generateLinkUi = document.getElementById('cyoag-generate-link-ui');
+    generateLinkUi.classList.remove('cyoag-hidden');
+    document.getElementById('cyoag-generated-link-textarea').select();
+    scrollToElementId('cyoag-generate-link-button');
+  }
+});
+
+var GenerateLinkUi = React.createClass({
+  render: function () {
+    return (
+      <div id='cyoag-generate-link-ui' className='cyoag-hidden'>
+        <textarea id='cyoag-generated-link-textarea' value={config.hostDomain + 'link?id=' + this.props.nodeUid} />
       </div>
     );
   }

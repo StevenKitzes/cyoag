@@ -4,6 +4,7 @@ var ReactDOM = require('react-dom');
 var config = require('../../build-config');
 var constants = require('../../constants');
 var logMgr = require('../../utils/browserLogger')('MainComponent.js');
+var scrollToElementId = require('../../utils/scrollToElementId');
 
 var HeaderComponents = require('./HeaderComponents');
 var MessagingComponents = require('./MessagingComponents');
@@ -17,22 +18,7 @@ var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   componentDidUpdate: function() {
     if(this.state.editMode) {
-      // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
-      var box = document.getElementById('cyoag-input-container').getBoundingClientRect();
-
-      var body = document.body;
-      var docEl = document.documentElement;
-
-      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-
-      var clientTop = docEl.clientTop || body.clientTop || 0;
-      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-
-      var top  = box.top +  scrollTop - clientTop;
-      var left = box.left + scrollLeft - clientLeft;
-
-      window.scrollTo(left, top);
+      scrollToElementId('cyoag-input-container');
     }
     else {
       restoreScroll(this.state.windowScroll);
