@@ -211,7 +211,9 @@ function logoutXhrHandler() {
   xhr.send();
 }
 
-function navigateXhrHandler(nodeUid) {
+// the urldirty flag indicates we should expect to need to clean the url somehow
+// (we are attempting to handle this server side with a subtle redirect)
+function navigateXhrHandler(nodeUid, urlDirty) {
   if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
@@ -231,12 +233,6 @@ function navigateXhrHandler(nodeUid) {
   var properThis = this;
   xhr.onreadystatechange = function() {
     if( xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304) ) {
-      // if direct link nav artifacts in URL, reset to base CYOAG URL to clear artifacts, unless important messages pending;
-      // another check will take place after messages clear to handle artifacts
-      if(location.href.indexOf('?') > -1 && !properThis.state.messageOnly && !properThis.state.msg && !properThis.state.warning && !properThis.state.error) {
-        location.href = config.hostDomain;
-        return;
-      }
       logMgr.debug('Status 200 (or 304)!');
       logMgr.verbose('Navigation response payload: ' + xhr.responseText);
       var response = JSON.parse(xhr.responseText);
@@ -256,7 +252,7 @@ function navigateXhrHandler(nodeUid) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({navigate: nodeUid});
+  var xhrPayload = JSON.stringify({navigate: nodeUid, urlDirty: urlDirty});
   xhr.send(xhrPayload);
 }
 
@@ -725,7 +721,7 @@ function directLinkIntercept(properThis) {
   }
   if(id) {
     logMgr.out('Frontend received direct link navigation request: ' + id);
-    navigateXhrHandler.bind(properThis)(id);
+    navigateXhrHandler.bind(properThis)(id, true);
     return true;
   }
   return false;

@@ -16,7 +16,7 @@ var Node = React.createClass({
   },
   navigate: function() {
     logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
-    this.props.context.navigate(this.props.context.state.parentUid);
+    this.props.context.navigate(this.props.context.state.parentUid, false);
   },
   render: function() {
     logMgr.verbose('Rendering...');
@@ -62,11 +62,11 @@ var ModificationsAndOptionsComponent = React.createClass({
       <span>Generate link</span> <img className='cyoag-question-icon' src='images/questionIcon.png' />
       <span className='cyoag-button-tooltip'>Generate a link to this chapter so that you can share it easily!</span>
     </button>;
-    var fullTrajectoryButtonElement = <button id='cyoag-full-trajectory-button' className='cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue' onClick={this.fullTrajectory}>
+    var fullTrajectoryButtonElement = <button id='cyoag-full-trajectory-button' className='cyoag-hidden cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue' onClick={this.fullTrajectory}>
       Full trajectory <img className='cyoag-question-icon' src='images/questionIcon.png' />
       <span className='cyoag-button-tooltip'>See the complete story trajectory leading to this chapter!</span>
     </button>;
-    var allByAuthorButtonElement = <button id='cyoag-all-by-author-button' className='cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue' onClick={this.allByAuthor}>
+    var allByAuthorButtonElement = <button id='cyoag-all-by-author-button' className='cyoag-hidden cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue' onClick={this.allByAuthor}>
       All by {context.state.snippet.authorName} <img className='cyoag-question-icon' src='images/questionIcon.png' />
       <span className='cyoag-button-tooltip'>See all chapters written by this author!!</span>
     </button>;

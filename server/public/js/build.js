@@ -21951,13 +21951,13 @@
 	var config = __webpack_require__(/*! ../../build-config */ 173);
 	var constants = __webpack_require__(/*! ../../constants */ 174);
 	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainComponent.js');
-	var scrollToElementId = __webpack_require__(/*! ../../utils/scrollToElementId */ 188);
+	var scrollToElementId = __webpack_require__(/*! ../../utils/scrollToElementId */ 177);
 	
-	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 177);
-	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 178);
-	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 179);
-	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 185);
-	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 186);
+	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 178);
+	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 179);
+	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 180);
+	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 187);
+	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 188);
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
@@ -22162,7 +22162,9 @@
 	  xhr.send();
 	}
 	
-	function navigateXhrHandler(nodeUid) {
+	// the urldirty flag indicates we should expect to need to clean the url somehow
+	// (we are attempting to handle this server side with a subtle redirect)
+	function navigateXhrHandler(nodeUid, urlDirty) {
 	  if (checkPendingEdits(this.editsPending, this)) {
 	    return;
 	  } else {
@@ -22181,10 +22183,6 @@
 	  var properThis = this;
 	  xhr.onreadystatechange = function () {
 	    if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
-	      if (location.href.indexOf('?') > -1 && !properThis.state.messageOnly && !properThis.state.msg && !properThis.state.warning && !properThis.state.error) {
-	        location.href = config.hostDomain;
-	        return;
-	      }
 	      logMgr.debug('Status 200 (or 304)!');
 	      logMgr.verbose('Navigation response payload: ' + xhr.responseText);
 	      var response = JSON.parse(xhr.responseText);
@@ -22203,7 +22201,7 @@
 	      windowScroll: savedWindowPosition
 	    });
 	  };
-	  var xhrPayload = JSON.stringify({ navigate: nodeUid });
+	  var xhrPayload = JSON.stringify({ navigate: nodeUid, urlDirty: urlDirty });
 	  xhr.send(xhrPayload);
 	}
 	
@@ -22643,7 +22641,7 @@
 	  }
 	  if (id) {
 	    logMgr.out('Frontend received direct link navigation request: ' + id);
-	    navigateXhrHandler.bind(properThis)(id);
+	    navigateXhrHandler.bind(properThis)(id, true);
 	    return true;
 	  }
 	  return false;
@@ -22906,6 +22904,33 @@
 
 /***/ },
 /* 177 */
+/*!************************************!*\
+  !*** ./utils/scrollToElementId.js ***!
+  \************************************/
+/***/ function(module, exports) {
+
+	module.exports = function(elementId) {
+	  // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
+	  var box = document.getElementById(elementId).getBoundingClientRect();
+	
+	  var body = document.body;
+	  var docEl = document.documentElement;
+	
+	  var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
+	  var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
+	
+	  var clientTop = docEl.clientTop || body.clientTop || 0;
+	  var clientLeft = docEl.clientLeft || body.clientLeft || 0;
+	
+	  var top  = box.top +  scrollTop - clientTop;
+	  var left = box.left + scrollLeft - clientLeft;
+	
+	  window.scrollTo(left, top);
+	}
+
+
+/***/ },
+/* 178 */
 /*!*********************************************!*\
   !*** ./build-source/js/HeaderComponents.js ***!
   \*********************************************/
@@ -22972,7 +22997,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 178 */
+/* 179 */
 /*!************************************************!*\
   !*** ./build-source/js/MessagingComponents.js ***!
   \************************************************/
@@ -23119,7 +23144,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 179 */
+/* 180 */
 /*!*************************************************!*\
   !*** ./build-source/js/MainColumnComponents.js ***!
   \*************************************************/
@@ -23131,10 +23156,10 @@
 	var constants = __webpack_require__(/*! ../../constants */ 174);
 	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainColumnComponents.js');
 	
-	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 180);
-	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 181);
-	var PathComponents = __webpack_require__(/*! ./PathComponents */ 183);
-	var InputComponents = __webpack_require__(/*! ./InputComponents */ 184);
+	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 181);
+	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 183);
+	var PathComponents = __webpack_require__(/*! ./PathComponents */ 185);
+	var InputComponents = __webpack_require__(/*! ./InputComponents */ 186);
 	
 	var exports = {};
 	
@@ -23183,7 +23208,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 180 */
+/* 181 */
 /*!*******************************************!*\
   !*** ./build-source/js/NodeComponents.js ***!
   \*******************************************/
@@ -23195,8 +23220,8 @@
 	var config = __webpack_require__(/*! ../../build-config */ 173);
 	var constants = __webpack_require__(/*! ../../constants */ 174);
 	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('NodeComponents.js');
-	var scrollToElementId = __webpack_require__(/*! ../../utils/scrollToElementId */ 188);
-	var uidGen = __webpack_require__(/*! ../../utils/uid-gen */ 187);
+	var scrollToElementId = __webpack_require__(/*! ../../utils/scrollToElementId */ 177);
+	var uidGen = __webpack_require__(/*! ../../utils/uid-gen */ 182);
 	
 	var exports = {};
 	
@@ -23209,7 +23234,7 @@
 	  },
 	  navigate: function () {
 	    logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
-	    this.props.context.navigate(this.props.context.state.parentUid);
+	    this.props.context.navigate(this.props.context.state.parentUid, false);
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
@@ -23299,7 +23324,7 @@
 	    );
 	    var fullTrajectoryButtonElement = React.createElement(
 	      'button',
-	      { id: 'cyoag-full-trajectory-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue', onClick: this.fullTrajectory },
+	      { id: 'cyoag-full-trajectory-button', className: 'cyoag-hidden cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue', onClick: this.fullTrajectory },
 	      'Full trajectory ',
 	      React.createElement('img', { className: 'cyoag-question-icon', src: 'images/questionIcon.png' }),
 	      React.createElement(
@@ -23310,7 +23335,7 @@
 	    );
 	    var allByAuthorButtonElement = React.createElement(
 	      'button',
-	      { id: 'cyoag-all-by-author-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue', onClick: this.allByAuthor },
+	      { id: 'cyoag-all-by-author-button', className: 'cyoag-hidden cyoag-side-spaced-button cyoag-tooltip-button shaded-border-blue', onClick: this.allByAuthor },
 	      'All by ',
 	      context.state.snippet.authorName,
 	      ' ',
@@ -23394,7 +23419,57 @@
 	module.exports = exports;
 
 /***/ },
-/* 181 */
+/* 182 */
+/*!**************************!*\
+  !*** ./utils/uid-gen.js ***!
+  \**************************/
+/***/ function(module, exports) {
+
+	// Alphabet from which to select characters for our UIDs
+	var alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+	
+	// Generate a random integer between min (inclusive) and max (exclusive)
+	function randInt(min, max) {
+	  return Math.floor(Math.random() * (max-min)) + min;
+	}
+	
+	// Get a UID!!
+	function getUid() {
+	  // List of characters to be populated as we go
+	  var chars = [];
+	
+	  // Even the dash locations are randomized (within constraints)
+	  var dash1 = 5 + randInt(5, 11);
+	  var dash2 = dash1 + randInt(5, 11);
+	  var dash3 = dash2 + randInt(5, 11);
+	
+	  // Generate 37 characters separated by 3 randomly placed dashes
+	  for(var i = 0; i < 40; i++) {
+	    // If this is a dash index, insert a dash instead of a random character
+	    if(i == dash1 || i == dash2 || i == dash3) {
+	      chars.push('-');
+	    }
+	    // Insert random char by indexing into a random one from the alphabet above
+	    else {
+	      var cRand = randInt(0,62);
+	      chars.push(alphabet.charAt(cRand));
+	    }
+	  }
+	
+	  // Join the running character list to create UID as a string
+	  var result = chars.join('');
+	
+	  // Report and return generated UID
+	  console.log('Made uid of length ' + result.length + ': ' + result);
+	  return result;
+	}
+	
+	// Expose the function that generates the UIDs
+	module.exports = getUid;
+
+
+/***/ },
+/* 183 */
 /*!***************************************************!*\
   !*** ./build-source/js/VotificationComponents.js ***!
   \***************************************************/
@@ -23406,7 +23481,7 @@
 	var constants = __webpack_require__(/*! ../../constants */ 174);
 	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('VotificationComponents.js');
 	
-	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 182);
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 184);
 	
 	var exports = {};
 	
@@ -23508,7 +23583,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 182 */
+/* 184 */
 /*!********************************************************!*\
   !*** ./build-source/js/SocialLoginButtonComponents.js ***!
   \********************************************************/
@@ -23590,7 +23665,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 183 */
+/* 185 */
 /*!*******************************************!*\
   !*** ./build-source/js/PathComponents.js ***!
   \*******************************************/
@@ -23610,7 +23685,7 @@
 	
 	  navigate: function (navElementUid) {
 	    var destinationUid = navElementUid.substring(5);
-	    this.props.context.navigate(destinationUid);
+	    this.props.context.navigate(destinationUid, false);
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
@@ -23666,7 +23741,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 184 */
+/* 186 */
 /*!********************************************!*\
   !*** ./build-source/js/InputComponents.js ***!
   \********************************************/
@@ -24204,7 +24279,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 185 */
+/* 187 */
 /*!***************************************************!*\
   !*** ./build-source/js/MarginColumnComponents.js ***!
   \***************************************************/
@@ -24216,7 +24291,7 @@
 	var constants = __webpack_require__(/*! ../../constants */ 174);
 	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MarginColumnComponents.js');
 	
-	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 182);
+	var SocialLoginButtonComponents = __webpack_require__(/*! ./SocialLoginButtonComponents */ 184);
 	
 	var exports = {};
 	
@@ -24415,7 +24490,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 186 */
+/* 188 */
 /*!*********************************************!*\
   !*** ./build-source/js/FooterComponents.js ***!
   \*********************************************/
@@ -24476,83 +24551,6 @@
 	exports.Footer = Footer;
 	
 	module.exports = exports;
-
-/***/ },
-/* 187 */
-/*!**************************!*\
-  !*** ./utils/uid-gen.js ***!
-  \**************************/
-/***/ function(module, exports) {
-
-	// Alphabet from which to select characters for our UIDs
-	var alphabet = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
-	
-	// Generate a random integer between min (inclusive) and max (exclusive)
-	function randInt(min, max) {
-	  return Math.floor(Math.random() * (max-min)) + min;
-	}
-	
-	// Get a UID!!
-	function getUid() {
-	  // List of characters to be populated as we go
-	  var chars = [];
-	
-	  // Even the dash locations are randomized (within constraints)
-	  var dash1 = 5 + randInt(5, 11);
-	  var dash2 = dash1 + randInt(5, 11);
-	  var dash3 = dash2 + randInt(5, 11);
-	
-	  // Generate 37 characters separated by 3 randomly placed dashes
-	  for(var i = 0; i < 40; i++) {
-	    // If this is a dash index, insert a dash instead of a random character
-	    if(i == dash1 || i == dash2 || i == dash3) {
-	      chars.push('-');
-	    }
-	    // Insert random char by indexing into a random one from the alphabet above
-	    else {
-	      var cRand = randInt(0,62);
-	      chars.push(alphabet.charAt(cRand));
-	    }
-	  }
-	
-	  // Join the running character list to create UID as a string
-	  var result = chars.join('');
-	
-	  // Report and return generated UID
-	  console.log('Made uid of length ' + result.length + ': ' + result);
-	  return result;
-	}
-	
-	// Expose the function that generates the UIDs
-	module.exports = getUid;
-
-
-/***/ },
-/* 188 */
-/*!************************************!*\
-  !*** ./utils/scrollToElementId.js ***!
-  \************************************/
-/***/ function(module, exports) {
-
-	module.exports = function(elementId) {
-	  // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
-	  var box = document.getElementById(elementId).getBoundingClientRect();
-	
-	  var body = document.body;
-	  var docEl = document.documentElement;
-	
-	  var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-	  var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-	
-	  var clientTop = docEl.clientTop || body.clientTop || 0;
-	  var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-	
-	  var top  = box.top +  scrollTop - clientTop;
-	  var left = box.left + scrollLeft - clientLeft;
-	
-	  window.scrollTo(left, top);
-	}
-
 
 /***/ }
 /******/ ]);
