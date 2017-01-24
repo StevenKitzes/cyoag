@@ -105,7 +105,7 @@ var Input = React.createClass({
         </div>
         <div id='cyoag-input-body-container'>
           Enter the body of your new chapter:<br />
-          <textarea id='cyoag-input-body' type='text' onKeyUp={this.updateBodyCharCount} placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
+          <textarea id='cyoag-input-body' type='text' onKeyUp={this.updateBodyCharCount} placeholder='Chapter content - minimum 500 characters, maximum 2,500 characters.'></textarea>
           <div id='cyoag-input-body-hints-container'>
             <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
           </div>
@@ -221,7 +221,7 @@ var Edit = React.createClass({
         </div>
         <div id='cyoag-input-body-container'>
           Body content for this chapter:<br />
-          <textarea id='cyoag-input-body' type='text' onKeyUp={this.updateBodyCharCount} placeholder='Chapter content - minimum 1000 characters, maximum 5000 characters.'></textarea>
+          <textarea id='cyoag-input-body' type='text' onKeyUp={this.updateBodyCharCount} placeholder='Chapter content - minimum 500 characters, maximum 2,500 characters.'></textarea>
           <div id='cyoag-input-body-hints-container'>
             <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
           </div>
