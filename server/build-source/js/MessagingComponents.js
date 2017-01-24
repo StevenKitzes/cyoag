@@ -1,6 +1,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var config = require('../../build-config');
 var constants = require('../../constants');
 var logMgr = require('../../utils/browserLogger')('MessagingComponents.js');
 
@@ -64,6 +65,11 @@ var Modal = React.createClass({
     var modalObj = document.getElementById('cyoag-modal-message-container');
     if(modalObj) {
       modalObj.style.display = 'none';
+    }
+    // if we have gotten this far and the URL is still dirty, clean it by redirecting to the plain host domain
+    if(location.href.indexOf('?') > -1) {
+      location.href = config.hostDomain;
+      return;
     }
   },
   render: function() {

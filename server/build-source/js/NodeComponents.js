@@ -16,7 +16,7 @@ var Node = React.createClass({
   },
   navigate: function() {
     logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
-    this.props.context.navigate(this.props.context.state.parentUid, false);
+    this.props.context.navigate(this.props.context.state.parentUid);
   },
   render: function() {
     logMgr.verbose('Rendering...');

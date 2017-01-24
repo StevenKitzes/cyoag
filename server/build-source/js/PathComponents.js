@@ -10,7 +10,7 @@ var exports = {};
 var Paths = React.createClass({
   navigate: function(navElementUid) {
     var destinationUid = navElementUid.substring(5);
-    this.props.context.navigate(destinationUid, false);
+    this.props.context.navigate(destinationUid);
   },
   render: function() {
     logMgr.verbose('Rendering...');

@@ -211,9 +211,7 @@ function logoutXhrHandler() {
   xhr.send();
 }
 
-// the urldirty flag indicates we should expect to need to clean the url somehow
-// (we are attempting to handle this server side with a subtle redirect)
-function navigateXhrHandler(nodeUid, urlDirty) {
+function navigateXhrHandler(nodeUid) {
   if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
@@ -252,7 +250,7 @@ function navigateXhrHandler(nodeUid, urlDirty) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({navigate: nodeUid, urlDirty: urlDirty});
+  var xhrPayload = JSON.stringify({navigate: nodeUid});
   xhr.send(xhrPayload);
 }
 
@@ -519,6 +517,15 @@ function saveDraft(path, body) {
 
 // scrollTop tells us whether we want to scroll the window to the top after validating and initializing a React re-render
 function validateResponse(properThis, response, newWindowPosition) {
+  // if there is no incoming message, and the url is dirty, force a refresh with a clean url
+  // if there is a message, we will check for dirty URL after modal message close and redirect then
+  if(location.href.indexOf('?') > -1 &&
+    response && !response.msg && !response.warning && !response.error)
+  {
+    location.href = config.hostDomain;
+    return;
+  }
+
   if(validateMessageResponse(properThis, response, newWindowPosition)) {
     return;
   }
@@ -721,7 +728,7 @@ function directLinkIntercept(properThis) {
   }
   if(id) {
     logMgr.out('Frontend received direct link navigation request: ' + id);
-    navigateXhrHandler.bind(properThis)(id, true);
+    navigateXhrHandler.bind(properThis)(id);
     return true;
   }
   return false;

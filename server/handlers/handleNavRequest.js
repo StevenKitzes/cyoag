@@ -7,7 +7,6 @@ module.exports = function(req, res, connection, session_uid, userRow, forwardedM
   var user_uid = userRow.uid;
   var user_position = userRow.node_uid;
   var destination = req.body.navigate;
-  var urlDirty = req.body.urlDirty;
   logMgr.out('Navigation request received from user ' + user_uid + ' to node ' + destination);
 
   if(destination==constants.defaultParentUid) {
@@ -69,12 +68,7 @@ module.exports = function(req, res, connection, session_uid, userRow, forwardedM
         // if destination was already a safe node, we can just respond to the client now
         if(rows[0].status == constants.nodeStatusVisible) {
           logMgr.out('Nav request targeted a safe node.  Already repositioned.  Building response.');
-          if(typeof urldirty != 'undefined' && urldirty) {
-            res.redirect(config.hostDomain);
-          }
-          else {
-            responder.respond(res, session_uid, forwardedMessage ? forwardedMessage : null);
-          }
+          responder.respond(res, session_uid, forwardedMessage ? forwardedMessage : null);
           connection.release();
           return;
         }
@@ -107,15 +101,10 @@ module.exports = function(req, res, connection, session_uid, userRow, forwardedM
               logMgr.debug('Affected rows (checking whether a user position was updated or not): ' + rows.affectedRows);
 
               // user successfully repositioned, respond with a message explaining why the user wasn't moved where expected
-              if(typeof urldirty != 'undefined' && urldirty) {
-                res.redirect(config.hostDomain);
-              }
-              else {
-                responder.respond(res, session_uid,
-                  forwardedMessage ?
-                  forwardedMessage :
-                  {warning: 'That chapter seems to have been deleted while you were reading!  Moving you to the nearest previous, undeleted node.'})
-              }
+              responder.respond(res, session_uid,
+                forwardedMessage ?
+                forwardedMessage :
+                {warning: 'That chapter seems to have been deleted while you were reading!  Moving you to the nearest previous, undeleted node.'})
               connection.release();
               return;
             });
