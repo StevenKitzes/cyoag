@@ -131,6 +131,11 @@ function checkPendingEdits(editsPending, context, altConfirmationMessage) {
 }
 
 function mountXhrHandler() {
+  // intercept this process with a navigation request if a direct-to-chapter URL is detected
+  if( directLinkIntercept(this) ) {
+    return;
+  }
+
   if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
@@ -694,6 +699,30 @@ function getErrorStateObject(errorMessage) {
     error: errorMessage,
     windowScroll: constants.windowScrollTop
   };
+}
+
+function directLinkIntercept(properThis) {
+  var url = location.href;
+  var queryString = url.split('?')[1];
+  if(!queryString) {
+    return false;
+  }
+  var args = queryString.split('&');
+  var id = null;
+  for(var i = 0; i < args.length; i++) {
+    var arg = args[i];
+    var argKey = arg.split('=')[0];
+    var argVal = arg.split('=')[1];
+    if(argKey == 'id') {
+      id = argVal;
+    }
+  }
+  if(id) {
+    logMgr.out('Frontend received direct link navigation request: ' + id);
+    navigateXhrHandler.bind(properThis)(id);
+    return true;
+  }
+  return false;
 }
 
 function resetNewChapterInputs() {

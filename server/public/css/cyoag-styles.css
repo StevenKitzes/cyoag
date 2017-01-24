@@ -411,6 +411,10 @@ button > .cyoag-button-tooltip {
   z-index: 1000;
 }
 
+#cyoag-mods-and-opts-container {
+  margin-top: 1em;
+}
+
 .cyoag-trailing-snippet-link:hover #cyoag-tooltip-regress {
   display: block;
 }
