@@ -1,6 +1,6 @@
 # cyoag
 
-Choose Your Own Adventure Game - A user-generated text adventure
+Create Your Own Adventure Game - A user-generated text adventure
 
 Choose Your Own Adventure Game, or CYOAG for short, is an idea Steven K
 came up with, based on the choose-your-own-adventure books he grew up with.
@@ -16,4 +16,4 @@ Having grown into a career in software development, and remembering his love of
 choose-your-own-adventure books, he decided it would be a great potential side
 project to build a website that combines all of these loves into one.  The CYOAG
 is, thus, a web app that proposes to let users read and/or create content for a
-choose-your-own-adventure game online.
+create-your-own-adventure game online.

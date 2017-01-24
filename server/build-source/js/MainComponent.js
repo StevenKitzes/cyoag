@@ -4,6 +4,7 @@ var ReactDOM = require('react-dom');
 var config = require('../../build-config');
 var constants = require('../../constants');
 var logMgr = require('../../utils/browserLogger')('MainComponent.js');
+var scrollToElementId = require('../../utils/scrollToElementId');
 
 var HeaderComponents = require('./HeaderComponents');
 var MessagingComponents = require('./MessagingComponents');
@@ -17,22 +18,7 @@ var MainComponent = React.createClass({
   componentDidMount: mountXhrHandler,
   componentDidUpdate: function() {
     if(this.state.editMode) {
-      // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
-      var box = document.getElementById('cyoag-input-container').getBoundingClientRect();
-
-      var body = document.body;
-      var docEl = document.documentElement;
-
-      var scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-      var scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-
-      var clientTop = docEl.clientTop || body.clientTop || 0;
-      var clientLeft = docEl.clientLeft || body.clientLeft || 0;
-
-      var top  = box.top +  scrollTop - clientTop;
-      var left = box.left + scrollLeft - clientLeft;
-
-      window.scrollTo(left, top);
+      scrollToElementId('cyoag-input-container');
     }
     else {
       restoreScroll(this.state.windowScroll);
@@ -145,6 +131,11 @@ function checkPendingEdits(editsPending, context, altConfirmationMessage) {
 }
 
 function mountXhrHandler() {
+  // intercept this process with a navigation request if a direct-to-chapter URL is detected
+  if( directLinkIntercept(this) ) {
+    return;
+  }
+
   if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
@@ -220,7 +211,9 @@ function logoutXhrHandler() {
   xhr.send();
 }
 
-function navigateXhrHandler(nodeUid) {
+// the urldirty flag indicates we should expect to need to clean the url somehow
+// (we are attempting to handle this server side with a subtle redirect)
+function navigateXhrHandler(nodeUid, urlDirty) {
   if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
@@ -259,7 +252,7 @@ function navigateXhrHandler(nodeUid) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({navigate: nodeUid});
+  var xhrPayload = JSON.stringify({navigate: nodeUid, urlDirty: urlDirty});
   xhr.send(xhrPayload);
 }
 
@@ -708,6 +701,30 @@ function getErrorStateObject(errorMessage) {
     error: errorMessage,
     windowScroll: constants.windowScrollTop
   };
+}
+
+function directLinkIntercept(properThis) {
+  var url = location.href;
+  var queryString = url.split('?')[1];
+  if(!queryString) {
+    return false;
+  }
+  var args = queryString.split('&');
+  var id = null;
+  for(var i = 0; i < args.length; i++) {
+    var arg = args[i];
+    var argKey = arg.split('=')[0];
+    var argVal = arg.split('=')[1];
+    if(argKey == 'id') {
+      id = argVal;
+    }
+  }
+  if(id) {
+    logMgr.out('Frontend received direct link navigation request: ' + id);
+    navigateXhrHandler.bind(properThis)(id, true);
+    return true;
+  }
+  return false;
 }
 
 function resetNewChapterInputs() {

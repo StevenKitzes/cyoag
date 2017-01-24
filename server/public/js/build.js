@@ -21951,6 +21951,10 @@
 	var config = __webpack_require__(/*! ../../build-config */ 173);
 	var constants = __webpack_require__(/*! ../../constants */ 174);
 	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('MainComponent.js');
+<<<<<<< HEAD
+=======
+	var scrollToElementId = __webpack_require__(/*! ../../utils/scrollToElementId */ 177);
+>>>>>>> generate-link
 	
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 178);
 	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 179);
@@ -21966,6 +21970,7 @@
 	  componentDidMount: mountXhrHandler,
 	  componentDidUpdate: function () {
 	    if (this.state.editMode) {
+<<<<<<< HEAD
 	      // scroll window to the editing area - thanks to basil: http://stackoverflow.com/questions/5598743/finding-elements-position-relative-to-the-document
 	      var box = document.getElementById('cyoag-input-container').getBoundingClientRect();
 	
@@ -21982,6 +21987,9 @@
 	      var left = box.left + scrollLeft - clientLeft;
 	
 	      window.scrollTo(left, top);
+=======
+	      scrollToElementId('cyoag-input-container');
+>>>>>>> generate-link
 	    } else {
 	      restoreScroll(this.state.windowScroll);
 	    }
@@ -22100,6 +22108,14 @@
 	}
 	
 	function mountXhrHandler() {
+<<<<<<< HEAD
+=======
+	  // intercept this process with a navigation request if a direct-to-chapter URL is detected
+	  if (directLinkIntercept(this)) {
+	    return;
+	  }
+	
+>>>>>>> generate-link
 	  if (checkPendingEdits(this.editsPending, this)) {
 	    return;
 	  } else {
@@ -22171,7 +22187,13 @@
 	  xhr.send();
 	}
 	
+<<<<<<< HEAD
 	function navigateXhrHandler(nodeUid) {
+=======
+	// the urldirty flag indicates we should expect to need to clean the url somehow
+	// (we are attempting to handle this server side with a subtle redirect)
+	function navigateXhrHandler(nodeUid, urlDirty) {
+>>>>>>> generate-link
 	  if (checkPendingEdits(this.editsPending, this)) {
 	    return;
 	  } else {
@@ -22208,7 +22230,11 @@
 	      windowScroll: savedWindowPosition
 	    });
 	  };
+<<<<<<< HEAD
 	  var xhrPayload = JSON.stringify({ navigate: nodeUid });
+=======
+	  var xhrPayload = JSON.stringify({ navigate: nodeUid, urlDirty: urlDirty });
+>>>>>>> generate-link
 	  xhr.send(xhrPayload);
 	}
 	
@@ -22630,6 +22656,33 @@
 	  };
 	}
 	
+<<<<<<< HEAD
+=======
+	function directLinkIntercept(properThis) {
+	  var url = location.href;
+	  var queryString = url.split('?')[1];
+	  if (!queryString) {
+	    return false;
+	  }
+	  var args = queryString.split('&');
+	  var id = null;
+	  for (var i = 0; i < args.length; i++) {
+	    var arg = args[i];
+	    var argKey = arg.split('=')[0];
+	    var argVal = arg.split('=')[1];
+	    if (argKey == 'id') {
+	      id = argVal;
+	    }
+	  }
+	  if (id) {
+	    logMgr.out('Frontend received direct link navigation request: ' + id);
+	    navigateXhrHandler.bind(properThis)(id, true);
+	    return true;
+	  }
+	  return false;
+	}
+	
+>>>>>>> generate-link
 	function resetNewChapterInputs() {
 	  var inputPathElement = document.getElementById('cyoag-input-path');
 	  var inputBodyElement = document.getElementById('cyoag-input-body');
@@ -22945,7 +22998,11 @@
 	      React.createElement(
 	        'p',
 	        { id: 'cyoag-header-subtitle' },
+<<<<<<< HEAD
 	        'Choose Your Own Adventure Game'
+=======
+	        'Create Your Own Adventure Game'
+>>>>>>> generate-link
 	      ),
 	      React.createElement(
 	        'a',
@@ -23668,7 +23725,11 @@
 	
 	  navigate: function (navElementUid) {
 	    var destinationUid = navElementUid.substring(5);
+<<<<<<< HEAD
 	    this.props.context.navigate(destinationUid);
+=======
+	    this.props.context.navigate(destinationUid, false);
+>>>>>>> generate-link
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');

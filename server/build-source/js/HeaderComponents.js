@@ -14,7 +14,7 @@ var Header = React.createClass({
     return(
       <div id='cyoag-header-container'>
         <h1 id='cyoag-header-title'>Welcome to CYOAG!</h1>
-        <p id='cyoag-header-subtitle'>Choose Your Own Adventure Game</p>
+        <p id='cyoag-header-subtitle'>Create Your Own Adventure Game</p>
         <a className='cyoag-link cyoag-button' href='about.html'>What is CYOAG?</a> | <a className='cyoag-link cyoag-button' href='usage.html'>Usage and Copyright</a> | <a className='cyoag-link cyoag-button' href='steve.html'>About the Creator</a> | <a className='cyoag-link cyoag-button' href='https://github.com/stevenkitzes/cyoag'>Project on GitHub</a>
         <hr />
       </div>
