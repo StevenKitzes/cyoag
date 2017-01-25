@@ -6,6 +6,16 @@ session_uid VARCHAR(40),
 INDEX (session_uid)
 );
 
+CREATE TABLE IF NOT EXISTS drafts (
+parent_uid VARCHAR(40),
+author_uid VARCHAR(40),
+path_snippet VARCHAR(100),
+node_snippet VARCHAR(2500),
+PRIMARY KEY (parent_uid, author_uid),
+INDEX (parent_uid),
+INDEX (author_uid)
+);
+
 CREATE TABLE IF NOT EXISTS nodes (
 uid VARCHAR(40) UNIQUE PRIMARY KEY,
 parent_uid VARCHAR(40),
