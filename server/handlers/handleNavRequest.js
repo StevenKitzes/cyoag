@@ -16,7 +16,7 @@ module.exports = function(req, res, connection, session_uid, userRow, forwardedM
   }
 
   if(user_position == destination) {
-    responder.respond(res, session_uid, {msg: 'Current chapter is the same as the requested destination!  Refreshing the page.'});
+    responder.respond(res, session_uid, forwardedMessage ? forwardedMessage : {msg: 'Current chapter is the same as the requested destination!  Refreshing the page.'});
     connection.release();
     return;
   }
