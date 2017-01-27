@@ -22411,7 +22411,11 @@
 	      windowScroll: savedWindowPosition
 	    });
 	  };
+<<<<<<< HEAD
 	  var xhrPayload = JSON.stringify({ newNodePath: path, newNodeBody: body });
+=======
+	  var xhrPayload = JSON.stringify({ newNodePath: path, newNodeBody: body, appendToUid: this.state.nodeUid });
+>>>>>>> inputFix-nodeIdentification
 	  xhr.send(xhrPayload);
 	}
 	
@@ -22441,7 +22445,11 @@
 	      windowScroll: savedWindowPosition
 	    });
 	  };
+<<<<<<< HEAD
 	  var xhrPayload = JSON.stringify({ draftPath: path, draftBody: body });
+=======
+	  var xhrPayload = JSON.stringify({ draftPath: path, draftBody: body, draftParentUid: this.state.nodeUid });
+>>>>>>> inputFix-nodeIdentification
 	  xhr.send(xhrPayload);
 	}
 	
@@ -22703,7 +22711,11 @@
 	config.DEBUG = true;
 	config.VERBOSE = true;
 	
+<<<<<<< HEAD
 	config.env = constants.envProd;
+=======
+	config.env = constants.envLocal;
+>>>>>>> inputFix-nodeIdentification
 	
 	switch(config.env) {
 	  case constants.envLocal:

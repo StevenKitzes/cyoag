@@ -480,7 +480,7 @@ function submitInput(path, body) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({newNodePath: path, newNodeBody: body});
+  var xhrPayload = JSON.stringify({newNodePath: path, newNodeBody: body, appendToUid: this.state.nodeUid});
   xhr.send(xhrPayload);
 }
 
@@ -511,7 +511,7 @@ function saveDraft(path, body) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({draftPath: path, draftBody: body});
+  var xhrPayload = JSON.stringify({draftPath: path, draftBody: body, draftParentUid: this.state.nodeUid});
   xhr.send(xhrPayload);
 }
 
