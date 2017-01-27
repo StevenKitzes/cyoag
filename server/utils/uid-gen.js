@@ -33,7 +33,6 @@ function getUid() {
   var result = chars.join('');
 
   // Report and return generated UID
-  console.log('Made uid of length ' + result.length + ': ' + result);
   return result;
 }
 
