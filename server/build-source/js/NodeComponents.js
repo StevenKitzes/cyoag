@@ -73,7 +73,7 @@ var ModificationsAndOptionsComponent = React.createClass({
     var editButtonElement = <button id='cyoag-edit-chapter-button' className='cyoag-side-spaced-button cyoag-tooltip-button shaded-border-orange' onClick={context.editChapter}>
       Edit chapter
     </button>;
-    var deleteButtonElement = <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button cyoag-tooltip-button shaded-border-red' onClick={context.deleteChapter}>
+    var deleteButtonElement = <button id='cyoag-delete-chapter-button' className='cyoag-side-spaced-button cyoag-tooltip-button shaded-border-red' onClick={context.deleteChapterXhr}>
       Delete chapter
     </button>;
 

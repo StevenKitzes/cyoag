@@ -88,7 +88,7 @@ function respond(res, session_uid, msg) {
   db.getConnection(function(err, connection) {
     if(err) {
       // handle any error getting connection from pool
-      respondError(res, 'Problem getting a database connection.  Unable to build response. ' + error_getConnection)
+      respondError(res, 'Problem getting a database connection.  Unable to build response. ' + err);
       return;
     }
 
@@ -118,12 +118,11 @@ function respond(res, session_uid, msg) {
           'ON nodes.author_uid=authors.uid ' +
       'WHERE ' +
         'users.session_uid=?; ';
-    logMgr.verbose('Query attempted: ' + query);
     connection.query(query, [session_uid], function(error, rows) {
       if(error) {
         // handle any error querying for users with this session ID
         respondError(res, 'Database error querying for user status.');
-        logMgr.error(error);
+        logMgr.error('DB error querying for user status: ' + error);
         connection.release();
         return;
       }
@@ -315,7 +314,7 @@ function visitorResponse(res, node_uid, msg) {
   }
 
   // build and send a response based on conditions
-  logMgr.out('Beginning response construction.');
+  logMgr.out('Beginning visitor response construction.');
   db.getConnection(function(err, connection) {
     if(err) {
       // handle any error getting connection from pool

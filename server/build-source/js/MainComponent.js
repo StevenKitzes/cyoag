@@ -15,7 +15,7 @@ var FooterComponents = require('./FooterComponents');
 // Hello World component: display a simple prop
 var MainComponent = React.createClass({
   cancelEdit: cancelEdit,
-  componentDidMount: mountXhrHandler,
+  componentDidMount: mountXhr,
   componentDidUpdate: function() {
     if(this.state.editMode) {
       scrollToElementId('cyoag-input-container');
@@ -29,10 +29,10 @@ var MainComponent = React.createClass({
     this.editsPending = false;
     window.onbeforeunload = null;
   },
-  deleteChapter: deleteChapter,
+  deleteChapterXhr: deleteChapterXhr,
   editChapter: editChapter,
   getInitialState: getDefaultStateObject,
-  logoutRequest: logoutXhrHandler,
+  logoutRequest: logoutXhr,
   message: function(msg) {
     logMgr.debug('incoming message object: ' + JSON.stringify(msg));
     this.setState({
@@ -42,25 +42,25 @@ var MainComponent = React.createClass({
       windowScroll: getWindowPosition()
     });
   },
-  nameChange: nameChange,
-  navigate: navigateXhrHandler,
+  nameChangeXhr: nameChangeXhr,
+  navigate: navigateXhr,
   render: function() {
     logMgr.verbose('Rendering...');
 
     var context = {};
     context.state = this.state;
-    context.deleteChapter = this.deleteChapter;
+    context.deleteChapterXhr = this.deleteChapterXhr;
     context.cancelEdit = this.cancelEdit;
     context.editChapter = this.editChapter;
     context.logoutRequest = this.logoutRequest;
     context.message = this.message;
-    context.nameChange = this.nameChange;
+    context.nameChangeXhr = this.nameChangeXhr;
     context.navigate = this.navigate;
     context.setEditsPending = this.setEditsPending;
-    context.saveDraft = this.saveDraft;
-    context.submitEdits = this.submitEdits;
-    context.submitInput = this.submitInput;
-    context.votify = this.votify;
+    context.saveDraftXhr = this.saveDraftXhr;
+    context.submitEditsXhr = this.submitEditsXhr;
+    context.submitInputXhr = this.submitInputXhr;
+    context.votifyXhr = this.votifyXhr;
 
     var debugStateDisplay = (function(){
       if(config.DEBUG) {
@@ -94,10 +94,10 @@ var MainComponent = React.createClass({
   setEditsPending: function(b) {
     this.editsPending = b;
   },
-  saveDraft: saveDraft,
-  submitInput: submitInput,
-  submitEdits: submitEdits,
-  votify: votify
+  saveDraftXhr: saveDraftXhr,
+  submitInputXhr: submitInputXhr,
+  submitEditsXhr: submitEditsXhr,
+  votifyXhr: votifyXhr
 });
 
 module.exports = MainComponent;
@@ -130,7 +130,7 @@ function checkPendingEdits(editsPending, context, altConfirmationMessage) {
   return true;
 }
 
-function mountXhrHandler() {
+function mountXhr() {
   // intercept this process with a navigation request if a direct-to-chapter URL is detected
   if( directLinkIntercept(this) ) {
     return;
@@ -173,7 +173,7 @@ function mountXhrHandler() {
   xhr.send();
 }
 
-function logoutXhrHandler() {
+function logoutXhr() {
   if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
@@ -211,7 +211,7 @@ function logoutXhrHandler() {
   xhr.send();
 }
 
-function navigateXhrHandler(nodeUid) {
+function navigateXhr(nodeUid) {
   if(checkPendingEdits(this.editsPending, this)) {
     return;
   }
@@ -254,7 +254,7 @@ function navigateXhrHandler(nodeUid) {
   xhr.send(xhrPayload);
 }
 
-function deleteChapter() {
+function deleteChapterXhr() {
   if(!confirm('Are you positive you want to delete this chapter?  This can only be undone by a CYOAG administrator ' +
   '(not even by a moderator)!'))
   {
@@ -333,7 +333,7 @@ function cancelEdit() {
   });
 }
 
-function votify(nodeUid, newVote) {
+function votifyXhr(nodeUid, newVote) {
   if(checkPendingEdits(this.editsPending, this,
     'Voting can cause pending edits to be lost ... you might want to vote after your edits are submitted! ' +
     'Do you still want to vote now (dangerous), or would you like to cancel your vote until you are done editing (safe)?'))
@@ -376,11 +376,11 @@ function votify(nodeUid, newVote) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({votify: nodeUid, newVote: newVote});
+  var xhrPayload = JSON.stringify({votificationTarget: nodeUid, newVote: newVote});
   xhr.send(xhrPayload);
 }
 
-function nameChange(newName) {
+function nameChangeXhr(newName) {
   if(checkPendingEdits(this.editsPending, this, 'Changing your name will trigger a page reload ... you might want to change your ' +
     'name after submitting your edits!  Do you want to proceed with changing your name and discarding your unsaved work?'))
   {
@@ -422,7 +422,7 @@ function nameChange(newName) {
   xhr.send(xhrPayload);
 }
 
-function submitEdits(path, body) {
+function submitEditsXhr(path, body) {
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to edit existing node . . .');
   var xhr = new XMLHttpRequest();
@@ -453,7 +453,7 @@ function submitEdits(path, body) {
   xhr.send(xhrPayload);
 }
 
-function submitInput(path, body) {
+function submitInputXhr(path, body) {
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to submit new node . . .');
   var xhr = new XMLHttpRequest();
@@ -484,7 +484,7 @@ function submitInput(path, body) {
   xhr.send(xhrPayload);
 }
 
-function saveDraft(path, body) {
+function saveDraftXhr(path, body) {
   var savedWindowPosition = getWindowPosition();
   logMgr.debug('User attempting to save draft . . .');
   var xhr = new XMLHttpRequest();
@@ -728,7 +728,7 @@ function directLinkIntercept(properThis) {
   }
   if(id) {
     logMgr.out('Frontend received direct link navigation request: ' + id);
-    navigateXhrHandler.bind(properThis)(id);
+    navigateXhr.bind(properThis)(id);
     return true;
   }
   return false;

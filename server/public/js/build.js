@@ -21964,7 +21964,7 @@
 	  displayName: 'MainComponent',
 	
 	  cancelEdit: cancelEdit,
-	  componentDidMount: mountXhrHandler,
+	  componentDidMount: mountXhr,
 	  componentDidUpdate: function () {
 	    if (this.state.editMode) {
 	      scrollToElementId('cyoag-input-container');
@@ -21977,10 +21977,10 @@
 	    this.editsPending = false;
 	    window.onbeforeunload = null;
 	  },
-	  deleteChapter: deleteChapter,
+	  deleteChapterXhr: deleteChapterXhr,
 	  editChapter: editChapter,
 	  getInitialState: getDefaultStateObject,
-	  logoutRequest: logoutXhrHandler,
+	  logoutRequest: logoutXhr,
 	  message: function (msg) {
 	    logMgr.debug('incoming message object: ' + JSON.stringify(msg));
 	    this.setState({
@@ -21990,25 +21990,25 @@
 	      windowScroll: getWindowPosition()
 	    });
 	  },
-	  nameChange: nameChange,
-	  navigate: navigateXhrHandler,
+	  nameChangeXhr: nameChangeXhr,
+	  navigate: navigateXhr,
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
 	    var context = {};
 	    context.state = this.state;
-	    context.deleteChapter = this.deleteChapter;
+	    context.deleteChapterXhr = this.deleteChapterXhr;
 	    context.cancelEdit = this.cancelEdit;
 	    context.editChapter = this.editChapter;
 	    context.logoutRequest = this.logoutRequest;
 	    context.message = this.message;
-	    context.nameChange = this.nameChange;
+	    context.nameChangeXhr = this.nameChangeXhr;
 	    context.navigate = this.navigate;
 	    context.setEditsPending = this.setEditsPending;
-	    context.saveDraft = this.saveDraft;
-	    context.submitEdits = this.submitEdits;
-	    context.submitInput = this.submitInput;
-	    context.votify = this.votify;
+	    context.saveDraftXhr = this.saveDraftXhr;
+	    context.submitEditsXhr = this.submitEditsXhr;
+	    context.submitInputXhr = this.submitInputXhr;
+	    context.votifyXhr = this.votifyXhr;
 	
 	    var debugStateDisplay = function () {
 	      if (config.DEBUG) {
@@ -22049,10 +22049,10 @@
 	  setEditsPending: function (b) {
 	    this.editsPending = b;
 	  },
-	  saveDraft: saveDraft,
-	  submitInput: submitInput,
-	  submitEdits: submitEdits,
-	  votify: votify
+	  saveDraftXhr: saveDraftXhr,
+	  submitInputXhr: submitInputXhr,
+	  submitEditsXhr: submitEditsXhr,
+	  votifyXhr: votifyXhr
 	});
 	
 	module.exports = MainComponent;
@@ -22085,7 +22085,7 @@
 	  return true;
 	}
 	
-	function mountXhrHandler() {
+	function mountXhr() {
 	  // intercept this process with a navigation request if a direct-to-chapter URL is detected
 	  if (directLinkIntercept(this)) {
 	    return;
@@ -22126,7 +22126,7 @@
 	  xhr.send();
 	}
 	
-	function logoutXhrHandler() {
+	function logoutXhr() {
 	  if (checkPendingEdits(this.editsPending, this)) {
 	    return;
 	  } else {
@@ -22162,7 +22162,7 @@
 	  xhr.send();
 	}
 	
-	function navigateXhrHandler(nodeUid) {
+	function navigateXhr(nodeUid) {
 	  if (checkPendingEdits(this.editsPending, this)) {
 	    return;
 	  } else {
@@ -22203,7 +22203,7 @@
 	  xhr.send(xhrPayload);
 	}
 	
-	function deleteChapter() {
+	function deleteChapterXhr() {
 	  if (!confirm('Are you positive you want to delete this chapter?  This can only be undone by a CYOAG administrator ' + '(not even by a moderator)!')) {
 	    return;
 	  }
@@ -22275,7 +22275,7 @@
 	  });
 	}
 	
-	function votify(nodeUid, newVote) {
+	function votifyXhr(nodeUid, newVote) {
 	  if (checkPendingEdits(this.editsPending, this, 'Voting can cause pending edits to be lost ... you might want to vote after your edits are submitted! ' + 'Do you still want to vote now (dangerous), or would you like to cancel your vote until you are done editing (safe)?')) {
 	    return;
 	  } else {
@@ -22313,11 +22313,11 @@
 	      windowScroll: savedWindowPosition
 	    });
 	  };
-	  var xhrPayload = JSON.stringify({ votify: nodeUid, newVote: newVote });
+	  var xhrPayload = JSON.stringify({ votificationTarget: nodeUid, newVote: newVote });
 	  xhr.send(xhrPayload);
 	}
 	
-	function nameChange(newName) {
+	function nameChangeXhr(newName) {
 	  if (checkPendingEdits(this.editsPending, this, 'Changing your name will trigger a page reload ... you might want to change your ' + 'name after submitting your edits!  Do you want to proceed with changing your name and discarding your unsaved work?')) {
 	    return;
 	  } else {
@@ -22355,7 +22355,7 @@
 	  xhr.send(xhrPayload);
 	}
 	
-	function submitEdits(path, body) {
+	function submitEditsXhr(path, body) {
 	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to edit existing node . . .');
 	  var xhr = new XMLHttpRequest();
@@ -22385,7 +22385,7 @@
 	  xhr.send(xhrPayload);
 	}
 	
-	function submitInput(path, body) {
+	function submitInputXhr(path, body) {
 	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to submit new node . . .');
 	  var xhr = new XMLHttpRequest();
@@ -22415,7 +22415,7 @@
 	  xhr.send(xhrPayload);
 	}
 	
-	function saveDraft(path, body) {
+	function saveDraftXhr(path, body) {
 	  var savedWindowPosition = getWindowPosition();
 	  logMgr.debug('User attempting to save draft . . .');
 	  var xhr = new XMLHttpRequest();
@@ -22646,7 +22646,7 @@
 	  }
 	  if (id) {
 	    logMgr.out('Frontend received direct link navigation request: ' + id);
-	    navigateXhrHandler.bind(properThis)(id);
+	    navigateXhr.bind(properThis)(id);
 	    return true;
 	  }
 	  return false;
@@ -23364,7 +23364,7 @@
 	    );
 	    var deleteButtonElement = React.createElement(
 	      'button',
-	      { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-red', onClick: context.deleteChapter },
+	      { id: 'cyoag-delete-chapter-button', className: 'cyoag-side-spaced-button cyoag-tooltip-button shaded-border-red', onClick: context.deleteChapterXhr },
 	      'Delete chapter'
 	    );
 	
@@ -23549,11 +23549,11 @@
 	
 	    var voteUp = function () {
 	      logMgr.verbose('Client trying to upvote ' + context.state.nodeUid);
-	      context.votify(context.state.nodeUid, upClickResult);
+	      context.votifyXhr(context.state.nodeUid, upClickResult);
 	    };
 	    var voteDown = function () {
 	      logMgr.verbose('Client trying to downvote ' + context.state.nodeUid);
-	      context.votify(context.state.nodeUid, downClickResult);
+	      context.votifyXhr(context.state.nodeUid, downClickResult);
 	    };
 	
 	    return React.createElement(
@@ -23932,7 +23932,7 @@
 	      return;
 	    }
 	
-	    this.props.context.saveDraft(inputPath, inputBody);
+	    this.props.context.saveDraftXhr(inputPath, inputBody);
 	    this.props.context.setEditsPending(false);
 	    window.onbeforeunload = null;
 	  },
@@ -23943,7 +23943,7 @@
 	    if (validateInput(inputPath, inputBody, this.props.context.message)) {
 	      this.props.context.setEditsPending(false);
 	      window.onbeforeunload = null;
-	      this.props.context.submitInput(inputPath, inputBody);
+	      this.props.context.submitInputXhr(inputPath, inputBody);
 	    }
 	  },
 	  updateBodyCharCount: function () {
@@ -24084,7 +24084,7 @@
 	      // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
 	      this.props.context.setEditsPending(false);
 	      window.onbeforeunload = null;
-	      this.props.context.submitEdits(inputPath, inputBody);
+	      this.props.context.submitEditsXhr(inputPath, inputBody);
 	    }
 	  },
 	  updateBodyCharCount: function () {
@@ -24420,13 +24420,13 @@
 	  },
 	  getInitialState: function () {
 	    return {
-	      nameChange: 'beg'
+	      nameChangeUiStatus: 'beg'
 	    };
 	  },
 	  render: function () {
 	    var context = this.props.context;
 	
-	    if (this.state.nameChange == 'beg') {
+	    if (this.state.nameChangeUiStatus == 'beg') {
 	      return React.createElement(
 	        'div',
 	        { id: 'cyoag-name-change-ui' },
@@ -24436,7 +24436,7 @@
 	          'Customize Your Pen Name'
 	        )
 	      );
-	    } else if (this.state.nameChange == 'ui') {
+	    } else if (this.state.nameChangeUiStatus == 'ui') {
 	      return React.createElement(
 	        'div',
 	        { id: 'cyoag-name-change-ui' },
@@ -24462,17 +24462,17 @@
 	      return;
 	    }
 	    var newName = document.getElementById('cyoag-name-input').value;
-	    this.props.context.nameChange(newName);
+	    this.props.context.nameChangeXhr(newName);
 	    this.swap();
 	  },
 	  swap: function () {
-	    if (this.state.nameChange == 'beg') {
+	    if (this.state.nameChangeUiStatus == 'beg') {
 	      this.setState({
-	        nameChange: 'ui'
+	        nameChangeUiStatus: 'ui'
 	      });
-	    } else if (this.state.nameChange == 'ui') {
+	    } else if (this.state.nameChangeUiStatus == 'ui') {
 	      this.setState({
-	        nameChange: 'beg'
+	        nameChangeUiStatus: 'beg'
 	      });
 	    }
 	  },

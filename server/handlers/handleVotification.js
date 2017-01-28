@@ -6,7 +6,7 @@ var navigate = require('./handleNavRequest');
 
 module.exports = function(req, res, connection, session_uid, userRow) {
   var user_uid = userRow['uid'];
-  var node_uid = req.body.votify;
+  var node_uid = req.body.votificationTarget;
   var newVote = req.body.newVote;
 
   logMgr.out('User ' + user_uid + ' voting ' + newVote + ' on node ' + node_uid);

@@ -142,7 +142,7 @@ router.post('/', function(req, res, next) {
             else if(req.body.hasOwnProperty('draftPath')) {
               require('../handlers/handleDraftSaveRequest')(req, res, connection, session_uid, userRow);
             }
-            else if(req.body.hasOwnProperty('votify')) {
+            else if(req.body.hasOwnProperty('votificationTarget')) {
               require('../handlers/handleVotification')(req, res, connection, session_uid, userRow);
             }
             else if(req.body.hasOwnProperty('deleteTarget')) {

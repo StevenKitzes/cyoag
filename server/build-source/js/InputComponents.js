@@ -124,7 +124,7 @@ var Input = React.createClass({
       return;
     }
 
-    this.props.context.saveDraft(inputPath, inputBody);
+    this.props.context.saveDraftXhr(inputPath, inputBody);
     this.props.context.setEditsPending(false);
     window.onbeforeunload = null;
   },
@@ -135,7 +135,7 @@ var Input = React.createClass({
     if(validateInput(inputPath, inputBody, this.props.context.message)) {
       this.props.context.setEditsPending(false);
       window.onbeforeunload = null;
-      this.props.context.submitInput(inputPath, inputBody);
+      this.props.context.submitInputXhr(inputPath, inputBody);
     }
   },
   updateBodyCharCount: function() {
@@ -239,7 +239,7 @@ var Edit = React.createClass({
       // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
       this.props.context.setEditsPending(false);
       window.onbeforeunload = null;
-      this.props.context.submitEdits(inputPath, inputBody);
+      this.props.context.submitEditsXhr(inputPath, inputBody);
     }
   },
   updateBodyCharCount: function() {

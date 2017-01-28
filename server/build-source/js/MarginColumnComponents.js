@@ -74,20 +74,20 @@ var NameChangeComponent = React.createClass({
   },
   getInitialState: function() {
     return {
-      nameChange: 'beg'
+      nameChangeUiStatus: 'beg'
     };
   },
   render: function() {
     var context = this.props.context;
 
-    if(this.state.nameChange == 'beg') {
+    if(this.state.nameChangeUiStatus == 'beg') {
       return (
         <div id='cyoag-name-change-ui'>
           <button id='cyoag-swap-name-change-button' className='shaded-border-blue' onClick={this.swap}>Customize Your Pen Name</button>
         </div>
       );
     }
-    else if(this.state.nameChange == 'ui') {
+    else if(this.state.nameChangeUiStatus == 'ui') {
       return (
         <div id='cyoag-name-change-ui'>
           <input id='cyoag-name-input' type='text' placeholder='New name'></input><br />
@@ -106,18 +106,18 @@ var NameChangeComponent = React.createClass({
       return;
     }
     var newName = document.getElementById('cyoag-name-input').value;
-    this.props.context.nameChange(newName);
+    this.props.context.nameChangeXhr(newName);
     this.swap();
   },
   swap: function() {
-    if(this.state.nameChange == 'beg') {
+    if(this.state.nameChangeUiStatus == 'beg') {
       this.setState({
-        nameChange: 'ui'
+        nameChangeUiStatus: 'ui'
       });
     }
-    else if(this.state.nameChange == 'ui') {
+    else if(this.state.nameChangeUiStatus == 'ui') {
       this.setState({
-        nameChange: 'beg'
+        nameChangeUiStatus: 'beg'
       });
     }
   },

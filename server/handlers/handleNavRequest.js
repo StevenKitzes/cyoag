@@ -69,8 +69,15 @@ module.exports = function(req, res, connection, session_uid, userRow, forwardedM
         if(rows[0].status == constants.nodeStatusVisible) {
           logMgr.out('Nav request targeted a safe node.  Already repositioned.  Building response.');
           responder.respond(res, session_uid, forwardedMessage ? forwardedMessage : null);
-          connection.release();
-          return;
+          try {
+            connection.release();
+          }
+          catch(err) {
+            logMgr.error('Problem releasing DB connection: ' + err.message ? err.message : err);
+          }
+          finally {
+            return;
+          }
         }
 
         logMgr.out('Nav request pointed to an unsafe node (deleted, etc; not visible).  Attempting to move to a safe node.');

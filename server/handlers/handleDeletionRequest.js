@@ -206,10 +206,15 @@ module.exports = function(req, res, connection, session_uid, userRow) {
               }
 
               logMgr.out('Set status deleted and moved users away from node ' + nodeToDelete);
-              if(db._freeConnections.indexOf(deletionConnection) == -1) {
+              try {
                 deletionConnection.release();
               }
-              return;
+              catch(err) {
+                logMgr.error('Problem releasing DB connection: ' + err.message ? err.message : err);
+              }
+              finally {
+                return;
+              }
             });
           });
 
@@ -236,7 +241,15 @@ module.exports = function(req, res, connection, session_uid, userRow) {
                 r_moderatorDeletion(row.uid);
               });
 
-              recursionConnection.release();
+              try {
+                recursionConnection.release();
+\              }
+              catch(err) {
+                logMgr.error('Problem releasing DB connection: ' + err.message ? err.message : err);
+              }
+              finally {
+                return;
+              }
               return;
             });
           });

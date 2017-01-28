@@ -53,11 +53,11 @@ var Votification = React.createClass({
 
     var voteUp = function() {
       logMgr.verbose('Client trying to upvote ' + context.state.nodeUid);
-      context.votify(context.state.nodeUid, upClickResult);
+      context.votifyXhr(context.state.nodeUid, upClickResult);
     }
     var voteDown = function() {
       logMgr.verbose('Client trying to downvote ' + context.state.nodeUid);
-      context.votify(context.state.nodeUid, downClickResult);
+      context.votifyXhr(context.state.nodeUid, downClickResult);
     }
 
     return (
