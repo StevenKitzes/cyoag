@@ -160,15 +160,17 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
     if(rows.length < 1) {
       // no rows returned; current node didn't even exist!  No idea where user is; send them to start
-      req.body.navigate = constants.rootNodeUid;
+      req.body.navigateTarget = constants.rootNodeUid;
       navigate(req, res, connection, session_uid, userRow, {error: 'Attempted to append to a chapter that does not exist!  You are being sent back to the beginning of the story.'});
+      // don't release connection here, it will be needed in navigate and cleared in nav response
       return;
     }
 
     if(rows[0].status != constants.nodeStatusVisible) {
       // not a valid node to append new story nodes to
-      req.body.navigate = rows[0].parent_uid;
+      req.body.navigateTarget = rows[0].parent_uid;
       navigate(req, res, connection, session_uid, userRow, {error: 'Attempted to append to a chapter that appears not to exist.  It may have been deleted while you were writing (possibly by a moderator).  You are being sent to the nearest safe chapter.'});
+      // don't release connection here, it will be needed in navigate and cleared in nav response
       return;
     }
 

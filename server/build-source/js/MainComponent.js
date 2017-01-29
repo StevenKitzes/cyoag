@@ -43,7 +43,7 @@ var MainComponent = React.createClass({
     });
   },
   nameChangeXhr: nameChangeXhr,
-  navigate: navigateXhr,
+  navigateXhr: navigateXhr,
   render: function() {
     logMgr.verbose('Rendering...');
 
@@ -55,7 +55,7 @@ var MainComponent = React.createClass({
     context.logoutRequest = this.logoutRequest;
     context.message = this.message;
     context.nameChangeXhr = this.nameChangeXhr;
-    context.navigate = this.navigate;
+    context.navigateXhr = this.navigateXhr;
     context.setEditsPending = this.setEditsPending;
     context.saveDraftXhr = this.saveDraftXhr;
     context.submitEditsXhr = this.submitEditsXhr;
@@ -250,7 +250,7 @@ function navigateXhr(nodeUid) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({navigate: nodeUid});
+  var xhrPayload = JSON.stringify({navigateTarget: nodeUid});
   xhr.send(xhrPayload);
 }
 

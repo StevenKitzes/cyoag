@@ -21991,7 +21991,7 @@
 	    });
 	  },
 	  nameChangeXhr: nameChangeXhr,
-	  navigate: navigateXhr,
+	  navigateXhr: navigateXhr,
 	  render: function () {
 	    logMgr.verbose('Rendering...');
 	
@@ -22003,7 +22003,7 @@
 	    context.logoutRequest = this.logoutRequest;
 	    context.message = this.message;
 	    context.nameChangeXhr = this.nameChangeXhr;
-	    context.navigate = this.navigate;
+	    context.navigateXhr = this.navigateXhr;
 	    context.setEditsPending = this.setEditsPending;
 	    context.saveDraftXhr = this.saveDraftXhr;
 	    context.submitEditsXhr = this.submitEditsXhr;
@@ -22199,7 +22199,7 @@
 	      windowScroll: savedWindowPosition
 	    });
 	  };
-	  var xhrPayload = JSON.stringify({ navigate: nodeUid });
+	  var xhrPayload = JSON.stringify({ navigateTarget: nodeUid });
 	  xhr.send(xhrPayload);
 	}
 	
@@ -23244,8 +23244,8 @@
 	    document.getElementById('cyoag-generate-link-ui').classList.add('cyoag-hidden');
 	  },
 	  navigate: function () {
-	    logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
-	    this.props.context.navigate(this.props.context.state.parentUid);
+	    logMgr.debug('^ ^ ^ ^ ^ Navigating to parent: ' + this.props.context.state.parentUid);
+	    this.props.context.navigateXhr(this.props.context.state.parentUid);
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');
@@ -23255,6 +23255,9 @@
 	
 	    var trailingSnippetId = 'node-' + context.state.parentUid;
 	
+	    var onRootNode = context.state.nodeUid == constants.rootNodeUid;
+	    var backNavText = onRootNode ? 'You are already at the first chapter. When visiting other chapters, use this button to backtrack.' : 'Back whence you came . . . ?';
+	
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-node-container' },
@@ -23263,7 +23266,7 @@
 	        { id: trailingSnippetId, className: 'cyoag-trailing-snippet-link cyoag-link', onMouseMove: this.locateTooltip },
 	        React.createElement(
 	          'div',
-	          { className: 'cyoag-path-item cyoag-trailing-snippet', onClick: this.navigate },
+	          { className: 'cyoag-path-item cyoag-trailing-snippet', onClick: onRootNode ? null : this.navigate },
 	          snippet.trailingSnippet.split("\n").map(function (i) {
 	            return React.createElement(
 	              'p',
@@ -23275,7 +23278,7 @@
 	        React.createElement(
 	          'div',
 	          { id: 'cyoag-tooltip-regress' },
-	          'Back whence you came . . . ?'
+	          backNavText
 	        )
 	      ),
 	      React.createElement(
@@ -23696,7 +23699,7 @@
 	
 	  navigate: function (navElementUid) {
 	    var destinationUid = navElementUid.substring(5);
-	    this.props.context.navigate(destinationUid);
+	    this.props.context.navigateXhr(destinationUid);
 	  },
 	  render: function () {
 	    logMgr.verbose('Rendering...');

@@ -250,8 +250,10 @@ function respond(res, session_uid, msg) {
         }
 
         // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
+        logMgr.out('Getting trailing node info for trailing snippet . . .');
         if(response.nodeUid == constants.rootNodeUid) {
           // root node gets special one-off trailing node snippet and trailing path snippet
+          logMgr.debug('Using trailing snippet for root node.');
           response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
           res.clearCookie(constants.cookieNode);
           res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
@@ -261,6 +263,7 @@ function respond(res, session_uid, msg) {
         }
         // if we have to do a final db call to get trailing node
         else {
+          logMgr.debug('Querying DB for trailing snippet of previous node.');
           var query = 'SELECT node_snippet as trailingSnippet FROM nodes WHERE uid=?;';
           connection.query(query, [response.parentUid], function(error, rows) {
             if(error) {
@@ -275,6 +278,8 @@ function respond(res, session_uid, msg) {
               connection.release();
               return;
             }
+
+            logMgr.debug('No DB errors detected . . . ');
 
             var parent = rows[0];
             var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);

@@ -15,8 +15,8 @@ var Node = React.createClass({
     document.getElementById('cyoag-generate-link-ui').classList.add('cyoag-hidden');
   },
   navigate: function() {
-    logMgr.debug('^ ^ ^ ^ ^ Navigating to parent.');
-    this.props.context.navigate(this.props.context.state.parentUid);
+    logMgr.debug('^ ^ ^ ^ ^ Navigating to parent: ' + this.props.context.state.parentUid);
+    this.props.context.navigateXhr(this.props.context.state.parentUid);
   },
   render: function() {
     logMgr.verbose('Rendering...');
@@ -26,13 +26,18 @@ var Node = React.createClass({
 
     var trailingSnippetId = 'node-' + context.state.parentUid;
 
+    var onRootNode = context.state.nodeUid == constants.rootNodeUid;
+    var backNavText = onRootNode ?
+      'You are already at the first chapter. When visiting other chapters, use this button to backtrack.' :
+      'Back whence you came . . . ?';
+
     return(
       <div id='cyoag-node-container'>
         <a id={trailingSnippetId} className='cyoag-trailing-snippet-link cyoag-link' onMouseMove={this.locateTooltip}>
-          <div className='cyoag-path-item cyoag-trailing-snippet' onClick={this.navigate}>
+          <div className='cyoag-path-item cyoag-trailing-snippet' onClick={onRootNode ? null : this.navigate}>
             {snippet.trailingSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}
           </div>
-          <div id='cyoag-tooltip-regress'>Back whence you came . . . ?</div>
+          <div id='cyoag-tooltip-regress'>{backNavText}</div>
         </a>
         <p id='cyoag-last-path'>{snippet.lastPath}</p>
         <div id='cyoag-node-snippet'>{snippet.nodeSnippet.split("\n").map(function(i) {return <p key={uidGen()} className='cyoag-snippet-paragraph'>{i}</p>;})}</div>

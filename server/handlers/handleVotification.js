@@ -55,8 +55,9 @@ module.exports = function(req, res, connection, session_uid, userRow) {
       // user tried to vote on a deleted node! notify and move user to a valid node (recursively)
       logMgr.out('User attempted to vote on a deleted node.  Trying to move user to a safe node.');
       // add nav property to request object to simulate nav request
-      req.body.navigate = node_uid;
+      req.body.navigateTarget = node_uid;
       navigate(req, res, connection, session_uid, userRow, {error: 'A vote was cast on a chapter that does not appear to exist.  We are navigating you back to the start of the story.'});
+      // don't release connection here, it will be needed in navigate and cleared in nav response
       return;
     }
     else if(row.sentiment == null) {

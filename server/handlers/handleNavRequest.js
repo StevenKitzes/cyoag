@@ -6,19 +6,21 @@ var responder = require('../responder');
 module.exports = function(req, res, connection, session_uid, userRow, forwardedMessage) {
   var user_uid = userRow.uid;
   var user_position = userRow.node_uid;
-  var destination = req.body.navigate;
+  var destination = req.body.navigateTarget;
   logMgr.out('Navigation request received from user ' + user_uid + ' to node ' + destination);
 
-  if(destination==constants.defaultParentUid) {
-    responder.respondMsgOnly(res, {msg: 'You are already at the first chapter.'});
-    connection.release();
-    return;
-  }
+  if(config.DEBUG) {
+    if(destination==constants.defaultParentUid) {
+      responder.respondMsgOnly(res, {msg: 'You are already at the first chapter.'});
+      connection.release();
+      return;
+    }
 
-  if(user_position == destination) {
-    responder.respond(res, session_uid, {msg: 'Current chapter is the same as the requested destination!  Refreshing the page.'});
-    connection.release();
-    return;
+    if(user_position == destination) {
+      responder.respond(res, session_uid, {msg: 'Current chapter is the same as the requested destination!  Refreshing the page.'});
+      connection.release();
+      return;
+    }
   }
 
   // query will update user position IFF destination exists

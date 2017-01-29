@@ -2,6 +2,7 @@ var express = require('express');
 var router = express.Router();
 var cookieParser = require('cookie-parser');
 
+var config = require('../build-config');
 var logMgr = require('../utils/serverLogger')('session.js', true);
 var constants = require('../constants');
 var db = require('../dbAccess')();
@@ -46,10 +47,12 @@ router.post('/', function(req, res, next) {
     // if request body includes navigation details, visitor is requesting to navigate
     if(req.body.hasOwnProperty('navigate')) {
       logMgr.out('Visitor requested navigation.');
-      var destination = req.body.navigate;
-      if(destination == constants.defaultParentUid) {
-        responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
-        return;
+      if(config.DEBUG) {
+        var destination = req.body.navigateTarget;
+        if(destination == constants.defaultParentUid) {
+          responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
+          return;
+        }
       }
 
       responder.visitorResponse(res, destination);
@@ -130,7 +133,7 @@ router.post('/', function(req, res, next) {
 
           else {
             logMgr.verbose('User details: ' + JSON.stringify(userRow));
-            if(req.body.hasOwnProperty('navigate')) {
+            if(req.body.hasOwnProperty('navigateTarget')) {
               require('../handlers/handleNavRequest')(req, res, connection, session_uid, userRow);
             }
             else if(req.body.hasOwnProperty('newName')) {

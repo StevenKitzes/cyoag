@@ -63,8 +63,9 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     // if the deleteTarget is already deleted, nav to the nearest safe node
     if(status == constants.nodeStatusDeleted) {
       logMgr.out('User tried to delete an already-deleted node, moving user to a safe node.');
-      req.body.navigate = deleteTarget;
+      req.body.navigateTarget = deleteTarget;
       navigate(req, res, connection, session_uid, userRow, {warning: 'That node appears to have already been deleted.  Moving you to the nearest previous, undeleted node.'});
+      // don't release connection here, it will be needed in navigate and cleared in nav response
       return;
     }
     // if the user is NOT the author and NOT a moderator, they're not permitted to delete this chapter
@@ -257,8 +258,9 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
         r_moderatorDeletion(deleteTarget);
 
-        req.body.navigate = safeDestination;
+        req.body.navigateTarget = safeDestination;
         navigate(req, res, connection, session_uid, userRow, {msg: 'Recursive deletion begun in background.  Moving you to nearest previous, undeleted chapter.'});
+        // don't release connection here, it will be needed in navigate and cleared in nav response
         return;
       }
 

@@ -1,6 +1,8 @@
 var logMgr = require('../utils/serverLogger')('handleDraftSaveRequest.js', true);
 var responder = require('../responder');
 
+var navigate = require('./handleNavRequest');
+
 module.exports = function(req, res, connection, session_uid, userRow) {
   logMgr.out('A draft save request was received from user ' + userRow.uid);
 
@@ -43,7 +45,18 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     var changed = rows.changedRows;
     logMgr.verbose('rows affected: ' + affected + ' rows changed: ' + changed);
 
-    // if updated rows ends up being 0, we'll know we need to create a new draft for this user at this node
-    connection.release();
+    // if changed rows > 0, we successfully overwrote, and we're done.
+    // if affected rows > 0, but changed == 0, new save was same as old, and we're done.
+    if(changed > 0 || (changed == 0 && affected > 0)) {
+      req.body.navigateTarget = draftParent;
+      navigate(req, res, connection, session_uid, userRow);
+      // don't release connection here, it will be needed in navigate and cleared in nav response
+      return;
+    }
+
+    // else, no rows effected && none changed, means we need to create a draft record
+    if(affected < 1) {
+
+    }
   });
 }
