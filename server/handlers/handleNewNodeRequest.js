@@ -234,12 +234,12 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
         // now delete any residual draft info
         query = 'DELETE FROM drafts WHERE author_uid=? AND parent_uid=?;';
-        connection.query(query, [user_uid, user_position], function(err, rows) {
+        connection.query(query, [user_uid, appendToUid], function(err, rows) {
           if(err) {
             logMgr.error('Database error prevented residual draft data deletion at node: ' + user_position);
           }
 
-          if(rows.changedRows > 0) {
+          if(rows.affectedRows > 0) {
             logMgr.out('Deleted residual draft data.');
           }
           else {
