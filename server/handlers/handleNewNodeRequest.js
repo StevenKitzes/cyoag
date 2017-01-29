@@ -42,8 +42,8 @@ module.exports = function(req, res, connection, session_uid, userRow) {
       }
     }
     responder.respondMsgOnly(res, {warning: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
-      'white space characters together in your story content are forbidden in path teasers.  Please correct any errors and try again!  ' +
-      problems});
+      'white space characters together in your story content are forbidden in path teasers.  Please correct any errors ' +
+      'and try again!  ' + problems});
     connection.release();
     return;
   }

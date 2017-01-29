@@ -511,7 +511,7 @@ function saveDraftXhr(path, body) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({draftPath: path, draftBody: body});
+  var xhrPayload = JSON.stringify({ draftPath: path, draftBody: body, draftParent: this.state.nodeUid });
   xhr.send(xhrPayload);
 }
 

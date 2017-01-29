@@ -119,8 +119,17 @@ var Input = React.createClass({
     var inputPath = document.getElementById('cyoag-input-path').value || '';
     var inputBody = document.getElementById('cyoag-input-body').value || '';
 
+    var warningMsg = '';
+
+    if(inputPath.length > 100) {
+      warningMsg += 'Draft paths of over 100 characters are not permitted.  ';
+    }
     if(inputBody.length > 2500) {
-      this.props.context.message({warning: "Sorry, drafts of over 2,500 characters are not permitted."});
+      warningMsg += 'Drafts of over 2,500 characters are not permitted.  ';
+    }
+
+    if(warningMsg) {
+      this.props.context.message({warning: warningMsg + '(These rules apply to drafts as well as new chapters.)'});
       return;
     }
 
