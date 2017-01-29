@@ -49,14 +49,29 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     // if affected rows > 0, but changed == 0, new save was same as old, and we're done.
     if(changed > 0 || (changed == 0 && affected > 0)) {
       req.body.navigateTarget = draftParent;
-      navigate(req, res, connection, session_uid, userRow);
+      navigate(req, res, connection, session_uid, userRow, {msg: 'Draft update saved successfully!'});
       // don't release connection here, it will be needed in navigate and cleared in nav response
       return;
     }
-
     // else, no rows effected && none changed, means we need to create a draft record
-    if(affected < 1) {
+    else {
+      query =
+        'INSERT INTO drafts (parent_uid, author_uid, path_snippet, node_snippet) ' +
+        'VALUES (?, ?, ?, ?);'
+      connection.query(query, [draftParent, user_uid, draftPath, draftBody], function(err, rows) {
+        if(err) {
+          responder.respondMsgOnly(res, {error: 'Database error saving new draft content.'});
+          logMgr.error(err);
+          connection.release();
+          return;
+        }
+      });
 
+      // DB ops complete, notify user new draft saved
+      req.body.navigateTarget = draftParent;
+      navigate(req, res, connection, session_uid, userRow, {msg: 'New draft saved successfully!'});
+      // don't release connection here, it will be needed in navigate and cleared in nav response
+      return;
     }
   });
 }
