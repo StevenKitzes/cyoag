@@ -244,7 +244,7 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
               try {
                 recursionConnection.release();
-\              }
+              }
               catch(err) {
                 logMgr.error('Problem releasing DB connection: ' + err.message ? err.message : err);
               }

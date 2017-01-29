@@ -1,3 +1,4 @@
+var constants = require('../constants');
 var generateGuid = require('../utils/uid-gen');
 var logMgr = require('../utils/serverLogger')('handleNewNodeRequest.js', true);
 var responder = require('../responder');
@@ -149,6 +150,8 @@ module.exports = function(req, res, connection, session_uid, userRow) {
   // INPUT VALIDATION
   //
 
+  logMgr.debug('Input was validated.');
+
   // ensure user did not author the current node, that current node exists, and that it is not status deleted
   var query = 'SELECT status, author_uid, parent_uid FROM nodes WHERE uid=?;';
   connection.query(query, [user_position], function(err, rows) {
@@ -208,6 +211,7 @@ module.exports = function(req, res, connection, session_uid, userRow) {
             'WHERE positions.user_uid=?;' +
           'UPDATE positions SET node_uid=? WHERE user_uid=?; ' +
         'COMMIT;';
+      logMgr.debug('GOT HEREE!!!!');
       var newNodeUid = generateGuid();
       connection.query(query, [newNodeUid, inputPath, inputBody, 0, constants.nodeStatusVisible, user_uid, newNodeUid, user_uid], function(err, rows) {
         if(err) {
@@ -216,9 +220,23 @@ module.exports = function(req, res, connection, session_uid, userRow) {
           return;
         }
 
-        responder.respond(res, session_uid);
-        connection.release();
-        return;
+        // now delete any residual draft info
+        query = 'DELETE FROM drafts WHERE author_uid=? AND parent_uid=?;';
+        connection.query(query, [user_uid, user_position], function(err, rows) {
+          if(err) {
+            logMgr.error('Database error prevented residual draft data deletion at node: ' + user_position);
+          }
+
+          if(rows.changedRows > 0) {
+            logMgr.out('Deleted residual draft data.');
+          }
+          else {
+            logMgr.out('No residual draft data to delete.');
+          }
+
+          responder.respond(res, session_uid);
+          connection.release();
+        });
       });
     });
   });
