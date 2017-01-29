@@ -104,6 +104,8 @@ function respond(res, session_uid, msg) {
         'nodes.parent_uid as parentUid, ' +
         'nodes.author_uid as authorUid, ' +
         'nodes.status as status, ' +
+        'drafts.path_snippet as draftPath, ' +
+        'drafts.node_snippet as draftBody, ' +
         'votes.sentiment as sentiment, ' +
         'authors.name as authorName, ' +
         'authors.acct_type as authorAcctType ' +
@@ -112,6 +114,8 @@ function respond(res, session_uid, msg) {
           'ON users.uid=positions.user_uid ' +
         'LEFT JOIN nodes ' +
           'ON positions.node_uid=nodes.uid ' +
+        'LEFT JOIN drafts ' +
+          'ON positions.node_uid=drafts.parent_uid AND positions.user_uid=drafts.author_uid ' +
         'LEFT JOIN votes ' +
           'ON nodes.uid=votes.node_uid AND users.uid=votes.user_uid ' +
         'LEFT JOIN users as authors ' +
@@ -189,6 +193,8 @@ function respond(res, session_uid, msg) {
       response.parentUid = row.parentUid;
       response.snippet.nodeSnippet = row.nodeSnippet;
       response.snippet.lastPath = row.pathSnippet;
+      response.draftPath = row.draftPath;
+      response.draftBody = row.draftBody;
       switch(row.authorAcctType) {
         case null:
           response.snippet.authorName = constants.displayNameUnknown;

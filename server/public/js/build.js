@@ -22528,6 +22528,13 @@
 	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
+	  if (!response.hasOwnProperty('draftPath') || !response.hasOwnProperty('draftBody')) {
+	    // saved draft information missing, set error state and display error content
+	    var errorMessage = 'Information on draft presence and content was missing in response from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
 	  if (!response.hasOwnProperty('inputBlocking')) {
 	    // no verification of current node's authorship, set error state and display error content
 	    var errorMessage = 'Could not retrieve input permissions from server.';
@@ -22550,6 +22557,8 @@
 	    acctType: response.acctType,
 	    votification: response.votification,
 	    snippet: response.snippet,
+	    draftPath: response.draftPath,
+	    draftBody: response.draftBody,
 	    paths: response.paths,
 	    inputBlocking: response.inputBlocking,
 	    editMode: false, // always reset this to false when taking in response from server
