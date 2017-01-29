@@ -480,7 +480,7 @@ function submitInputXhr(path, body) {
       windowScroll: savedWindowPosition
     });
   }
-  var xhrPayload = JSON.stringify({newNodePath: path, newNodeBody: body});
+  var xhrPayload = JSON.stringify({newNodePath: path, newNodeBody: body, appendToUid: this.state.nodeUid});
   xhr.send(xhrPayload);
 }
 

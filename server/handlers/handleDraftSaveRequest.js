@@ -1,3 +1,4 @@
+var constants = require('../constants');
 var logMgr = require('../utils/serverLogger')('handleDraftSaveRequest.js', true);
 var responder = require('../responder');
 

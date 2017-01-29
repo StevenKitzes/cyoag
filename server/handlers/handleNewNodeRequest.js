@@ -8,19 +8,23 @@ var navigate = require('./handleNavRequest');
 module.exports = function(req, res, connection, session_uid, userRow) {
   var inputPath = req.body.newNodePath;
   var inputBody = req.body.newNodeBody;
+  var appendToUid = req.body.appendToUid;
   var user_uid = userRow['uid'];
   var user_position = userRow['node_uid'];
 
   logMgr.out('User ' + user_uid + ' requested to create a new node from position ' + user_position + ' with inputPath "' +
     inputPath + '..." and inputBody "' + inputBody.split(0, 50) + '..."');
 
+  // if existing user position could not be determined at all
   if(!user_position) {
-    responder.respondError(res, 'Unable to establish link between existing chapter and new chapter.');
+    responder.respondError(res, 'Unable to establish link between existing chapter and new chapter.  If you are ' +
+      'reading this, the CYOAG dev team forgot to ensure you were on a safe node before letting you try to post!');
     connection.release();
     return;
   }
 
-  if(!inputPath || !inputBody) {
+  // if input arguments are missing
+  if(!inputPath || !inputBody || !appendToUid) {
     responder.respondError(res, 'Crucial data was missing from the chapter authoring request.');
     connection.release();
     return;
@@ -154,7 +158,7 @@ module.exports = function(req, res, connection, session_uid, userRow) {
 
   // ensure user did not author the current node, that current node exists, and that it is not status deleted
   var query = 'SELECT status, author_uid, parent_uid FROM nodes WHERE uid=?;';
-  connection.query(query, [user_position], function(err, rows) {
+  connection.query(query, [appendToUid], function(err, rows) {
     if(err) {
       responder.respondError(res, 'Database error validating user permission to post new content at this position.');
       connection.release();
@@ -185,8 +189,8 @@ module.exports = function(req, res, connection, session_uid, userRow) {
     }
 
     // also ensure user did not already author any nodes following this node
-    query = 'SELECT author_uid FROM nodes WHERE parent_uid=?;';
-    connection.query(query, [user_position], function(err, rows) {
+    query = 'SELECT author_uid FROM nodes WHERE parent_uid=? AND status=?;';
+    connection.query(query, [appendToUid, constants.nodeStatusVisible], function(err, rows) {
       if(err) {
         responder.respondError(res, 'Database error validating user permission to post new content at this position.');
         connection.release();
@@ -206,14 +210,22 @@ module.exports = function(req, res, connection, session_uid, userRow) {
       query =
         'START TRANSACTION; ' +
           'INSERT INTO nodes (uid, parent_uid, author_uid, path_snippet, node_snippet, votification, status) ' +
-          'SELECT ?, positions.node_uid, positions.user_uid, ?, ?, ?, ? ' +
-            'FROM positions ' +
-            'WHERE positions.user_uid=?;' +
+          'SELECT ?, uid, ?, ?, ?, ?, ? ' +
+            'FROM nodes ' +
+            'WHERE nodes.uid=? AND nodes.status=?;' +
           'UPDATE positions SET node_uid=? WHERE user_uid=?; ' +
         'COMMIT;';
       logMgr.debug('GOT HEREE!!!!');
       var newNodeUid = generateGuid();
-      connection.query(query, [newNodeUid, inputPath, inputBody, 0, constants.nodeStatusVisible, user_uid, newNodeUid, user_uid], function(err, rows) {
+      connection.query(
+        query,
+        [
+          newNodeUid, user_uid, inputPath, inputBody, 0, constants.nodeStatusVisible,
+          appendToUid, constants.nodeStatusVisible,
+          newNodeUid, user_uid
+        ],
+        function(err, rows)
+      {
         if(err) {
           responder.respondError(res, 'Database error saving new chapter information.');
           connection.release();
