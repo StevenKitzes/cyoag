@@ -88,24 +88,60 @@ var Input = React.createClass({
     }
 
   },
+  componentWillReceiveProps: function(nextProps) {
+    var draftPath = nextProps.context.state.draftPath ? nextProps.context.state.draftPath : '';
+    var draftBody = nextProps.context.state.draftBody ? nextProps.context.state.draftBody : '';
+    this.setState({
+      draftPath: draftPath,
+      draftBody: draftBody,
+      pathCharCount: draftPath.length,
+      bodyCharCount: draftBody.length
+    });
+  },
   getInitialState: function() {
+    var draftPath = this.props.context.state.draftPath ? this.props.context.state.draftPath : '';
+    var draftBody = this.props.context.state.draftBody ? this.props.context.state.draftBody : '';
     return {
-      pathCharCount: 0,
-      bodyCharCount: 0
+      draftPath: draftPath,
+      draftBody: draftBody,
+      pathCharCount: draftPath.length,
+      bodyCharCount: draftBody.length
     };
   },
+  handleDraftPathChange: function(event) {
+    this.setState({
+      draftPath: event.target.value,
+      pathCharCount: event.target.value.length
+    });
+  },
+  handleDraftBodyChange: function(event) {
+    this.setState({
+      draftBody: event.target.value,
+      bodyCharCount: event.target.value.length
+    });
+  },
   render: function() {
+    var inputHeader = (this.state.draftPath || this.state.draftBody) ?
+      <strong>Your previously saved draft was loaded.</strong>:
+      <em>Want to add your own content following this chapter?</em>;
+
     return (
       <div id='cyoag-input-container'>
-        <p id='cyoag-input-cta'><em>Want to add your own content following this chapter?</em></p>
+        <p id='cyoag-input-cta'>{inputHeader}</p>
         <div id='cyoag-input-path-container'>
           Enter the path teaser for your new chapter:<br />
-          <textarea id='cyoag-input-path' type='text' onKeyUp={this.updatePathCharCount} placeholder='Path snippet - minimum 4 characters, maximum 100 characters.'></textarea>
+          <textarea id='cyoag-input-path' type='text'
+            placeholder='Path snippet - minimum 4 characters, maximum 100 characters.'
+            value={this.state.draftPath} onChange={this.handleDraftPathChange} >
+          </textarea>
           <div id='cyoag-path-char-hint'><PathHint count={this.state.pathCharCount} /></div>
         </div>
         <div id='cyoag-input-body-container'>
           Enter the body of your new chapter:<br />
-          <textarea id='cyoag-input-body' type='text' onKeyUp={this.updateBodyCharCount} placeholder='Chapter content - minimum 500 characters, maximum 2,500 characters.'></textarea>
+          <textarea id='cyoag-input-body' type='text'
+            placeholder='Chapter content - minimum 500 characters, maximum 2,500 characters.'
+            value={this.state.draftBody} onChange={this.handleDraftBodyChange} >
+          </textarea>
           <div id='cyoag-input-body-hints-container'>
             <div id='cyoag-body-char-hint'><BodyHint count={this.state.bodyCharCount} /></div><div className='cyoag-resize-input-hint cyoag-note'>Drag to resize! ^</div>
           </div>
@@ -146,16 +182,6 @@ var Input = React.createClass({
       window.onbeforeunload = null;
       this.props.context.submitInputXhr(inputPath, inputBody);
     }
-  },
-  updateBodyCharCount: function() {
-    this.setState({
-      bodyCharCount: document.getElementById('cyoag-input-body').value.length
-    });
-  },
-  updatePathCharCount: function() {
-    this.setState({
-      pathCharCount: document.getElementById('cyoag-input-path').value.length
-    });
   }
 });
 

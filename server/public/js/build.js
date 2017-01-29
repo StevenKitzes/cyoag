@@ -23871,31 +23871,65 @@
 	        logMgr.debug('. . . then added them back on.');
 	      }
 	  },
+	  componentWillReceiveProps: function (nextProps) {
+	    var draftPath = nextProps.context.state.draftPath ? nextProps.context.state.draftPath : '';
+	    var draftBody = nextProps.context.state.draftBody ? nextProps.context.state.draftBody : '';
+	    this.setState({
+	      draftPath: draftPath,
+	      draftBody: draftBody,
+	      pathCharCount: draftPath.length,
+	      bodyCharCount: draftBody.length
+	    });
+	  },
 	  getInitialState: function () {
+	    var draftPath = this.props.context.state.draftPath ? this.props.context.state.draftPath : '';
+	    var draftBody = this.props.context.state.draftBody ? this.props.context.state.draftBody : '';
 	    return {
-	      pathCharCount: 0,
-	      bodyCharCount: 0
+	      draftPath: draftPath,
+	      draftBody: draftBody,
+	      pathCharCount: draftPath.length,
+	      bodyCharCount: draftBody.length
 	    };
 	  },
+	  handleDraftPathChange: function (event) {
+	    this.setState({
+	      draftPath: event.target.value,
+	      pathCharCount: event.target.value.length
+	    });
+	  },
+	  handleDraftBodyChange: function (event) {
+	    this.setState({
+	      draftBody: event.target.value,
+	      bodyCharCount: event.target.value.length
+	    });
+	  },
 	  render: function () {
+	    var inputHeader = this.state.draftPath || this.state.draftBody ? React.createElement(
+	      'strong',
+	      null,
+	      'Your previously saved draft was loaded.'
+	    ) : React.createElement(
+	      'em',
+	      null,
+	      'Want to add your own content following this chapter?'
+	    );
+	
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-input-container' },
 	      React.createElement(
 	        'p',
 	        { id: 'cyoag-input-cta' },
-	        React.createElement(
-	          'em',
-	          null,
-	          'Want to add your own content following this chapter?'
-	        )
+	        inputHeader
 	      ),
 	      React.createElement(
 	        'div',
 	        { id: 'cyoag-input-path-container' },
 	        'Enter the path teaser for your new chapter:',
 	        React.createElement('br', null),
-	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text', onKeyUp: this.updatePathCharCount, placeholder: 'Path snippet - minimum 4 characters, maximum 100 characters.' }),
+	        React.createElement('textarea', { id: 'cyoag-input-path', type: 'text',
+	          placeholder: 'Path snippet - minimum 4 characters, maximum 100 characters.',
+	          value: this.state.draftPath, onChange: this.handleDraftPathChange }),
 	        React.createElement(
 	          'div',
 	          { id: 'cyoag-path-char-hint' },
@@ -23907,7 +23941,9 @@
 	        { id: 'cyoag-input-body-container' },
 	        'Enter the body of your new chapter:',
 	        React.createElement('br', null),
-	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text', onKeyUp: this.updateBodyCharCount, placeholder: 'Chapter content - minimum 500 characters, maximum 2,500 characters.' }),
+	        React.createElement('textarea', { id: 'cyoag-input-body', type: 'text',
+	          placeholder: 'Chapter content - minimum 500 characters, maximum 2,500 characters.',
+	          value: this.state.draftBody, onChange: this.handleDraftBodyChange }),
 	        React.createElement(
 	          'div',
 	          { id: 'cyoag-input-body-hints-container' },
@@ -23966,16 +24002,6 @@
 	      window.onbeforeunload = null;
 	      this.props.context.submitInputXhr(inputPath, inputBody);
 	    }
-	  },
-	  updateBodyCharCount: function () {
-	    this.setState({
-	      bodyCharCount: document.getElementById('cyoag-input-body').value.length
-	    });
-	  },
-	  updatePathCharCount: function () {
-	    this.setState({
-	      pathCharCount: document.getElementById('cyoag-input-path').value.length
-	    });
 	  }
 	});
 	
