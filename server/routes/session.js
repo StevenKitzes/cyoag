@@ -16,7 +16,7 @@ app.use(cookieParser());
 router.post('/', function(req, res, next) {
   logMgr.out('+ + + + + + [ New User Interaction Begins ] + + + + + +');
   if(req.body) {
-    logMgr.verbose('> > > > > req.body: ' + JSON.stringify(req.body));
+    logMgr.out('> > > > > req.body: ' + JSON.stringify(req.body));
   }
   else {
     logMgr.verbose('> > > > > no req body');
