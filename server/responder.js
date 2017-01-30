@@ -376,7 +376,7 @@ function visitorResponse(res, node_uid, msg) {
 
       // if no data was found with these requirements, this is an error here
       if(rows.length < 1) {
-        respondError(res, 'No chapter information found for this chapter!');
+        respondError(res, 'No chapter information found for this chapter (' + node_uid + ')!');
         connection.release();
         return;
       }
