@@ -46,13 +46,11 @@ router.post('/', function(req, res, next) {
     logMgr.out('Position cookie found.  Visitor detected.');
     // if request body includes navigation details, visitor is requesting to navigate
     if(req.body.hasOwnProperty('navigateTarget')) {
-      logMgr.out('Visitor requested navigation.');
-      if(config.DEBUG) {
-        var destination = req.body.navigateTarget;
-        if(config.DEBUG && destination == constants.defaultParentUid) {
-          responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
-          return;
-        }
+      var destination = req.body.navigateTarget;
+
+      if(config.DEBUG && destination == constants.defaultParentUid) {
+        responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
+        return;
       }
 
       logMgr.out('Calling visitorResponse with destination: ' + destination);
