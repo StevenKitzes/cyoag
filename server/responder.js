@@ -324,7 +324,7 @@ function respond(res, session_uid, msg) {
 }
 
 function visitorResponse(res, node_uid, msg) {
-  logMgr.verbose('Beginning visitor response . . .');
+  logMgr.verbose('Beginning visitor response targeting node ' + node_uid + ' . . .');
   var response = {};
   response.snippet = {};
   response.inputBlocking = {};

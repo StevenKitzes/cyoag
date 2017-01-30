@@ -16,7 +16,7 @@ app.use(cookieParser());
 router.post('/', function(req, res, next) {
   logMgr.out('+ + + + + + [ New User Interaction Begins ] + + + + + +');
   if(req.body) {
-    logMgr.out('> > > > > req.body: ' + JSON.stringify(req.body));
+    logMgr.verbose('> > > > > req.body: ' + JSON.stringify(req.body));
   }
   else {
     logMgr.verbose('> > > > > no req body');
@@ -49,12 +49,13 @@ router.post('/', function(req, res, next) {
       logMgr.out('Visitor requested navigation.');
       if(config.DEBUG) {
         var destination = req.body.navigateTarget;
-        if(destination == constants.defaultParentUid) {
+        if(config.DEBUG && destination == constants.defaultParentUid) {
           responder.respondMsgOnly(res, {msg: "You are already at the first chapter."});
           return;
         }
       }
 
+      logMgr.out('Calling visitorResponse with destination: ' + destination);
       responder.visitorResponse(res, destination);
       return;
     }
