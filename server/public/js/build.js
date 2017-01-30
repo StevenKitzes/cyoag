@@ -22514,6 +22514,13 @@
 	    properThis.setState(getErrorStateObject(errorMessage));
 	    return;
 	  }
+	  if (!response.hasOwnProperty('drafts')) {
+	    // no drafts given, set error state and display error content
+	    var errorMessage = 'Could not retrieve information on pending drafts from server.';
+	    logMgr.out(errorMessage);
+	    properThis.setState(getErrorStateObject(errorMessage));
+	    return;
+	  }
 	  if (!response.hasOwnProperty('snippet')) {
 	    // no snippet to display, set error state and display error content
 	    var errorMessage = 'Could not retrieve snippet data from server.';
@@ -22560,6 +22567,7 @@
 	    draftPath: response.draftPath,
 	    draftBody: response.draftBody,
 	    paths: response.paths,
+	    drafts: response.drafts,
 	    inputBlocking: response.inputBlocking,
 	    editMode: false, // always reset this to false when taking in response from server
 	    msg: response.msg ? response.msg : null,
@@ -24371,7 +24379,8 @@
 	    return React.createElement(
 	      'div',
 	      { id: 'cyoag-margin-column' },
-	      loginComponent
+	      loginComponent,
+	      React.createElement(Drafts, { context: context })
 	    );
 	  }
 	});
@@ -24540,6 +24549,58 @@
 	      return false;
 	    }
 	    return true;
+	  }
+	});
+	
+	var Drafts = React.createClass({
+	  displayName: 'Drafts',
+	
+	  navigate: function (navElementUid) {
+	    var destinationUid = navElementUid.substring(5);
+	    this.props.context.navigateXhr(destinationUid);
+	  },
+	  render: function () {
+	    var state = this.props.context.state;
+	
+	    // if not a registered user of any kind, don't show any kind of draft data
+	    if (state.acctType != constants.acctTypeRegistered && state.acctType != constants.acctTypeModerator) {
+	      return React.createElement('div', { id: 'cyoag-drafts-container', className: 'cyoag-hidden' });
+	    } else {
+	      var draftsTitle = state.drafts.length > 0 ? 'These are your saved drafts. Click one to resume editing.' : 'You do not have any saved drafts yet.';
+	      var properThis = this;
+	
+	      return React.createElement(
+	        'div',
+	        { id: 'cyoag-drafts-container' },
+	        React.createElement(
+	          'h4',
+	          null,
+	          draftsTitle
+	        ),
+	        state.drafts.map(function (draft) {
+	          var draftParentUid = 'node-' + draft.parentUid;
+	          return React.createElement(
+	            'a',
+	            { id: draftParentUid, key: draftParentUid, className: 'cyoag-draft-link cyoag-link', onMouseMove: properThis.locateTooltip.bind(null, draftParentUid) },
+	            React.createElement(
+	              'div',
+	              { className: 'cyoag-draft-item', onClick: properThis.navigate.bind(null, draftParentUid) },
+	              draft.pathSnippet ? draft.pathSnippet : '[no path teaser for this draft]'
+	            ),
+	            React.createElement(
+	              'div',
+	              { className: 'cyoag-tooltip-draft' },
+	              'Resume editing . . .'
+	            )
+	          );
+	        })
+	      );
+	    }
+	  },
+	  locateTooltip: function (hoverTargetId, mouseEvent) {
+	    var tooltip = document.querySelector('#' + hoverTargetId + ' .cyoag-tooltip-draft');
+	    tooltip.style.top = mouseEvent.clientY + pageYOffset + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+	    tooltip.style.left = mouseEvent.clientX + pageXOffset + 'px';
 	  }
 	});
 	

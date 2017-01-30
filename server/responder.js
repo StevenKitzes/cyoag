@@ -255,49 +255,69 @@ function respond(res, session_uid, msg) {
           }
         }
 
-        // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
-        logMgr.out('Getting trailing node info for trailing snippet . . .');
-        if(response.nodeUid == constants.rootNodeUid) {
-          // root node gets special one-off trailing node snippet and trailing path snippet
-          logMgr.debug('Using trailing snippet for root node.');
-          response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
-          res.clearCookie(constants.cookieNode);
-          res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
-          res.send(JSON.stringify(response));
-          connection.release();
-          return;
-        }
-        // if we have to do a final db call to get trailing node
-        else {
-          logMgr.debug('Querying DB for trailing snippet of previous node.');
-          var query = 'SELECT node_snippet as trailingSnippet FROM nodes WHERE uid=?;';
-          connection.query(query, [response.parentUid], function(error, rows) {
-            if(error) {
-              respondError(res, 'Database error trying to retrieve information about previous chapter.');
-              logMgr.error(error);
-              connection.release();
-              return;
-            }
+        // adding draft data to response
+        query = 'SELECT path_snippet, parent_uid FROM drafts WHERE author_uid=?;';
+        connection.query(query, [row.userUid], function(err, rows) {
+          if(err) {
+            responder.respondError(res, 'Database error attempting to retrieve saved draft data.');
+            logMgr.error(err);
+            connection.release();
+            return;
+          }
 
-            if(rows.length != 1) {
-              respondError(res, 'Found multiple parent chapters.  Note, this is impossible.  CYOAG dev is fired.');
-              connection.release();
-              return;
-            }
+          response.drafts = [];
+          for(var i = 0; i < rows.length; i++) {
+            var draft = {
+              parentUid: rows[i].parent_uid,
+              pathSnippet: rows[i].path_snippet
+            };
+            response.drafts.push(draft);
+          }
 
-            logMgr.debug('No DB errors detected . . . ');
-
-            var parent = rows[0];
-            var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
-            response.snippet.trailingSnippet = trailingSnippet;
-
+          // finally, let's get trailing node's info, if valid/needed (root node has no trailing node)
+          logMgr.out('Getting trailing node info for trailing snippet . . .');
+          if(response.nodeUid == constants.rootNodeUid) {
+            // root node gets special one-off trailing node snippet and trailing path snippet
+            logMgr.debug('Using trailing snippet for root node.');
+            response.snippet.trailingSnippet = getTrailingFromSnippet(constants.rootTrailingSnippet);
             res.clearCookie(constants.cookieNode);
             res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
             res.send(JSON.stringify(response));
             connection.release();
             return;
-          });
-        }
+          }
+          // if we have to do a final db call to get trailing node
+          else {
+            logMgr.debug('Querying DB for trailing snippet of previous node.');
+            query = 'SELECT node_snippet as trailingSnippet FROM nodes WHERE uid=?;';
+            connection.query(query, [response.parentUid], function(error, rows) {
+              if(error) {
+                respondError(res, 'Database error trying to retrieve information about previous chapter.');
+                logMgr.error(error);
+                connection.release();
+                return;
+              }
+
+              if(rows.length != 1) {
+                respondError(res, 'Found multiple parent chapters.  Note, this is impossible.  CYOAG dev is fired.');
+                connection.release();
+                return;
+              }
+
+              logMgr.debug('No DB errors detected . . . ');
+
+              var parent = rows[0];
+              var trailingSnippet = getTrailingFromSnippet(parent.trailingSnippet);
+              response.snippet.trailingSnippet = trailingSnippet;
+
+              res.clearCookie(constants.cookieNode);
+              res.cookie(constants.cookieSession, session_uid, constants.cookieExpiry);
+              res.send(JSON.stringify(response));
+              connection.release();
+              return;
+            });
+          }
+        });
       });
     });
   });
@@ -374,6 +394,9 @@ function visitorResponse(res, node_uid, msg) {
       response.parentUid = row.parent_uid;
       response.snippet.nodeSnippet = row.node_snippet;
       response.snippet.lastPath = row.path_snippet;
+      response.draftPath = null;
+      response.draftBody = null;
+      response.drafts = [];
       switch(row.authorAcctType) {
         case null:
           response.snippet.authorName = constants.displayNameUnknown;

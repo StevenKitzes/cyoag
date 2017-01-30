@@ -45,7 +45,7 @@ router.post('/', function(req, res, next) {
   else if(req.cookies.node_uid) {
     logMgr.out('Position cookie found.  Visitor detected.');
     // if request body includes navigation details, visitor is requesting to navigate
-    if(req.body.hasOwnProperty('navigate')) {
+    if(req.body.hasOwnProperty('navigateTarget')) {
       logMgr.out('Visitor requested navigation.');
       if(config.DEBUG) {
         var destination = req.body.navigateTarget;

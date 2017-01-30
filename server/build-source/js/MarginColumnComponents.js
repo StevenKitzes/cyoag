@@ -19,12 +19,13 @@ var MarginColumn = React.createClass({
       loginComponent = <MarginLogout context={context} logoutRequest={context.logoutRequest} />;
     }
     else {
-      loginComponent = <MarginLogin context={context}/>;
+      loginComponent = <MarginLogin context={context} />;
     }
 
     return (
       <div id='cyoag-margin-column'>
         {loginComponent}
+        <Drafts context={context} />
       </div>
     );
   }
@@ -141,6 +142,49 @@ var NameChangeComponent = React.createClass({
       return false;
     }
     return true;
+  }
+});
+
+var Drafts = React.createClass({
+  navigate: function(navElementUid) {
+    var destinationUid = navElementUid.substring(5);
+    this.props.context.navigateXhr(destinationUid);
+  },
+  render: function() {
+    var state = this.props.context.state;
+
+    // if not a registered user of any kind, don't show any kind of draft data
+    if(state.acctType != constants.acctTypeRegistered && state.acctType != constants.acctTypeModerator) {
+      return (
+        <div id='cyoag-drafts-container' className='cyoag-hidden'></div>
+      );
+    }
+    else {
+      var draftsTitle = state.drafts.length > 0 ?
+        'These are your saved drafts. Click one to resume editing.' :
+        'You do not have any saved drafts yet.';
+      var properThis = this;
+
+      return (
+        <div id='cyoag-drafts-container'>
+          <h4>{draftsTitle}</h4>
+          {state.drafts.map(function(draft) {
+            var draftParentUid = 'node-' + draft.parentUid;
+            return (
+              <a id={draftParentUid} key={draftParentUid} className='cyoag-draft-link cyoag-link' onMouseMove={properThis.locateTooltip.bind(null, draftParentUid)}>
+                <div className='cyoag-draft-item' onClick={properThis.navigate.bind(null, draftParentUid)}>{draft.pathSnippet ? draft.pathSnippet : '[no path teaser for this draft]'}</div>
+                <div className='cyoag-tooltip-draft'>Resume editing . . .</div>
+              </a>
+            );
+          })}
+        </div>
+      );
+    }
+  },
+  locateTooltip: function(hoverTargetId, mouseEvent) {
+    var tooltip = document.querySelector('#' + hoverTargetId + ' .cyoag-tooltip-draft');
+    tooltip.style.top = (mouseEvent.clientY + pageYOffset) + 'px'; // note: pageYOffset ugly usage is GUESS WHAT due to IE being short-bus
+    tooltip.style.left = (mouseEvent.clientX + pageXOffset) + 'px';
   }
 });
 

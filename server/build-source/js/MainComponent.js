@@ -590,6 +590,13 @@ function validateResponse(properThis, response, newWindowPosition) {
     properThis.setState(getErrorStateObject(errorMessage));
     return;
   }
+  if(!response.hasOwnProperty('drafts')) {
+    // no drafts given, set error state and display error content
+    var errorMessage = 'Could not retrieve information on pending drafts from server.';
+    logMgr.out(errorMessage);
+    properThis.setState(getErrorStateObject(errorMessage));
+    return;
+  }
   if(!response.hasOwnProperty('snippet')) {
     // no snippet to display, set error state and display error content
     var errorMessage = 'Could not retrieve snippet data from server.';
@@ -644,6 +651,7 @@ function validateResponse(properThis, response, newWindowPosition) {
     draftPath: response.draftPath,
     draftBody: response.draftBody,
     paths: response.paths,
+    drafts: response.drafts,
     inputBlocking: response.inputBlocking,
     editMode: false,  // always reset this to false when taking in response from server
     msg: response.msg ? response.msg : null,
