@@ -531,6 +531,18 @@ button > .cyoag-button-tooltip {
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+.cyoag-gold-star {
+  float: left;
+  vertical-align: middle;
+  margin-top: 0.1em;
+  height: 1em;
+  width: 1em;
+}
+.cyoag-gold-star-spacer {
+  float: right;
+  height: 1em;
+  width: 1em;
+}
 .cyoag-tooltip-progress {
   color: white;
   font-weight: bold;

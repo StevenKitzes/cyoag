@@ -23732,32 +23732,53 @@
 	        'No paths yet lead from this chapter.'
 	      );
 	    } else {
-	      return React.createElement(
-	        'div',
-	        { id: 'cyoag-path-list' },
-	        React.createElement(
-	          'p',
-	          { className: 'italics sans-serif' },
-	          'What happens next . . . ?'
-	        ),
-	        paths.map(function (item) {
-	          var pathUid = 'node-' + item.pathUid;
-	          return React.createElement(
-	            'a',
-	            { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-link', onMouseMove: properThis.locateTooltip.bind(null, pathUid) },
-	            React.createElement(
-	              'div',
-	              { className: 'cyoag-path-item', onClick: properThis.navigate.bind(null, pathUid) },
-	              item.pathSnippet
-	            ),
-	            React.createElement(
-	              'div',
-	              { className: 'cyoag-tooltip-progress' },
-	              'Choose wisely . . .'
-	            )
-	          );
-	        })
-	      );
+	      // body howdy, here goes nothin'!
+	
+	      // copy array by value, then sort it
+	      var sortedPaths = paths.slice();
+	      sortedPaths.sort(function (a, b) {
+	        return b.pathVotification - a.pathVotification; // DESCENDING order!
+	      });
+	
+	      // determine winner(s)
+	      var highestRank = sortedPaths[0].pathVotification;
+	
+	      // gold star to be added to winner(s)
+	      var goldStarElement = React.createElement('img', { className: 'cyoag-gold-star', src: 'images/gold-star.png' });
+	      var goldStarSpacer = React.createElement('div', { className: 'cyoag-gold-star-spacer' });
+	
+	      // if there are 4 or fewer paths, this is easy, just display them in order
+	      // if(sortedPaths.length <= 4) {
+	      if (true) {
+	        return React.createElement(
+	          'div',
+	          { id: 'cyoag-path-list' },
+	          React.createElement(
+	            'p',
+	            { className: 'italics sans-serif' },
+	            'What happens next . . . ?'
+	          ),
+	          sortedPaths.map(function (item) {
+	            var pathUid = 'node-' + item.pathUid;
+	            return React.createElement(
+	              'a',
+	              { id: pathUid, key: pathUid, className: 'cyoag-path-item-link cyoag-link', onMouseMove: properThis.locateTooltip.bind(null, pathUid) },
+	              React.createElement(
+	                'div',
+	                { className: 'cyoag-path-item', onClick: properThis.navigate.bind(null, pathUid) },
+	                item.pathVotification == highestRank && highestRank > 0 ? goldStarElement : React.createElement('div', { className: 'cyoag-hidden' }),
+	                item.pathVotification == highestRank && highestRank > 0 ? goldStarSpacer : React.createElement('div', { className: 'cyoag-hidden' }),
+	                item.pathSnippet
+	              ),
+	              React.createElement(
+	                'div',
+	                { className: 'cyoag-tooltip-progress' },
+	                item.pathVotification == highestRank && highestRank > 0 ? 'Popular path!' : 'Choose wisely . . .'
+	              )
+	            );
+	          })
+	        );
+	      }
 	    }
 	  },
 	  locateTooltip: function (hoverTargetId, mouseEvent) {
