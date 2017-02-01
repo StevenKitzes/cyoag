@@ -69,7 +69,7 @@ var Paths = React.createClass({
                     {item.pathSnippet}
                   </div>
                   <div className='cyoag-tooltip-progress'>
-                    {showGoldStar ? 'Popular path!' : 'Choose wisely . . .'}
+                    {showGoldStar ? 'Popular path!' : 'Walk your own path . . .'}
                   </div>
                 </a>
               );
@@ -116,7 +116,7 @@ var Paths = React.createClass({
                       {item.pathSnippet}
                     </div>
                     <div className='cyoag-tooltip-progress'>
-                      {showGoldStar ? 'Popular path!' : 'Choose wisely . . .'}
+                      {showGoldStar ? 'Popular path!' : 'Walk your own path . . .'}
                     </div>
                   </a>
                 );
@@ -152,7 +152,7 @@ var Paths = React.createClass({
                       {item.pathSnippet}
                     </div>
                     <div className='cyoag-tooltip-progress'>
-                      {showGoldStar ? 'Popular path!' : 'Choose wisely . . .'}
+                      {showGoldStar ? 'Popular path!' : 'Walk your own path . . .'}
                     </div>
                   </a>
                 );
