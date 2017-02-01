@@ -531,8 +531,21 @@ button > .cyoag-button-tooltip {
   word-wrap: break-word;
   overflow-wrap: break-word;
 }
+.cyoag-expand-paths-item {
+  margin: 0.2em 0 0.2em 0;
+  background: #eee;
+  color: #666;
+  border-style: solid;
+  border-width: thin;
+  border-radius: 1em;
+  border-color: #666;
+  padding: 0.5em;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 .cyoag-gold-star {
   float: left;
+  margin-right: 0.5em;
   vertical-align: middle;
   margin-top: 0.1em;
   height: 1em;
@@ -540,8 +553,20 @@ button > .cyoag-button-tooltip {
 }
 .cyoag-gold-star-spacer {
   float: right;
+  margin-left: 0.5em;
   height: 1em;
   width: 1em;
+}
+.cyoag-gold-star-spacer-left {
+  float: left;
+  margin-right: 0.5em;
+  height: 1em;
+  width: 1em;
+}
+.cyoag-votification-display {
+  color: #aaa;
+  float: right;
+  margin-left: 0.5em;
 }
 .cyoag-tooltip-progress {
   color: white;
@@ -554,6 +579,8 @@ button > .cyoag-button-tooltip {
   border-color: #444444;
   margin-left: 0.5em;
   margin-top: 0.5em;
+  margin-right: 2em;
+  max-width: 30em;
   padding: 0.3em;
   position: absolute;
   z-index: 1000;
