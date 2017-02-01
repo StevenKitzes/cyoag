@@ -21956,8 +21956,8 @@
 	var HeaderComponents = __webpack_require__(/*! ./HeaderComponents */ 178);
 	var MessagingComponents = __webpack_require__(/*! ./MessagingComponents */ 179);
 	var MainColumnComponents = __webpack_require__(/*! ./MainColumnComponents */ 180);
-	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 187);
-	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 188);
+	var MarginColumnComponents = __webpack_require__(/*! ./MarginColumnComponents */ 188);
+	var FooterComponents = __webpack_require__(/*! ./FooterComponents */ 189);
 	
 	// Hello World component: display a simple prop
 	var MainComponent = React.createClass({
@@ -23188,7 +23188,7 @@
 	var NodeComponents = __webpack_require__(/*! ./NodeComponents */ 181);
 	var VotificationComponents = __webpack_require__(/*! ./VotificationComponents */ 183);
 	var PathComponents = __webpack_require__(/*! ./PathComponents */ 185);
-	var InputComponents = __webpack_require__(/*! ./InputComponents */ 186);
+	var InputComponents = __webpack_require__(/*! ./InputComponents */ 187);
 	
 	var exports = {};
 	
@@ -23708,7 +23708,7 @@
 	var constants = __webpack_require__(/*! ../../constants */ 174);
 	var logMgr = __webpack_require__(/*! ../../utils/browserLogger */ 176)('PathComponents.js');
 	
-	var randomizeArray = __webpack_require__(/*! ../../utils/randomizeArray */ 189);
+	var randomizeArray = __webpack_require__(/*! ../../utils/randomizeArray */ 186);
 	
 	var exports = {};
 	
@@ -23927,6 +23927,26 @@
 
 /***/ },
 /* 186 */
+/*!*********************************!*\
+  !*** ./utils/randomizeArray.js ***!
+  \*********************************/
+/***/ function(module, exports) {
+
+	// shuffle array in place; stolen from user Laurens Holst at
+	// http://stackoverflow.com/a/12646864/983173
+	module.exports = function(array) {
+	    for (var i = array.length - 1; i > 0; i--) {
+	        var j = Math.floor(Math.random() * (i + 1));
+	        var temp = array[i];
+	        array[i] = array[j];
+	        array[j] = temp;
+	    }
+	    return array;
+	}
+
+
+/***/ },
+/* 187 */
 /*!********************************************!*\
   !*** ./build-source/js/InputComponents.js ***!
   \********************************************/
@@ -24499,7 +24519,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 187 */
+/* 188 */
 /*!***************************************************!*\
   !*** ./build-source/js/MarginColumnComponents.js ***!
   \***************************************************/
@@ -24763,7 +24783,7 @@
 	module.exports = exports;
 
 /***/ },
-/* 188 */
+/* 189 */
 /*!*********************************************!*\
   !*** ./build-source/js/FooterComponents.js ***!
   \*********************************************/
@@ -24824,26 +24844,6 @@
 	exports.Footer = Footer;
 	
 	module.exports = exports;
-
-/***/ },
-/* 189 */
-/*!*********************************!*\
-  !*** ./utils/randomizeArray.js ***!
-  \*********************************/
-/***/ function(module, exports) {
-
-	// shuffle array in place; stolen from user Laurens Holst at
-	// http://stackoverflow.com/a/12646864/983173
-	module.exports = function(array) {
-	    for (var i = array.length - 1; i > 0; i--) {
-	        var j = Math.floor(Math.random() * (i + 1));
-	        var temp = array[i];
-	        array[i] = array[j];
-	        array[j] = temp;
-	    }
-	    return array;
-	}
-
 
 /***/ }
 /******/ ]);
