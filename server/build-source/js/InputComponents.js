@@ -148,6 +148,7 @@ var Input = React.createClass({
         </div>
         <button id='cyoag-save-draft-submit' className='shaded-border-blue' onClick={this.saveDraft}>Save Draft</button>
         <button id='cyoag-input-submit' className='shaded-border-green' onClick={this.submit}>Submit</button>
+        <InputValidationModal onClick={hideInputValidationModal} />
       </div>
     );
   },
@@ -165,7 +166,7 @@ var Input = React.createClass({
     }
 
     if(warningMsg) {
-      this.props.context.message({warning: warningMsg + '(These rules apply to drafts as well as new chapters.)'});
+      revealInputValidationModal(warningMsg + '(These rules apply to drafts as well as new chapters.)');
       return;
     }
 
@@ -177,7 +178,7 @@ var Input = React.createClass({
     var inputPath = document.getElementById('cyoag-input-path').value;
     var inputBody = document.getElementById('cyoag-input-body').value;
 
-    if(validateInput(inputPath, inputBody, this.props.context.message)) {
+    if(validateInput(inputPath, inputBody)) {
       this.props.context.setEditsPending(false);
       window.onbeforeunload = null;
       this.props.context.submitInputXhr(inputPath, inputBody);
@@ -263,6 +264,7 @@ var Edit = React.createClass({
         </div>
         <button id='cyoag-input-cancel' className='cyoag-side-spaced-button shaded-border-red' onClick={this.cancel}>Cancel</button>
         <button id='cyoag-input-submit' className='cyoag-side-spaced-button shaded-border-green' onClick={this.submit}>Save changes</button>
+        <InputValidationModal onClick={hideInputValidationModal} />
       </div>
     );
   },
@@ -270,7 +272,7 @@ var Edit = React.createClass({
     var inputPath = document.getElementById('cyoag-input-path').value;
     var inputBody = document.getElementById('cyoag-input-body').value;
 
-    if(validateInput(inputPath, inputBody, this.props.context.message)) {
+    if(validateInput(inputPath, inputBody)) {
       // once validated, submit edits, set editsPending false (no longer pending, but rather submitted) and onbeforeunload null
       this.props.context.setEditsPending(false);
       window.onbeforeunload = null;
@@ -333,7 +335,39 @@ var BodyHint = React.createClass({
   }
 });
 
-function validateInput(inputPath, inputBody, message) {
+var InputValidationModal = React.createClass({
+  componentDidMount: hideInputValidationModal,
+  render: function() {
+    logMgr.verbose('Rendering input validation modal...');
+
+    return(
+      <div onClick={hideInputValidationModal} id='cyoag-input-validation-modal-message-container' title='Click to dismiss.'>
+        <div id='cyoag-input-validation-modal-message-overlay'></div>
+        <div id='cyoag-input-validation-message-modal' className={constants.modalTypeWarning}>
+          <p className='cyoag-modal-message' id='cyoag-input-validation-message'></p>
+          <a className='cyoag-side-padded-link'><div className='cyoag-modal-message-button'>Click to Acknowledge</div></a>
+        </div>
+      </div>
+    );
+  }
+});
+
+function hideInputValidationModal() {
+  var modal = document.getElementById('cyoag-input-validation-modal-message-container');
+  if(modal) {
+    modal.style.display = 'none';
+  }
+}
+function revealInputValidationModal(content) {
+  var modal = document.getElementById('cyoag-input-validation-modal-message-container');
+  var message = document.getElementById('cyoag-input-validation-message');
+  if(modal && message) {
+    modal.style.display = 'block';
+    message.innerHTML = content;
+  }
+}
+
+function validateInput(inputPath, inputBody) {
   var warningMsg = '';
 
   var whiteSpaceRegex = /\S*[\s]{3,}\S*/g;
@@ -347,9 +381,9 @@ function validateInput(inputPath, inputBody, message) {
         problems += matches[i].replace(/\s/g, ' _ ') + '; ';
       }
     }
-    message({error: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
+    revealInputValidationModal('Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
       'white space characters are forbidden in path teasers.  Please correct any errors and try again!  ' +
-      problems});
+      problems);
     return false;
   }
 
@@ -362,9 +396,9 @@ function validateInput(inputPath, inputBody, message) {
         problems += matches[i].replace(/\s/g, ' _ ') + '; ';
       }
     }
-    message({error: 'Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
+    revealInputValidationModal('Groups of more than two consecutive spaces, tabs, hard returns, and other ' +
       'white space characters are forbidden in chapter body content.  Please correct any errors and try again!  ' +
-      problems});
+      problems);
     return false;
   }
 
@@ -373,21 +407,21 @@ function validateInput(inputPath, inputBody, message) {
 
   // check new path or body for starting white space
   if(startingWhiteSpaceRegex.test(inputPath)) {
-    message({error: 'Path teasers may not begin with white space.  Please try again!'});
+    revealInputValidationModal('Path teasers may not begin with white space.  Please try again!');
     return false;
   }
   else if(startingWhiteSpaceRegex.test(inputBody)) {
-    message({error: 'Chapter body content may not begin with white space.  Please try again!'});
+    revealInputValidationModal('Chapter body content may not begin with white space.  Please try again!');
     return false;
   }
 
   // check new path or body for ending white space
   if(endingWhiteSpaceRegex.test(inputPath)) {
-    message({error: 'Path teasers may not end with white space.  Please try again!'});
+    revealInputValidationModal('Path teasers may not end with white space.  Please try again!');
     return false;
   }
   else if(endingWhiteSpaceRegex.test(inputBody)) {
-    message({error: 'Chapter body content may not end with white space.  Please try again!'});
+    revealInputValidationModal('Chapter body content may not end with white space.  Please try again!');
     return false;
   }
 
@@ -402,8 +436,8 @@ function validateInput(inputPath, inputBody, message) {
         problems += matches[i].replace(/\s/g, ' _ ') + '; ';
       }
     }
-    message({error: 'Consecutive sets of 4 or more of the same character are forbidden in path teasers.  ' +
-      'Please correct any errors and try again!  ' + problems});
+    revealInputValidationModal('Consecutive sets of 4 or more of the same character are forbidden in path teasers.  ' +
+      'Please correct any errors and try again!  ' + problems);
     return false;
   }
 
@@ -416,8 +450,8 @@ function validateInput(inputPath, inputBody, message) {
         problems += matches[i].replace(/\s/g, ' _ ') + '; ';
       }
     }
-    message({error: 'Consecutive sets of 4 or more of the same character are forbidden in chapter body content.  ' +
-      'Please correct any errors and try again!  ' + problems});
+    revealInputValidationModal('Consecutive sets of 4 or more of the same character are forbidden in chapter body content.  ' +
+      'Please correct any errors and try again!  ' + problems);
     return false;
   }
 
@@ -438,7 +472,7 @@ function validateInput(inputPath, inputBody, message) {
   }
 
   if(warningMsg) {
-    message({warning: warningMsg});
+    revealInputValidationModal(warningMsg);
     return false;
   }
 
