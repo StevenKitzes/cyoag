@@ -32,13 +32,13 @@ router.post('/', function(req, res, next) {
   // If we don't see a session ID or a node ID in the cookie, a new visitor is here for the first time!
   if(!req.cookies.session_uid && !req.cookies.node_uid) {
     logMgr.debug('No cookies found.');
-    responder.visitorResponse(res, constants.rootNodeUid);
+    responder.visitorResponse(res, req.body.navigateTarget || constants.rootNodeUid);
     return;
   }
   // should not have both cookie types together
   else if(req.cookies.session_uid && req.cookies.node_uid) {
     logMgr.debug('Both cookies found!  Uh oh!');
-    responder.visitorResponse(res, constants.rootNodeUid, {warning: 'Detected traces of registered and unregistered accounts together. Resetting cookies... please try logging in again if you have a registered account.'});
+    responder.visitorResponse(res, req.body.navigateTarget || constants.rootNodeUid, {warning: 'Detected traces of registered and unregistered accounts together. Resetting cookies... please try logging in again if you have a registered account.'});
     return;
   }
   // presence of node_uid cookie indicates visitor
